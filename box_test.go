@@ -29,3 +29,25 @@ func Test_Box_MustBytes(t *testing.T) {
 	_, err := testBox.MustBytes("idontexist.txt")
 	r.Error(err)
 }
+
+func Test_Box_Walk_Physical(t *testing.T) {
+	r := require.New(t)
+	count := 0
+	err := testBox.Walk(func(path string, f File) error {
+		count++
+		return nil
+	})
+	r.NoError(err)
+	r.Equal(2, count)
+}
+
+func Test_Box_Walk_Virtual(t *testing.T) {
+	r := require.New(t)
+	count := 0
+	err := virtualBox.Walk(func(path string, f File) error {
+		count++
+		return nil
+	})
+	r.NoError(err)
+	r.Equal(3, count)
+}

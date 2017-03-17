@@ -8,6 +8,13 @@ import (
 )
 
 var testBox = NewBox("./fixtures")
+var virtualBox = NewBox("./virtual")
+
+func init() {
+	PackBytes(virtualBox.Path, "a", []byte("a"))
+	PackBytes(virtualBox.Path, "b", []byte("b"))
+	PackBytes(virtualBox.Path, "c", []byte("c"))
+}
 
 func Test_PackBytes(t *testing.T) {
 	r := require.New(t)
