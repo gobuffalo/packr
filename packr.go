@@ -2,18 +2,23 @@ package packr
 
 import (
 	"encoding/json"
-	"path/filepath"
 	"sync"
 )
 
 var gil = &sync.Mutex{}
-var data = map[string][]byte{}
+var data = map[string]map[string][]byte{}
+
+// var data = map[string][]byte{}
 
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {
 	gil.Lock()
 	defer gil.Unlock()
-	data[filepath.Join(box, name)] = bb
+	// data[filepath.Join(box, name)] = bb
+	if _, ok := data[box]; !ok {
+		data[box] = map[string][]byte{}
+	}
+	data[box][name] = bb
 }
 
 // PackJSONBytes packs JSON encoded bytes for a file into a box.

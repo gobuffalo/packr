@@ -59,12 +59,13 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 }
 
 func (b Box) find(name string) (File, error) {
-	p := filepath.Join(b.Path, name)
-	if bb, ok := data[p]; ok {
-		return newVirtualFile(name, bb), nil
+	if _, ok := data[b.Path]; ok {
+		if bb, ok := data[b.Path][name]; ok {
+			return newVirtualFile(name, bb), nil
+		}
 	}
 
-	p = filepath.Join(b.callingDir, b.Path, name)
+	p := filepath.Join(b.callingDir, b.Path, name)
 	f, err := os.Open(p)
 	if err != nil {
 		return nil, err
