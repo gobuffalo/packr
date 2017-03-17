@@ -1,7 +1,9 @@
 package packr
 
 import (
+	"bytes"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -46,10 +48,26 @@ func (b Box) Bytes(name string) []byte {
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
 func (b Box) MustBytes(name string) ([]byte, error) {
-	bb, err := find(b.Path, name)
+	f, err := b.find(name)
 	if err == nil {
-		return bb, err
+		bb := &bytes.Buffer{}
+		bb.ReadFrom(f)
+		return bb.Bytes(), err
 	}
 	p := filepath.Join(b.callingDir, b.Path, name)
 	return ioutil.ReadFile(p)
+}
+
+func (b Box) find(name string) (File, error) {
+	p := filepath.Join(b.Path, name)
+	if bb, ok := data[p]; ok {
+		return newVirtualFile(name, bb), nil
+	}
+
+	p = filepath.Join(b.callingDir, b.Path, name)
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+	return physicalFile{f}, nil
 }

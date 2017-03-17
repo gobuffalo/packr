@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"sync"
-
-	"github.com/pkg/errors"
 )
 
 var gil = &sync.Mutex{}
@@ -27,12 +25,4 @@ func PackJSONBytes(box string, name string, jbb string) error {
 	}
 	PackBytes(box, name, bb)
 	return nil
-}
-
-func find(box string, name string) ([]byte, error) {
-	p := filepath.Join(box, name)
-	if b, ok := data[p]; ok {
-		return b, nil
-	}
-	return []byte{}, errors.Errorf("%s not found", p)
 }
