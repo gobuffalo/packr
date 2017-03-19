@@ -3,6 +3,7 @@ package packr
 import (
 	"bytes"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -99,4 +100,9 @@ func (b Box) Walk(wf WalkFunc) error {
 		}
 	}
 	return nil
+}
+
+// Open returns a File using the http.File interface
+func (b Box) Open(name string) (http.File, error) {
+	return b.find(name)
 }

@@ -12,7 +12,7 @@ func Test_HTTPBox(t *testing.T) {
 	r := require.New(t)
 
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(testBox.HTTPBox()))
+	mux.Handle("/", http.FileServer(testBox))
 
 	req, err := http.NewRequest("GET", "/hello.txt", nil)
 	r.NoError(err)
