@@ -13,10 +13,14 @@ import (
 // retrieve files from either disk or the embedded
 // binary.
 func NewBox(path string) Box {
-	_, filename, _, _ := runtime.Caller(1)
+	var cd string
+	if !filepath.IsAbs(path) {
+		_, filename, _, _ := runtime.Caller(1)
+		cd = filepath.Dir(filename)
+	}
 	return Box{
 		Path:       path,
-		callingDir: filepath.Dir(filename),
+		callingDir: cd,
 	}
 }
 
