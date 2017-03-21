@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // NewBox returns a Box that can be used to
@@ -64,6 +65,7 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 }
 
 func (b Box) find(name string) (File, error) {
+	name = strings.TrimPrefix(name, string(os.PathSeparator))
 	if _, ok := data[b.Path]; ok {
 		if bb, ok := data[b.Path][name]; ok {
 			return newVirtualFile(name, bb), nil
