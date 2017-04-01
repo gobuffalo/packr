@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Clean up an *-packr.go files
@@ -19,7 +21,11 @@ func Clean(root string) {
 		}
 		if strings.Contains(base, "-packr.go") {
 			fmt.Printf("----> cleaning up %s\n", path)
-			os.Remove(path)
+			err := os.Remove(path)
+			if err != nil {
+				fmt.Println(err)
+				return errors.WithStack(err)
+			}
 		}
 		return nil
 	})

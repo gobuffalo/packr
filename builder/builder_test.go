@@ -15,7 +15,7 @@ import (
 func Test_Builder_Run(t *testing.T) {
 	r := require.New(t)
 
-	root := "../example"
+	root := filepath.Join("..", "example")
 	defer Clean(root)
 
 	exPackr := filepath.Join(root, "example-packr.go")
@@ -33,14 +33,14 @@ func Test_Builder_Run(t *testing.T) {
 
 	bb, err := ioutil.ReadFile(exPackr)
 	r.NoError(err)
-	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "/app.css", "\"Ym9keSB7CiAgYmFja2dyb3VuZDogcmVkOwp9Cg==\"")`)))
-	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "/app.js", "\"YWxlcnQoImhlbGxvISIpOwo=\"")`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "app.css", "\"Ym9keSB7CiAgYmFja2dyb3VuZDogcmVkOwp9Cg==\"")`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "app.js", "\"YWxlcnQoImhlbGxvISIpOwo=\"")`)))
 
 	bb, err = ioutil.ReadFile(fooPackr)
 	r.NoError(err)
-	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "/app.css", "\"Ym9keSB7CiAgYmFja2dyb3VuZDogcmVkOwp9Cg==\"")`)))
-	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "/app.js", "\"YWxlcnQoImhlbGxvISIpOwo=\"")`)))
-	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../templates", "/index.html", "\"PCFET0NUWVBFIGh0bWw+CjxodG1sPgogIDxoZWFkPgogICAgPG1ldGEgY2hhcnNldD0idXRmLTgiIC8+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoIiAvPgogICAgPHRpdGxlPklOREVYPC90aXRsZT4KICAgIGxpbmsKICA8L2hlYWQ+CiAgPGJvZHk+CiAgICBib2R5CiAgPC9ib2R5Pgo8L2h0bWw+Cg==\"")`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.css", "\"Ym9keSB7CiAgYmFja2dyb3VuZDogcmVkOwp9Cg==\"")`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.js", "\"YWxlcnQoImhlbGxvISIpOwo=\"")`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../templates", "index.html", "\"PCFET0NUWVBFIGh0bWw+CjxodG1sPgogIDxoZWFkPgogICAgPG1ldGEgY2hhcnNldD0idXRmLTgiIC8+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoIiAvPgogICAgPHRpdGxlPklOREVYPC90aXRsZT4KICAgIGxpbmsKICA8L2hlYWQ+CiAgPGJvZHk+CiAgICBib2R5CiAgPC9ib2R5Pgo8L2h0bWw+Cg==\"")`)))
 }
 
 func Test_Binary_Builds(t *testing.T) {
