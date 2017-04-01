@@ -1,8 +1,10 @@
 package packr
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -22,5 +24,9 @@ func Test_HTTPBox(t *testing.T) {
 	mux.ServeHTTP(res, req)
 
 	r.Equal(200, res.Code)
-	r.Equal("hello world!\n", res.Body.String())
+	testFile, err := ioutil.ReadFile(filepath.Join("fixtures", "hello.txt"))
+	if err != nil {
+		t.Error("Cannot read test file: ", err)
+	}
+	r.Equal(string(testFile), res.Body.String())
 }

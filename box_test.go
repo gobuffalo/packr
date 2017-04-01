@@ -1,6 +1,8 @@
 package packr
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,7 +11,12 @@ import (
 func Test_Box_String(t *testing.T) {
 	r := require.New(t)
 	s := testBox.String("hello.txt")
-	r.Equal("hello world!\n", s)
+	// Need to compare the file, that test works on different machines
+	testFile, err := ioutil.ReadFile(filepath.Join("fixtures", "hello.txt"))
+	if err != nil {
+		t.Error("Cannot read test file: ", err)
+	}
+	r.Equal(string(testFile), s)
 }
 
 func Test_Box_MustString(t *testing.T) {
@@ -21,7 +28,12 @@ func Test_Box_MustString(t *testing.T) {
 func Test_Box_Bytes(t *testing.T) {
 	r := require.New(t)
 	s := testBox.Bytes("hello.txt")
-	r.Equal([]byte("hello world!\n"), s)
+	// Need to compare the file, that test works on different machines
+	testFile, err := ioutil.ReadFile(filepath.Join("fixtures", "hello.txt"))
+	if err != nil {
+		t.Error("Cannot read test file: ", err)
+	}
+	r.Equal(testFile, s)
 }
 
 func Test_Box_MustBytes(t *testing.T) {
