@@ -49,6 +49,7 @@ func (b *Builder) dump() error {
 		name := filepath.Join(p.Dir, p.Name+"-packr.go")
 		fmt.Printf("--> packing %s\n", name)
 		f, err := os.Create(name)
+		defer f.Close()
 		if err != nil {
 			return errors.WithStack(err)
 		}
