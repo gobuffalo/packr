@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -46,8 +47,8 @@ func (b *Builder) Run() error {
 
 func (b *Builder) dump() error {
 	for _, p := range b.pkgs {
-		name := filepath.Join(p.Dir, p.Name+"-packr.go")
-		fmt.Printf("--> packing %s\n", name)
+		pName := strings.TrimRight(p.Name, "\r")
+		name := filepath.Join(p.Dir, fmt.Sprintf("%s-packr.go", pName))
 		f, err := os.Create(name)
 		if err != nil {
 			return errors.WithStack(err)

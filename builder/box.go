@@ -21,7 +21,7 @@ func (b *box) Walk(root string) error {
 			return nil
 		}
 		f := file{
-			Name: strings.Replace(path, root+"/", "", 1),
+			Name: filepath.ToSlash(strings.Replace(path, root+"/", "", 1)),
 		}
 
 		bb, err := ioutil.ReadFile(path)
