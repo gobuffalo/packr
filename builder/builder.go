@@ -13,7 +13,10 @@ import (
 )
 
 var boxPattern = regexp.MustCompile(`packr.NewBox\(["` + "`" + `](.+)["` + "`" + `]\)`)
-var packagePattern = regexp.MustCompile(`package\s+(.+)`)
+
+var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
+
+//var packagePattern = regexp.MustCompile(`package\s+([^\r]+)`)
 var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 
 // Builder scans folders/files looking for `packr.NewBox` and then compiling
@@ -49,6 +52,7 @@ func (b *Builder) dump() error {
 		name := filepath.Join(p.Dir, p.Name+"-packr.go")
 		fmt.Printf("--> packing %s\n", name)
 		f, err := os.Create(name)
+		defer f.Close()
 		if err != nil {
 			return errors.WithStack(err)
 		}

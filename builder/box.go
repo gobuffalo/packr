@@ -20,8 +20,10 @@ func (b *box) Walk(root string) error {
 		if info == nil || info.IsDir() {
 			return nil
 		}
+		name := strings.Replace(path, root+string(os.PathSeparator), "", 1)
+		name = strings.Replace(name, "\\", "/", -1)
 		f := file{
-			Name: strings.Replace(path, root+"/", "", 1),
+			Name: name,
 		}
 
 		bb, err := ioutil.ReadFile(path)
