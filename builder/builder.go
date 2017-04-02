@@ -13,7 +13,10 @@ import (
 )
 
 var boxPattern = regexp.MustCompile(`packr.NewBox\(["` + "`" + `](.+)["` + "`" + `]\)`)
-var packagePattern = regexp.MustCompile(`package\s+(.+)`)
+
+var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
+
+//var packagePattern = regexp.MustCompile(`package\s+([^\r]+)`)
 var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 
 // Builder scans folders/files looking for `packr.NewBox` and then compiling
