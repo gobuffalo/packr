@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -88,7 +89,7 @@ func (b *Builder) process(path string) error {
 		Boxes: []box{},
 	}
 	pname := packagePattern.FindStringSubmatch(fb)
-	pk.Name = pname[1]
+	pk.Name = strings.TrimRight(pname[1], "\r")
 
 	for _, m := range matches {
 		bx := &box{
