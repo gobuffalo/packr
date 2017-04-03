@@ -86,7 +86,7 @@ type WalkFunc func(string, File) error
 func (b Box) Walk(wf WalkFunc) error {
 	if data[b.Path] == nil {
 		return filepath.Walk(b.Path, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() {
+			if info == nil || info.IsDir() {
 				return nil
 			}
 			f, err := os.Open(path)
