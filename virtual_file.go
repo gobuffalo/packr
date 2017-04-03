@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+var virtualFileModTime = time.Now()
 var _ File = virtualFile{}
 
 type virtualFile struct {
@@ -42,7 +43,7 @@ func newVirtualFile(name string, b []byte) File {
 			Path:     name,
 			Contents: b,
 			size:     int64(len(b)),
-			modTime:  time.Now(),
+			modTime:  virtualFileModTime,
 		},
 	}
 }
