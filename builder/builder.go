@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var boxPattern = regexp.MustCompile(`packr.NewBox\(["` + "`" + `](.+)["` + "`" + `]\)`)
+var boxPattern = regexp.MustCompile(`packr.NewBox\(["` + "`" + `]([^\(\)]+)["` + "`" + `]\)`)
 
 var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
 
