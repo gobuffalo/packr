@@ -85,7 +85,9 @@ type WalkFunc func(string, File) error
 
 func (b Box) Walk(wf WalkFunc) error {
 	if data[b.Path] == nil {
-		return filepath.Walk(filepath.Join(b.callingDir, b.Path), func(path string, info os.FileInfo, err error) error {
+		base := filepath.Join(b.callingDir, b.Path)
+		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+			shortPath := strings.TrimPrefix(path, base)
 			if info == nil || info.IsDir() {
 				return nil
 			}
@@ -93,7 +95,7 @@ func (b Box) Walk(wf WalkFunc) error {
 			if err != nil {
 				return err
 			}
-			return wf(path, physicalFile{f})
+			return wf(shortPath, physicalFile{f})
 		})
 	}
 	for n := range data[b.Path] {
