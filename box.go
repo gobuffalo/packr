@@ -64,6 +64,14 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 	return ioutil.ReadFile(p)
 }
 
+func (b Box) Has(name string) bool {
+	_, err := b.find(name)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (b Box) find(name string) (File, error) {
 	name = strings.TrimPrefix(name, "/")
 	name = strings.Replace(name, "\\", "/", -1)
