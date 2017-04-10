@@ -2,6 +2,7 @@ package packr
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"time"
 )
@@ -10,21 +11,21 @@ var virtualFileModTime = time.Now()
 var _ File = virtualFile{}
 
 type virtualFile struct {
-	*bytes.Buffer
+	*bytes.Reader
 	Name string
 	info fileInfo
 }
 
-func (v virtualFile) FileInfo() (os.FileInfo, error) {
-	return v.info, nil
+func (f virtualFile) FileInfo() (os.FileInfo, error) {
+	return f.info, nil
 }
 
 func (f virtualFile) Close() error {
 	return nil
 }
 
-func (f virtualFile) Seek(offset int64, whence int) (int64, error) {
-	return 0, nil
+func (f virtualFile) Write(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("Not implemented")
 }
 
 func (f virtualFile) Readdir(count int) ([]os.FileInfo, error) {
@@ -37,7 +38,7 @@ func (f virtualFile) Stat() (os.FileInfo, error) {
 
 func newVirtualFile(name string, b []byte) File {
 	return virtualFile{
-		Buffer: bytes.NewBuffer(b),
+		Reader: bytes.NewReader(b),
 		Name:   name,
 		info: fileInfo{
 			Path:     name,
