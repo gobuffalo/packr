@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"compress/gzip"
 )
 
 // NewBox returns a Box that can be used to
@@ -72,11 +73,24 @@ func (b Box) Has(name string) bool {
 	return true
 }
 
+func (b Box) decompress(bb []byte) []byte {
+	reader, err := gzip.NewReader(bytes.NewReader(bb))
+	if err != nil {
+		return bb
+	}
+	data, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return bb
+	}
+	return data
+}
+
 func (b Box) find(name string) (File, error) {
 	name = strings.TrimPrefix(name, "/")
 	name = strings.Replace(name, "\\", "/", -1)
 	if _, ok := data[b.Path]; ok {
 		if bb, ok := data[b.Path][name]; ok {
+			bb = b.decompress(bb)
 			return newVirtualFile(name, bb), nil
 		}
 	}

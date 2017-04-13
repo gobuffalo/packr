@@ -33,3 +33,11 @@ func Test_PackJSONBytes(t *testing.T) {
 	r.NoError(err)
 	r.Equal([]byte("json bytes"), s)
 }
+
+func Test_PackBytesGzip(t *testing.T) {
+	r := require.New(t)
+	err := PackBytesGzip(testBox.Path, "gzip", []byte("gzip foobar"))
+	r.NoError(err)
+	s := testBox.String("gzip")
+	r.Equal("gzip foobar", s)
+}

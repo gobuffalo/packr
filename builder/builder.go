@@ -25,6 +25,7 @@ var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 type Builder struct {
 	context.Context
 	RootPath string
+	compress bool
 	pkgs     map[string]pkg
 }
 
@@ -98,7 +99,7 @@ func (b *Builder) process(path string) error {
 			Name:  m[1],
 			Files: []file{},
 		}
-		err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
+		err = bx.Walk(filepath.Join(pk.Dir, bx.Name), b.compress)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -124,10 +125,11 @@ func (b *Builder) addPkg(p pkg) {
 }
 
 // New Builder with a given context and path
-func New(ctx context.Context, path string) *Builder {
+func New(ctx context.Context, path string, compress bool) *Builder {
 	return &Builder{
 		Context:  ctx,
 		RootPath: path,
 		pkgs:     map[string]pkg{},
+		compress: compress,
 	}
 }

@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"bytes"
+	"compress/gzip"
 )
 
 type box struct {
@@ -15,7 +17,7 @@ type box struct {
 	Files []file
 }
 
-func (b *box) Walk(root string) error {
+func (b *box) Walk(root string, compress bool) error {
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info == nil || info.IsDir() {
 			return nil
@@ -30,6 +32,12 @@ func (b *box) Walk(root string) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		if compress {
+			bb, err = compressFile(bb)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+		}
 		bb, err = json.Marshal(bb)
 		if err != nil {
 			return errors.WithStack(err)
@@ -39,4 +47,18 @@ func (b *box) Walk(root string) error {
 		b.Files = append(b.Files, f)
 		return nil
 	})
+}
+
+func compressFile(bb []byte) ([]byte, error) {
+	var buf bytes.Buffer
+	writer := gzip.NewWriter(&buf)
+	_, err := writer.Write(bb)
+	if err != nil {
+		return bb, errors.WithStack(err)
+	}
+	err = writer.Close()
+	if err != nil {
+		return bb, errors.WithStack(err)
+	}
+	return buf.Bytes(), nil
 }
