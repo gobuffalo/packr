@@ -30,7 +30,11 @@ html := box.Bytes("index.html")
 html, err := box.MustBytes("index.html")
 ```
 
-### Building a Binary
+### Building a Binary (the easy way)
+
+When it comes time to build, or install, your Go binary, simply use `packr build` or `packr install` just as you would `go build` or `go install`. All flags for the `go` tool are supported and everything works the way you expect, the only difference is your static assets are now bundled in the generated binary. If you want more control over how this happens, looking at the following section on building binaries (the hard way).
+
+### Building a Binary (the hard way)
 
 Before you build your Go binary, run the `packr` command first. It will look for all the boxes in your code and then generate `.go` files that pack the static files into bytes that can be bundled into the Go binary.
 
@@ -42,7 +46,7 @@ $ packr
 
 Then run your `go build command` like normal.
 
-### Cleaning Up
+#### Cleaning Up
 
 When you're done it is recommended that you run the `packr clean` command. This will remove all of the generated files that Packr created for you.
 
