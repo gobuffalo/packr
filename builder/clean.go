@@ -16,7 +16,7 @@ func Clean(root string) {
 		if base == ".git" || base == "vendor" || base == "node_modules" {
 			return filepath.SkipDir
 		}
-		if info.IsDir() {
+		if info == nil || info.IsDir() {
 			return nil
 		}
 		if strings.Contains(base, "-packr.go") {
