@@ -2,7 +2,6 @@ package builder
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -24,8 +23,9 @@ var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 // be built into Go binaries.
 type Builder struct {
 	context.Context
-	RootPath string
-	pkgs     map[string]pkg
+	RootPath     string
+	IgnoredBoxes []string
+	pkgs         map[string]pkg
 }
 
 // Run the builder.
@@ -50,7 +50,6 @@ func (b *Builder) Run() error {
 func (b *Builder) dump() error {
 	for _, p := range b.pkgs {
 		name := filepath.Join(p.Dir, p.Name+"-packr.go")
-		fmt.Printf("--> packing %s\n", name)
 		f, err := os.Create(name)
 		defer f.Close()
 		if err != nil {
@@ -94,16 +93,29 @@ func (b *Builder) process(path string) error {
 	pk.Name = pname[1]
 
 	for _, m := range matches {
-		bx := &box{
-			Name:  m[1],
-			Files: []file{},
-		}
-		err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
+		n := m[1]
+		err := func() error {
+			for _, i := range b.IgnoredBoxes {
+				if n == i {
+					// this is an ignored box
+					return nil
+				}
+			}
+			bx := &box{
+				Name:  n,
+				Files: []file{},
+			}
+			err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			if len(bx.Files) > 0 {
+				pk.Boxes = append(pk.Boxes, *bx)
+			}
+			return nil
+		}()
 		if err != nil {
 			return errors.WithStack(err)
-		}
-		if len(bx.Files) > 0 {
-			pk.Boxes = append(pk.Boxes, *bx)
 		}
 	}
 
@@ -126,8 +138,9 @@ func (b *Builder) addPkg(p pkg) {
 // New Builder with a given context and path
 func New(ctx context.Context, path string) *Builder {
 	return &Builder{
-		Context:  ctx,
-		RootPath: path,
-		pkgs:     map[string]pkg{},
+		Context:      ctx,
+		RootPath:     path,
+		IgnoredBoxes: []string{},
+		pkgs:         map[string]pkg{},
 	}
 }

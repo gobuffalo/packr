@@ -20,7 +20,6 @@ func Clean(root string) {
 			return nil
 		}
 		if strings.Contains(base, "-packr.go") {
-			fmt.Printf("----> cleaning up %s\n", path)
 			err := os.Remove(path)
 			if err != nil {
 				fmt.Println(err)
