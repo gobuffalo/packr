@@ -2,6 +2,10 @@
 
 Packr is a simple solution for bundling static assets inside of Go binaries. Most importantly it does it in a way that is friendly to developers while they are developing.
 
+## Intro Video
+
+To get an idea of the what and why of packr, please enjoy this short video: [https://vimeo.com/219863271](https://vimeo.com/219863271).
+
 ## Installation
 
 ```text
