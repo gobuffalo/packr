@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr/builder"
@@ -17,6 +19,15 @@ var installCmd = &cobra.Command{
 	Short:              "Wraps the go install command with packr",
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			input = args[len(args)-1]
+			if !strings.HasPrefix(input, ".") {
+				input = filepath.Join(envy.GoPath(), "src", input)
+				if _, err := os.Stat(input); err != nil {
+					return errors.WithStack(err)
+				}
+			}
+		}
 		defer builder.Clean(input)
 		b := builder.New(context.Background(), input)
 		err := b.Run()
