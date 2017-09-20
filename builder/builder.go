@@ -6,12 +6,14 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
 )
 
-var boxPattern = regexp.MustCompile(`packr.NewBox\(["` + "`" + `]([^\(\)]+)["` + "`" + `]\)`)
+// ^\s*[^(//)]*\s*packr.NewBox\([\"`]([^\(\)]+)[\"`]\)
+var boxPattern = regexp.MustCompile("^\\s*[^(//)]*\\s*packr.NewBox\\([\"`]([^\\(\\)]+)[\"`]\\)")
 
 var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
 
@@ -80,47 +82,50 @@ func (b *Builder) process(path string) error {
 	}
 	fb := string(bb)
 
-	matches := boxPattern.FindAllStringSubmatch(fb, -1)
-	if len(matches) == 0 {
-		return nil
-	}
+	for _, line := range strings.Split(fb, "\n") {
+		line = strings.TrimSpace(line)
+		matches := boxPattern.FindAllStringSubmatch(line, -1)
+		if len(matches) == 0 {
+			continue
+		}
 
-	pk := pkg{
-		Dir:   filepath.Dir(path),
-		Boxes: []box{},
-	}
-	pname := packagePattern.FindStringSubmatch(fb)
-	pk.Name = pname[1]
+		pk := pkg{
+			Dir:   filepath.Dir(path),
+			Boxes: []box{},
+		}
+		pname := packagePattern.FindStringSubmatch(fb)
+		pk.Name = pname[1]
 
-	for _, m := range matches {
-		n := m[1]
-		err := func() error {
-			for _, i := range b.IgnoredBoxes {
-				if n == i {
-					// this is an ignored box
-					return nil
+		for _, m := range matches {
+			n := m[1]
+			err := func() error {
+				for _, i := range b.IgnoredBoxes {
+					if n == i {
+						// this is an ignored box
+						return nil
+					}
 				}
-			}
-			bx := &box{
-				Name:  n,
-				Files: []file{},
-			}
-			err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
+				bx := &box{
+					Name:  n,
+					Files: []file{},
+				}
+				err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
+				if err != nil {
+					return errors.WithStack(err)
+				}
+				if len(bx.Files) > 0 {
+					pk.Boxes = append(pk.Boxes, *bx)
+				}
+				return nil
+			}()
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			if len(bx.Files) > 0 {
-				pk.Boxes = append(pk.Boxes, *bx)
-			}
-			return nil
-		}()
-		if err != nil {
-			return errors.WithStack(err)
 		}
-	}
 
-	if len(pk.Boxes) > 0 {
-		b.addPkg(pk)
+		if len(pk.Boxes) > 0 {
+			b.addPkg(pk)
+		}
 	}
 	return nil
 }

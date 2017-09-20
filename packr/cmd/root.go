@@ -20,7 +20,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&input, "input", "i", ".", "path to scan for packr Boxes")
+	pwd, _ := os.Getwd()
+	rootCmd.Flags().StringVarP(&input, "input", "i", pwd, "path to scan for packr Boxes")
 }
 
 // Execute the commands
