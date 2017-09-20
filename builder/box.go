@@ -16,6 +16,9 @@ type box struct {
 }
 
 func (b *box) Walk(root string) error {
+	if _, err := os.Stat(root); err != nil {
+		return errors.Errorf("could not find folder for box: %s", root)
+	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info == nil || info.IsDir() {
 			return nil
