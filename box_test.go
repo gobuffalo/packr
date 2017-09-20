@@ -38,7 +38,7 @@ func Test_Box_Walk_Physical(t *testing.T) {
 		return nil
 	})
 	r.NoError(err)
-	r.Equal(2, count)
+	r.Equal(3, count)
 }
 
 func Test_Box_Walk_Virtual(t *testing.T) {

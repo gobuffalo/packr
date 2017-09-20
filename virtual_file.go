@@ -48,3 +48,10 @@ func newVirtualFile(name string, b []byte) File {
 		},
 	}
 }
+
+func newVirtualDir(name string) File {
+	b := []byte{}
+	v := newVirtualFile(name, b).(virtualFile)
+	v.info.isDir = true
+	return v
+}

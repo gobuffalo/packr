@@ -74,11 +74,12 @@ func (b Box) Has(name string) bool {
 
 func (b Box) find(name string) (File, error) {
 	name = strings.TrimPrefix(name, "/")
-	name = strings.Replace(name, "\\", "/", -1)
+	name = filepath.ToSlash(name)
 	if _, ok := data[b.Path]; ok {
 		if bb, ok := data[b.Path][name]; ok {
 			return newVirtualFile(name, bb), nil
 		}
+		return newVirtualDir(name), nil
 	}
 
 	p := filepath.Join(b.callingDir, b.Path, name)

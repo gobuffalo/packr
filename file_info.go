@@ -10,6 +10,7 @@ type fileInfo struct {
 	Contents []byte
 	size     int64
 	modTime  time.Time
+	isDir    bool
 }
 
 func (f fileInfo) Name() string {
@@ -29,7 +30,7 @@ func (f fileInfo) ModTime() time.Time {
 }
 
 func (f fileInfo) IsDir() bool {
-	return false
+	return f.isDir
 }
 
 func (f fileInfo) Sys() interface{} {
