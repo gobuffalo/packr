@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // NewBox returns a Box that can be used to
@@ -78,6 +80,9 @@ func (b Box) find(name string) (File, error) {
 	if _, ok := data[b.Path]; ok {
 		if bb, ok := data[b.Path][name]; ok {
 			return newVirtualFile(name, bb), nil
+		}
+		if filepath.Ext(name) != "" {
+			return nil, errors.Errorf("could not find virtual file: %s", name)
 		}
 		return newVirtualDir(name), nil
 	}
