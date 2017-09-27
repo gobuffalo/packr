@@ -13,7 +13,7 @@ import (
 )
 
 // ^\s*[^(//)]*\s*packr.NewBox\([\"`]([^\(\)]+)[\"`]\)
-var boxPattern = regexp.MustCompile("^\\s*[^(//)]*\\s*packr.NewBox\\([\"`]([^\\(\\)]+)[\"`]\\)")
+var boxPattern = regexp.MustCompile("packr.NewBox\\([\"`]([^\\(\\)]+)[\"`]\\)")
 
 var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
 
@@ -82,19 +82,22 @@ func (b *Builder) process(path string) error {
 	}
 	fb := string(bb)
 
+	pk := pkg{
+		Dir:   filepath.Dir(path),
+		Boxes: []box{},
+	}
+	pname := packagePattern.FindStringSubmatch(fb)
+	pk.Name = pname[1]
+
 	for _, line := range strings.Split(fb, "\n") {
 		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "//") {
+			continue
+		}
 		matches := boxPattern.FindAllStringSubmatch(line, -1)
 		if len(matches) == 0 {
 			continue
 		}
-
-		pk := pkg{
-			Dir:   filepath.Dir(path),
-			Boxes: []box{},
-		}
-		pname := packagePattern.FindStringSubmatch(fb)
-		pk.Name = pname[1]
 
 		for _, m := range matches {
 			n := m[1]
