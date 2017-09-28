@@ -3,6 +3,8 @@ package packr
 import (
 	"encoding/json"
 	"sync"
+	"bytes"
+	"compress/gzip"
 )
 
 var gil = &sync.Mutex{}
@@ -16,6 +18,22 @@ func PackBytes(box string, name string, bb []byte) {
 		data[box] = map[string][]byte{}
 	}
 	data[box][name] = bb
+}
+
+// PackBytesGzip packets the gzipped compressed bytes into a box.
+func PackBytesGzip(box string, name string, bb []byte) error {
+	var buf bytes.Buffer
+	w := gzip.NewWriter(&buf)
+	_, err := w.Write(bb)
+	if err != nil {
+		return err
+	}
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+	PackBytes(box, name, buf.Bytes())
+	return nil
 }
 
 // PackJSONBytes packs JSON encoded bytes for a file into a box.

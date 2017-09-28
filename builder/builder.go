@@ -23,6 +23,7 @@ type Builder struct {
 	IgnoredBoxes []string
 	pkgs         map[string]pkg
 	moot         *sync.Mutex
+	Compress     bool
 }
 
 // Run the builder.
@@ -96,8 +97,9 @@ func (b *Builder) process(path string) error {
 			}
 		}
 		bx := &box{
-			Name:  n,
-			Files: []file{},
+			Name:     n,
+			Files:    []file{},
+			compress: b.Compress,
 		}
 		p := filepath.Join(pk.Dir, bx.Name)
 		if err := bx.Walk(p); err != nil {

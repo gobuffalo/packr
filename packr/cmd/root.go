@@ -9,12 +9,14 @@ import (
 )
 
 var input string
+var compress bool
 
 var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "compiles static files into Go files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b := builder.New(context.Background(), input)
+		b.Compress = compress
 		return b.Run()
 	},
 }
@@ -22,6 +24,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	pwd, _ := os.Getwd()
 	rootCmd.Flags().StringVarP(&input, "input", "i", pwd, "path to scan for packr Boxes")
+	rootCmd.Flags().BoolVarP(&compress, "compress", "z", false, "compress box contents")
 }
 
 // Execute the commands
