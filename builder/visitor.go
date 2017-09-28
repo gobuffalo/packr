@@ -74,6 +74,8 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 
 func (v *visitor) eval(node ast.Node) error {
 	switch t := node.(type) {
+	case *ast.Ident:
+		return v.evalIdent(t)
 	case *ast.GenDecl:
 		for _, n := range t.Specs {
 			if err := v.eval(n); err != nil {
@@ -101,12 +103,12 @@ func (v *visitor) evalStmt(stmt ast.Stmt) error {
 	switch t := stmt.(type) {
 	case *ast.ExprStmt:
 		return v.evalExpr(t.X)
-		// case *ast.AssignStmt:
-		// 	for _, e := range t.Rhs {
-		// 		if err := v.evalArgs(e); err != nil {
-		// 			return errors.WithStack(err)
-		// 		}
-		// 	}
+	case *ast.AssignStmt:
+		for _, e := range t.Rhs {
+			if err := v.evalArgs(e); err != nil {
+				return errors.WithStack(err)
+			}
+		}
 	}
 	return nil
 }
@@ -147,17 +149,30 @@ func (v *visitor) evalExpr(expr ast.Expr) error {
 func (v *visitor) evalArgs(expr ast.Expr) error {
 	switch at := expr.(type) {
 	case *ast.CompositeLit:
-	case *ast.BasicLit:
-		v.addBox(at.Value)
+		for _, e := range at.Elts {
+			if err := v.evalExpr(e); err != nil {
+				return errors.WithStack(err)
+			}
+		}
+	// case *ast.BasicLit:
+	// fmt.Println("evalArgs", at.Value)
+	// v.addBox(at.Value)
 	case *ast.CallExpr:
 		if at.Fun == nil {
 			return nil
 		}
 		switch st := at.Fun.(type) {
 		case *ast.SelectorExpr:
-			return v.evalSelector(at, st)
+			if err := v.evalSelector(at, st); err != nil {
+				return errors.WithStack(err)
+			}
 		case *ast.Ident:
 			return v.evalIdent(st)
+		}
+		for _, a := range at.Args {
+			if err := v.evalArgs(a); err != nil {
+				return errors.WithStack(err)
+			}
 		}
 	}
 	return nil
