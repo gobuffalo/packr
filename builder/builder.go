@@ -2,22 +2,16 @@ package builder
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
+	"sync"
 	"text/template"
 
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
-// ^\s*[^(//)]*\s*packr.NewBox\([\"`]([^\(\)]+)[\"`]\)
-var boxPattern = regexp.MustCompile("packr.NewBox\\([\"`]([^\\(\\)]+)[\"`]\\)")
-
-var packagePattern = regexp.MustCompile(`package\s+(\w+)`)
-
-//var packagePattern = regexp.MustCompile(`package\s+([^\r]+)`)
 var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 
 // Builder scans folders/files looking for `packr.NewBox` and then compiling
@@ -28,10 +22,12 @@ type Builder struct {
 	RootPath     string
 	IgnoredBoxes []string
 	pkgs         map[string]pkg
+	moot         *sync.Mutex
 }
 
 // Run the builder.
 func (b *Builder) Run() error {
+	wg := &errgroup.Group{}
 	err := filepath.Walk(b.RootPath, func(path string, info os.FileInfo, err error) error {
 		base := filepath.Base(path)
 		if base == ".git" || base == "vendor" || base == "node_modules" {
@@ -39,11 +35,16 @@ func (b *Builder) Run() error {
 		}
 
 		if !info.IsDir() {
-			return b.process(path)
+			wg.Go(func() error {
+				return b.process(path)
+			})
 		}
 		return nil
 	})
 	if err != nil {
+		return errors.WithStack(err)
+	}
+	if err := wg.Wait(); err != nil {
 		return errors.WithStack(err)
 	}
 	return b.dump()
@@ -76,64 +77,46 @@ func (b *Builder) process(path string) error {
 		return nil
 	}
 
-	bb, err := ioutil.ReadFile(path)
-	if err != nil {
+	v := newVisitor(path)
+	if err := v.Run(); err != nil {
 		return errors.WithStack(err)
 	}
-	fb := string(bb)
 
 	pk := pkg{
 		Dir:   filepath.Dir(path),
 		Boxes: []box{},
+		Name:  v.Package,
 	}
-	pname := packagePattern.FindStringSubmatch(fb)
-	pk.Name = pname[1]
 
-	for _, line := range strings.Split(fb, "\n") {
-		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "//") {
-			continue
-		}
-		matches := boxPattern.FindAllStringSubmatch(line, -1)
-		if len(matches) == 0 {
-			continue
-		}
-
-		for _, m := range matches {
-			n := m[1]
-			err := func() error {
-				for _, i := range b.IgnoredBoxes {
-					if n == i {
-						// this is an ignored box
-						return nil
-					}
-				}
-				bx := &box{
-					Name:  n,
-					Files: []file{},
-				}
-				err = bx.Walk(filepath.Join(pk.Dir, bx.Name))
-				if err != nil {
-					return errors.WithStack(err)
-				}
-				if len(bx.Files) > 0 {
-					pk.Boxes = append(pk.Boxes, *bx)
-				}
+	for _, n := range v.Boxes {
+		for _, i := range b.IgnoredBoxes {
+			if n == i {
+				// this is an ignored box
 				return nil
-			}()
-			if err != nil {
-				return errors.WithStack(err)
 			}
 		}
-
-		if len(pk.Boxes) > 0 {
-			b.addPkg(pk)
+		bx := &box{
+			Name:  n,
+			Files: []file{},
 		}
+		p := filepath.Join(pk.Dir, bx.Name)
+		if err := bx.Walk(p); err != nil {
+			return errors.WithStack(err)
+		}
+		if len(bx.Files) > 0 {
+			pk.Boxes = append(pk.Boxes, *bx)
+		}
+	}
+
+	if len(pk.Boxes) > 0 {
+		b.addPkg(pk)
 	}
 	return nil
 }
 
 func (b *Builder) addPkg(p pkg) {
+	b.moot.Lock()
+	defer b.moot.Unlock()
 	if _, ok := b.pkgs[p.Name]; !ok {
 		b.pkgs[p.Name] = p
 		return
@@ -150,5 +133,6 @@ func New(ctx context.Context, path string) *Builder {
 		RootPath:     path,
 		IgnoredBoxes: []string{},
 		pkgs:         map[string]pkg{},
+		moot:         &sync.Mutex{},
 	}
 }
