@@ -144,3 +144,23 @@ func (b Box) Walk(wf WalkFunc) error {
 func (b Box) Open(name string) (http.File, error) {
 	return b.find(name)
 }
+
+// List shows "What's in the box?"
+func (b Box) List() []string {
+	var keys []string
+
+	if b.data == nil {
+		b.Walk(func(path string, info File) error {
+			finfo, _ := info.FileInfo()
+			if !finfo.IsDir() {
+				keys = append(keys, finfo.Name())
+			}
+			return nil
+		})
+	} else {
+		for k := range b.data {
+			keys = append(keys, k)
+		}
+	}
+	return keys
+}
