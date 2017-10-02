@@ -51,3 +51,17 @@ func Test_Box_Walk_Virtual(t *testing.T) {
 	r.NoError(err)
 	r.Equal(3, count)
 }
+
+func Test_List_Virtual(t *testing.T) {
+	r := require.New(t)
+	mustHave := []string{"a", "b", "c"}
+	actual := virtualBox.List()
+	r.Equal(mustHave, actual)
+}
+
+func Test_List_Physical(t *testing.T) {
+	r := require.New(t)
+	mustHave := []string{"goodbye.txt", "hello.txt", "index.html"}
+	actual := testBox.List()
+	r.Equal(mustHave, actual)
+}
