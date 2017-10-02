@@ -11,6 +11,7 @@ import (
 
 	"compress/gzip"
 
+	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
 )
 
@@ -23,6 +24,14 @@ func NewBox(path string) Box {
 		_, filename, _, _ := runtime.Caller(1)
 		cd = filepath.Dir(filename)
 	}
+
+	// this little hack courtesy of the `-cover` flag!!
+	cov := filepath.Join("_test", "_obj_test")
+	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
+	if !filepath.IsAbs(cd) && cd != "" {
+		cd = filepath.Join(envy.GoPath(), "src", cd)
+	}
+
 	return Box{
 		Path:       path,
 		callingDir: cd,
