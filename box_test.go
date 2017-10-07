@@ -1,6 +1,7 @@
 package packr
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -56,6 +57,7 @@ func Test_List_Virtual(t *testing.T) {
 	r := require.New(t)
 	mustHave := []string{"a", "b", "c"}
 	actual := virtualBox.List()
+	sort.Strings(actual)
 	r.Equal(mustHave, actual)
 }
 

@@ -9,6 +9,10 @@ import (
 
 var a = packr.NewBox("./foo")
 
+type S struct{}
+
+func (S) f(packr.Box) {}
+
 func init() {
 	// packr.NewBox("../idontexists")
 
@@ -22,6 +26,9 @@ func init() {
 		TemplatesBox: packr.NewBox("./bar"),
 	})
 	fmt.Println(r)
+
+	s := S{}
+	s.f(packr.NewBox("./sf"))
 }
 
 func foo(s string, box packr.Box) {}

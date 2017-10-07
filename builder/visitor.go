@@ -74,6 +74,8 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 
 func (v *visitor) eval(node ast.Node) error {
 	switch t := node.(type) {
+	case *ast.CallExpr:
+		return v.evalExpr(t)
 	case *ast.Ident:
 		return v.evalIdent(t)
 	case *ast.GenDecl:
