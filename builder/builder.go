@@ -90,11 +90,16 @@ func (b *Builder) process(path string) error {
 	}
 
 	for _, n := range v.Boxes {
+		var ignored bool
 		for _, i := range b.IgnoredBoxes {
 			if n == i {
 				// this is an ignored box
-				return nil
+				ignored = true
+				break
 			}
+		}
+		if ignored {
+			continue
 		}
 		bx := &box{
 			Name:     n,
