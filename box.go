@@ -112,11 +112,16 @@ func (b Box) find(name string) (File, error) {
 	}
 
 	p := filepath.Join(b.callingDir, b.Path, name)
-	f, err := os.Open(p)
-	if err != nil {
-		return nil, err
+	if f, err := os.Open(p); err == nil {
+		return physicalFile{f}, nil
 	}
-	return physicalFile{f}, nil
+	// make one last ditch effort to find the file below the PWD:
+	pwd, _ := os.Getwd()
+	p = filepath.Join(pwd, b.Path, name)
+	if f, err := os.Open(p); err == nil {
+		return physicalFile{f}, nil
+	}
+	return nil, errors.Errorf("could not find %s in box %s", name, b.Path)
 }
 
 type WalkFunc func(string, File) error
