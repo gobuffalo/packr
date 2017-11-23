@@ -15,6 +15,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
+)
+
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
 // binary.
@@ -73,10 +77,10 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 		bb.ReadFrom(f)
 		return bb.Bytes(), err
 	}
-	p := filepath.Join(b.callingDir, b.Path, name)
-	return ioutil.ReadFile(p)
+	return nil, err
 }
 
+// Has returns true if the resource exists in the box
 func (b Box) Has(name string) bool {
 	_, err := b.find(name)
 	if err != nil {
@@ -98,30 +102,33 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
-	name = strings.TrimPrefix(name, "/")
-	name = filepath.ToSlash(name)
+	cleanName := filepath.Clean(filepath.ToSlash(name))
+	// Ensure name is not outside the box
+	if strings.HasPrefix(cleanName, "../") {
+		return nil, ErrResOutsideBox
+	}
+	// Absolute name is considered as relative to the box root
+	cleanName = strings.TrimPrefix(cleanName, "/")
+
+	// Try to get the resource from the box
 	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][name]; ok {
+		if bb, ok := data[b.Path][cleanName]; ok {
 			bb = b.decompress(bb)
-			return newVirtualFile(name, bb), nil
+			return newVirtualFile(cleanName, bb), nil
 		}
-		if filepath.Ext(name) != "" {
-			return nil, errors.Errorf("could not find virtual file: %s", name)
+		if filepath.Ext(cleanName) != "" {
+			return nil, errors.Errorf("could not find virtual file: %s", cleanName)
 		}
-		return newVirtualDir(name), nil
+		return newVirtualDir(cleanName), nil
 	}
 
-	p := filepath.Join(b.callingDir, b.Path, name)
+	// Not found in the box virtual fs, try to get it from the file system
+	cleanName = filepath.FromSlash(cleanName)
+	p := filepath.Join(b.callingDir, b.Path, cleanName)
 	if f, err := os.Open(p); err == nil {
 		return physicalFile{f}, nil
 	}
-	// make one last ditch effort to find the file below the PWD:
-	pwd, _ := os.Getwd()
-	p = filepath.Join(pwd, b.Path, name)
-	if f, err := os.Open(p); err == nil {
-		return physicalFile{f}, nil
-	}
-	return nil, errors.Errorf("could not find %s in box %s", name, b.Path)
+	return nil, errors.Errorf("could not find %s in box %s", cleanName, b.Path)
 }
 
 type WalkFunc func(string, File) error

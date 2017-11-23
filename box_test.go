@@ -67,3 +67,9 @@ func Test_List_Physical(t *testing.T) {
 	actual := testBox.List()
 	r.Equal(mustHave, actual)
 }
+
+func Test_Outside_Box(t *testing.T) {
+	r := require.New(t)
+	_, err := testBox.MustString("../README.md")
+	r.Error(err)
+}
