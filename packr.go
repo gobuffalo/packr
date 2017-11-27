@@ -1,10 +1,10 @@
 package packr
 
 import (
-	"encoding/json"
-	"sync"
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
+	"sync"
 )
 
 var gil = &sync.Mutex{}
