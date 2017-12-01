@@ -25,6 +25,22 @@ func Test_HTTPBox(t *testing.T) {
 	r.Equal("hello world!\n", res.Body.String())
 }
 
+func Test_HTTPBox_NotFound(t *testing.T) {
+	r := require.New(t)
+
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(testBox))
+
+	req, err := http.NewRequest("GET", "/notInBox.txt", nil)
+	r.NoError(err)
+
+	res := httptest.NewRecorder()
+
+	mux.ServeHTTP(res, req)
+
+	r.Equal(404, res.Code)
+}
+
 func Test_HTTPBox_Handles_IndexHTML(t *testing.T) {
 	r := require.New(t)
 

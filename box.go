@@ -117,7 +117,9 @@ func (b Box) find(name string) (File, error) {
 			return newVirtualFile(cleanName, bb), nil
 		}
 		if filepath.Ext(cleanName) != "" {
-			return nil, errors.Errorf("could not find virtual file: %s", cleanName)
+			// The Handler created by http.FileSystem checks for those errors and
+			// returns http.StatusNotFound instead of http.StatusInternalServerError.
+			return nil, os.ErrNotExist
 		}
 		return newVirtualDir(cleanName), nil
 	}
@@ -128,7 +130,7 @@ func (b Box) find(name string) (File, error) {
 	if f, err := os.Open(p); err == nil {
 		return physicalFile{f}, nil
 	}
-	return nil, errors.Errorf("could not find %s in box %s", cleanName, b.Path)
+	return nil, os.ErrNotExist
 }
 
 type WalkFunc func(string, File) error
