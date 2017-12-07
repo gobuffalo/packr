@@ -26,4 +26,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    condition: $TRAVIS_GO_VERSION =~ ^1\.9\.[0-9]+$
+    condition: $TRAVIS_GO_VERSION =~ ^1\.9(|\.[0-9]+)$
