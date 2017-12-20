@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"testing"
@@ -88,26 +89,29 @@ func Test_Outside_Box(t *testing.T) {
 }
 
 func Test_Box_find(t *testing.T) {
-	r := require.New(t)
 	box := NewBox("./example")
 
+	onWindows := runtime.GOOS == "windows"
 	table := []struct {
 		name  string
 		found bool
 	}{
 		{"assets/app.css", true},
-		{"assets\\app.css", true},
+		{"assets\\app.css", onWindows},
 		{"foo/bar.baz", false},
 	}
 
 	for _, tt := range table {
-		_, err := box.find(tt.name)
-		if tt.found {
-			r.True(box.Has(tt.name))
-			r.NoError(err)
-		} else {
-			r.False(box.Has(tt.name))
-			r.Error(err)
-		}
+		t.Run(tt.name, func(st *testing.T) {
+			r := require.New(st)
+			_, err := box.find(tt.name)
+			if tt.found {
+				r.True(box.Has(tt.name))
+				r.NoError(err)
+			} else {
+				r.False(box.Has(tt.name))
+				r.Error(err)
+			}
+		})
 	}
 }
