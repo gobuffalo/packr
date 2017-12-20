@@ -30,6 +30,10 @@ type Builder struct {
 func (b *Builder) Run() error {
 	wg := &errgroup.Group{}
 	err := filepath.Walk(b.RootPath, func(path string, info os.FileInfo, err error) error {
+		if info == nil {
+			return filepath.SkipDir
+		}
+
 		base := filepath.Base(path)
 		if base == ".git" || base == "vendor" || base == "node_modules" {
 			return filepath.SkipDir
