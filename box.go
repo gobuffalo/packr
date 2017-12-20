@@ -2,7 +2,6 @@ package packr
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -103,9 +102,7 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
-	fmt.Println("name", name)
 	cleanName := filepath.ToSlash(filepath.Clean(name))
-	fmt.Println("cleanName", cleanName)
 	// Ensure name is not outside the box
 	if strings.HasPrefix(cleanName, "../") {
 		return nil, ErrResOutsideBox
@@ -129,7 +126,6 @@ func (b Box) find(name string) (File, error) {
 
 	// Not found in the box virtual fs, try to get it from the file system
 	cleanName = filepath.FromSlash(cleanName)
-	fmt.Println("revised cleanName", cleanName)
 	p := filepath.Join(b.callingDir, b.Path, cleanName)
 	if f, err := os.Open(p); err == nil {
 		return physicalFile{f}, nil
