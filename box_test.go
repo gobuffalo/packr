@@ -35,6 +35,12 @@ func Test_Box_MustBytes(t *testing.T) {
 	r.Error(err)
 }
 
+func Test_Box_Has(t *testing.T) {
+	r := require.New(t)
+	r.True(testBox.Has("hello.txt"))
+	r.False(testBox.Has("idontexist.txt"))
+}
+
 func Test_Box_Walk_Physical(t *testing.T) {
 	r := require.New(t)
 	count := 0
@@ -79,4 +85,29 @@ func Test_Outside_Box(t *testing.T) {
 	defer os.RemoveAll(f.Name())
 	_, err = testBox.MustString(f.Name())
 	r.Error(err)
+}
+
+func Test_Box_find(t *testing.T) {
+	r := require.New(t)
+	box := NewBox("./example")
+
+	table := []struct {
+		name  string
+		found bool
+	}{
+		{"assets/app.css", true},
+		{"assets\\app.css", true},
+		{"foo/bar.baz", false},
+	}
+
+	for _, tt := range table {
+		_, err := box.find(tt.name)
+		if tt.found {
+			r.True(box.Has(tt.name))
+			r.NoError(err)
+		} else {
+			r.False(box.Has(tt.name))
+			r.Error(err)
+		}
+	}
 }
