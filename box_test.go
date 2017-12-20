@@ -1,7 +1,11 @@
 package packr
 
 import (
+	"bytes"
+	"io/ioutil"
+	"os"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,7 +14,7 @@ import (
 func Test_Box_String(t *testing.T) {
 	r := require.New(t)
 	s := testBox.String("hello.txt")
-	r.Equal("hello world!\n", s)
+	r.Equal("hello world!", strings.TrimSpace(s))
 }
 
 func Test_Box_MustString(t *testing.T) {
@@ -22,7 +26,7 @@ func Test_Box_MustString(t *testing.T) {
 func Test_Box_Bytes(t *testing.T) {
 	r := require.New(t)
 	s := testBox.Bytes("hello.txt")
-	r.Equal([]byte("hello world!\n"), s)
+	r.Equal([]byte("hello world!"), bytes.TrimSpace(s))
 }
 
 func Test_Box_MustBytes(t *testing.T) {
@@ -70,6 +74,9 @@ func Test_List_Physical(t *testing.T) {
 
 func Test_Outside_Box(t *testing.T) {
 	r := require.New(t)
-	_, err := testBox.MustString("../README.md")
+	f, err := ioutil.TempFile("", "")
+	r.NoError(err)
+	defer os.RemoveAll(f.Name())
+	_, err = testBox.MustString(f.Name())
 	r.Error(err)
 }

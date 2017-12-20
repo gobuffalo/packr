@@ -3,6 +3,7 @@ package packr
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -22,7 +23,7 @@ func Test_HTTPBox(t *testing.T) {
 	mux.ServeHTTP(res, req)
 
 	r.Equal(200, res.Code)
-	r.Equal("hello world!\n", res.Body.String())
+	r.Equal("hello world!", strings.TrimSpace(res.Body.String()))
 }
 
 func Test_HTTPBox_NotFound(t *testing.T) {
@@ -54,5 +55,5 @@ func Test_HTTPBox_Handles_IndexHTML(t *testing.T) {
 
 	mux.ServeHTTP(res, req)
 
-	r.Equal("<h1>Index!</h1>\n", res.Body.String())
+	r.Equal("<h1>Index!</h1>", strings.TrimSpace(res.Body.String()))
 }
