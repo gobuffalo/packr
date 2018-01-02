@@ -41,7 +41,7 @@ var _ = Add("release", func(c *Context) error {
 		return err
 	}
 
-	cmd = exec.Command("goreleaser")
+	cmd = exec.Command("goreleaser", "--rm-dist")
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
