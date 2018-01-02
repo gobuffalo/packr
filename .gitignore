@@ -30,3 +30,4 @@ gin-bin
 /packr_linux_amd64
 .vscode/
 debug.test
+.grifter/
