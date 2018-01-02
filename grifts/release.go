@@ -40,5 +40,13 @@ var _ = Add("release", func(c *Context) error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
+
+	cmd = exec.Command("goreleaser")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
 	return nil
 })
