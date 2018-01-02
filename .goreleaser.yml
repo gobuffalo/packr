@@ -10,30 +10,34 @@ brew:
     email: goreleaser@carlosbecker.com
   install: bin.install "packr"
 builds:
-- goos:
-  - linux
-  - darwin
-  - windows
-  goarch:
-  - amd64
-  - "386"
-  goarm:
-  - "6"
-  main: ./packr/main.go
-  binary: packr
+  -
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - "386"
+    goarm:
+      - "6"
+    main: ./packr/main.go
+    binary: packr
+    hooks:
+      pre: packr
+      post: packr clean
 archive:
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
     }}v{{ .Arm }}{{ end }}'
   format: tar.gz
   files:
-  - licence*
-  - LICENCE*
-  - license*
-  - LICENSE*
-  - readme*
-  - README*
-  - changelog*
-  - CHANGELOG*
+    - licence*
+    - LICENCE*
+    - license*
+    - LICENSE*
+    - readme*
+    - README*
+    - changelog*
+    - CHANGELOG*
 fpm:
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
     }}v{{ .Arm }}{{ end }}'
@@ -49,9 +53,9 @@ dist: dist
 sign:
   cmd: gpg
   args:
-  - --output
-  - $signature
-  - --detach-sig
-  - $artifact
+    - --output
+    - $signature
+    - --detach-sig
+    - $artifact
   signature: ${artifact}.sig
   artifacts: none
