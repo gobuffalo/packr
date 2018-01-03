@@ -61,12 +61,12 @@ func Test_Box_Walk_Virtual(t *testing.T) {
 		return nil
 	})
 	r.NoError(err)
-	r.Equal(3, count)
+	r.Equal(4, count)
 }
 
 func Test_List_Virtual(t *testing.T) {
 	r := require.New(t)
-	mustHave := []string{"a", "b", "c"}
+	mustHave := []string{"a", "b", "c", "d/a"}
 	actual := virtualBox.List()
 	sort.Strings(actual)
 	r.Equal(mustHave, actual)
@@ -114,4 +114,12 @@ func Test_Box_find(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_Virtual_Directory_Not_Found(t *testing.T) {
+	r := require.New(t)
+	_, err := virtualBox.find("d")
+	r.NoError(err)
+	_, err = virtualBox.find("does-not-exist")
+	r.Error(err)
 }

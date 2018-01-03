@@ -14,6 +14,7 @@ func init() {
 	PackBytes(virtualBox.Path, "a", []byte("a"))
 	PackBytes(virtualBox.Path, "b", []byte("b"))
 	PackBytes(virtualBox.Path, "c", []byte("c"))
+	PackBytes(virtualBox.Path, "d/a", []byte("d/a"))
 }
 
 func Test_PackBytes(t *testing.T) {
