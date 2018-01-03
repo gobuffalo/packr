@@ -25,7 +25,7 @@ func (b *box) Walk(root string) error {
 		return errors.Errorf("could not find folder for box: %s", root)
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if info == nil || info.IsDir() {
+		if info == nil || info.IsDir() || strings.HasSuffix(info.Name(), "-packr.go") {
 			return nil
 		}
 		name := strings.Replace(path, root+string(os.PathSeparator), "", 1)
