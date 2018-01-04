@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -45,9 +46,10 @@ func NewBox(path string) Box {
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path       string
-	callingDir string
-	data       map[string][]byte
+	Path        string
+	callingDir  string
+	data        map[string][]byte
+	directories map[string]bool
 }
 
 // String of the file asked for or an empty string.
@@ -102,6 +104,10 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
+	if b.directories == nil {
+		b.indexDirectories()
+	}
+
 	cleanName := filepath.ToSlash(filepath.Clean(name))
 	// Ensure name is not outside the box
 	if strings.HasPrefix(cleanName, "../") {
@@ -121,7 +127,10 @@ func (b Box) find(name string) (File, error) {
 			// returns http.StatusNotFound instead of http.StatusInternalServerError.
 			return nil, os.ErrNotExist
 		}
-		return newVirtualDir(cleanName), nil
+		if _, ok := b.directories[cleanName]; ok {
+			return newVirtualDir(cleanName), nil
+		}
+		return nil, os.ErrNotExist
 	}
 
 	// Not found in the box virtual fs, try to get it from the file system
@@ -186,4 +195,16 @@ func (b Box) List() []string {
 		}
 	}
 	return keys
+}
+
+func (b *Box) indexDirectories() {
+	b.directories = map[string]bool{}
+	if _, ok := data[b.Path]; ok {
+		for name, _ := range data[b.Path] {
+			prefix, _ := path.Split(name)
+			// Even on Windows the suffix appears to be a /
+			prefix = strings.TrimSuffix(prefix, "/")
+			b.directories[prefix] = true
+		}
+	}
 }
