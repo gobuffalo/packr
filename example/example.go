@@ -1,9 +1,6 @@
 package example
 
 import (
-	"fmt"
-
-	"github.com/gobuffalo/buffalo/render"
 	"github.com/gobuffalo/packr"
 )
 
@@ -22,10 +19,7 @@ func init() {
 	foo("/templates", packr.NewBox("./templates"))
 	packr.NewBox("./assets")
 
-	r := render.New(render.Options{
-		TemplatesBox: packr.NewBox("./bar"),
-	})
-	fmt.Println(r)
+	packr.NewBox("./bar")
 
 	s := S{}
 	s.f(packr.NewBox("./sf"))
