@@ -13,17 +13,3 @@ matrix:
 
 script:
   - go test -v ./...
-  - GOARCH=amd64 GOOS=linux go build -v -o packr_linux_amd64 ./packr
-  - GOARCH=amd64 GOOS=darwin go build -v -o packr_darwin_amd64 ./packr
-
-deploy:
-  provider: releases
-  api_key:
-    secure: GITHUB_TOKEN
-  file: 
-    - packr_darwin_amd64
-    - packr_linux_amd64
-  skip_cleanup: true
-  on:
-    tags: true
-    condition: $TRAVIS_GO_VERSION =~ ^1\.9(|\.[0-9]+)$
