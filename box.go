@@ -24,7 +24,7 @@ var (
 
 func init() {
 	if runtime.GOOS == "windows" {
-		srcX = regexp.MustCompile(`^.+\src\`)
+		srcX = regexp.MustCompile(`^.+\src\\`)
 	} else {
 		srcX = regexp.MustCompile("^.+/src/")
 	}
