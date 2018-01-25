@@ -2,11 +2,13 @@ package packr
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -103,6 +105,14 @@ func (b Box) decompress(bb []byte) []byte {
 	return data
 }
 
+var srcX = regexp.MustCompile(fmt.Sprintf("^.+%ssrc%s", string(filepath.Separator), string(filepath.Separator)))
+
+func (b Box) lookupKey() string {
+	key := path.Join(b.callingDir, b.Path)
+	key = srcX.ReplaceAllString(key, "")
+	return key
+}
+
 func (b Box) find(name string) (File, error) {
 	if b.directories == nil {
 		b.indexDirectories()
@@ -117,8 +127,8 @@ func (b Box) find(name string) (File, error) {
 	cleanName = strings.TrimPrefix(cleanName, "/")
 
 	// Try to get the resource from the box
-	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][cleanName]; ok {
+	if _, ok := data[b.lookupKey()]; ok {
+		if bb, ok := data[b.lookupKey()][cleanName]; ok {
 			bb = b.decompress(bb)
 			return newVirtualFile(cleanName, bb), nil
 		}
@@ -145,7 +155,7 @@ func (b Box) find(name string) (File, error) {
 type WalkFunc func(string, File) error
 
 func (b Box) Walk(wf WalkFunc) error {
-	if data[b.Path] == nil {
+	if data[b.lookupKey()] == nil {
 		base := filepath.Join(b.callingDir, b.Path)
 		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
 			shortPath := strings.TrimPrefix(path, base)
@@ -159,7 +169,7 @@ func (b Box) Walk(wf WalkFunc) error {
 			return wf(shortPath, physicalFile{f})
 		})
 	}
-	for n := range data[b.Path] {
+	for n := range data[b.lookupKey()] {
 		f, err := b.find(n)
 		if err != nil {
 			return err
@@ -199,8 +209,8 @@ func (b Box) List() []string {
 
 func (b *Box) indexDirectories() {
 	b.directories = map[string]bool{}
-	if _, ok := data[b.Path]; ok {
-		for name, _ := range data[b.Path] {
+	if _, ok := data[b.lookupKey()]; ok {
+		for name, _ := range data[b.lookupKey()] {
 			prefix, _ := path.Split(name)
 			// Even on Windows the suffix appears to be a /
 			prefix = strings.TrimSuffix(prefix, "/")

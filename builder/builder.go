@@ -3,11 +3,14 @@ package builder
 import (
 	"context"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"text/template"
 
+	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -76,19 +79,19 @@ func (b *Builder) dump() error {
 	return nil
 }
 
-func (b *Builder) process(path string) error {
-	ext := filepath.Ext(path)
-	if ext != ".go" || invalidFilePattern.MatchString(path) {
+func (b *Builder) process(root string) error {
+	ext := filepath.Ext(root)
+	if ext != ".go" || invalidFilePattern.MatchString(root) {
 		return nil
 	}
 
-	v := newVisitor(path)
+	v := newVisitor(root)
 	if err := v.Run(); err != nil {
 		return errors.WithStack(err)
 	}
 
 	pk := pkg{
-		Dir:   filepath.Dir(path),
+		Dir:   filepath.Dir(root),
 		Boxes: []box{},
 		Name:  v.Package,
 	}
@@ -105,13 +108,17 @@ func (b *Builder) process(path string) error {
 		if ignored {
 			continue
 		}
+		wp := path.Join(filepath.Dir(root), n)
+		n = wp
+		for _, gp := range envy.GoPaths() {
+			n = strings.TrimPrefix(n, filepath.Join(gp, "src")+string(filepath.Separator))
+		}
 		bx := &box{
 			Name:     n,
 			Files:    []file{},
 			compress: b.Compress,
 		}
-		p := filepath.Join(pk.Dir, bx.Name)
-		if err := bx.Walk(p); err != nil {
+		if err := bx.Walk(wp); err != nil {
 			return errors.WithStack(err)
 		}
 		if len(bx.Files) > 0 {
