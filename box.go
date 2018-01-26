@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 
@@ -19,16 +18,7 @@ import (
 
 var (
 	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
-	srcX             *regexp.Regexp
 )
-
-func init() {
-	if runtime.GOOS == "windows" {
-		srcX = regexp.MustCompile("^.+\\src")
-	} else {
-		srcX = regexp.MustCompile("^.+/src")
-	}
-}
 
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded

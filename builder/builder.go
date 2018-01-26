@@ -107,10 +107,15 @@ func (b *Builder) process(root string) error {
 			continue
 		}
 		wp := filepath.Join(filepath.Dir(root), n)
-		n := wp[strings.Index(n, "src")+4:]
-		n = filepath.ToSlash(n)
+		key := wp
+		src := string(filepath.Separator) + "src" + string(filepath.Separator)
+		index := strings.Index(wp, src)
+		if index > 0 {
+			key = wp[index+len(src):]
+		}
+		key = filepath.ToSlash(key)
 		bx := &box{
-			Name:     n,
+			Name:     key,
 			Files:    []file{},
 			compress: b.Compress,
 		}
