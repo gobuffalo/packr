@@ -2,7 +2,6 @@ package packr
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -15,7 +14,6 @@ import (
 	"compress/gzip"
 
 	"github.com/gobuffalo/envy"
-	"github.com/kr/pretty"
 	"github.com/pkg/errors"
 )
 
@@ -26,7 +24,7 @@ var (
 
 func init() {
 	if runtime.GOOS == "windows" {
-		srcX = regexp.MustCompile(`^.+\src`)
+		srcX = regexp.MustCompile("^.+\\src")
 	} else {
 		srcX = regexp.MustCompile("^.+/src")
 	}
@@ -117,10 +115,8 @@ func (b Box) decompress(bb []byte) []byte {
 
 func (b Box) lookupKey() string {
 	key := path.Join(b.callingDir, b.Path)
-	key = srcX.ReplaceAllString(key, "")
-	key = strings.TrimSuffix(key, string(filepath.Separator))
-	fmt.Println("srcX", srcX.String())
-	pretty.Println("### key ->", key)
+	key = key[strings.Index(key, "src")+4:]
+	key = filepath.ToSlash(key)
 	return key
 }
 

@@ -3,14 +3,12 @@ package builder
 import (
 	"context"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
 	"text/template"
 
-	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -108,11 +106,9 @@ func (b *Builder) process(root string) error {
 		if ignored {
 			continue
 		}
-		wp := path.Join(filepath.Dir(root), n)
-		n = wp
-		for _, gp := range envy.GoPaths() {
-			n = strings.TrimPrefix(n, filepath.Join(gp, "src")+string(filepath.Separator))
-		}
+		wp := filepath.Join(filepath.Dir(root), n)
+		n := wp[strings.Index(n, "src")+4:]
+		n = filepath.ToSlash(n)
 		bx := &box{
 			Name:     n,
 			Files:    []file{},
