@@ -105,7 +105,11 @@ func (b Box) decompress(bb []byte) []byte {
 
 func (b Box) lookupKey() string {
 	key := path.Join(b.callingDir, b.Path)
-	key = key[strings.Index(key, "src")+4:]
+	src := string(filepath.Separator) + "src" + string(filepath.Separator)
+	index := strings.Index(key, src)
+	if index > 0 {
+		key = key[index+len(src):]
+	}
 	key = filepath.ToSlash(key)
 	return key
 }
