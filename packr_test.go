@@ -9,12 +9,18 @@ import (
 
 var testBox = NewBox("./fixtures")
 var virtualBox = NewBox("./virtual")
+var v1Box = NewBox("./v1")
 
 func init() {
 	PackBytes("github.com/gobuffalo/packr/virtual", "a", []byte("a"))
 	PackBytes("github.com/gobuffalo/packr/virtual", "b", []byte("b"))
 	PackBytes("github.com/gobuffalo/packr/virtual", "c", []byte("c"))
 	PackBytes("github.com/gobuffalo/packr/virtual", "d/a", []byte("d/a"))
+
+	PackBytes("./v1", "a", []byte("a"))
+	PackBytes("./v1", "b", []byte("b"))
+	PackBytes("./v1", "c", []byte("c"))
+	PackBytes("./v1", "d/a", []byte("d/a"))
 }
 
 func Test_PackBytes(t *testing.T) {

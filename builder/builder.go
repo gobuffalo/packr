@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 	"text/template"
 
+	"github.com/markbates/inflect"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -107,15 +107,8 @@ func (b *Builder) process(root string) error {
 			continue
 		}
 		wp := filepath.Join(filepath.Dir(root), n)
-		key := wp
-		src := string(filepath.Separator) + "src" + string(filepath.Separator)
-		index := strings.Index(wp, src)
-		if index > 0 {
-			key = wp[index+len(src):]
-		}
-		key = filepath.ToSlash(key)
 		bx := &box{
-			Name:     key,
+			Name:     inflect.Name(wp).Package(),
 			Files:    []file{},
 			compress: b.Compress,
 		}
