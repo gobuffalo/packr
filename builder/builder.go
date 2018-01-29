@@ -2,6 +2,7 @@ package builder
 
 import (
 	"context"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -140,6 +141,10 @@ func (b *Builder) addPkg(p pkg) {
 
 // New Builder with a given context and path
 func New(ctx context.Context, path string) *Builder {
+	path, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &Builder{
 		Context:      ctx,
 		RootPath:     path,
