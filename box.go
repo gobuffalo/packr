@@ -13,6 +13,7 @@ import (
 	"compress/gzip"
 
 	"github.com/gobuffalo/envy"
+	"github.com/markbates/inflect"
 	"github.com/pkg/errors"
 )
 
@@ -103,15 +104,11 @@ func (b Box) decompress(bb []byte) []byte {
 	return data
 }
 
-func (b Box) lookupKey() string {
-	key := path.Join(b.callingDir, b.Path)
-	src := string(filepath.Separator) + "src" + string(filepath.Separator)
-	index := strings.Index(key, src)
-	if index > 0 {
-		key = key[index+len(src):]
+func (b Box) lookupKeys() []string {
+	return []string{
+		inflect.Name(filepath.Join(b.callingDir, b.Path)).Package(),
+		b.Path,
 	}
-	key = filepath.ToSlash(key)
-	return key
 }
 
 func (b Box) find(name string) (File, error) {
@@ -128,20 +125,22 @@ func (b Box) find(name string) (File, error) {
 	cleanName = strings.TrimPrefix(cleanName, "/")
 
 	// Try to get the resource from the box
-	if _, ok := data[b.lookupKey()]; ok {
-		if bb, ok := data[b.lookupKey()][cleanName]; ok {
-			bb = b.decompress(bb)
-			return newVirtualFile(cleanName, bb), nil
-		}
-		if filepath.Ext(cleanName) != "" {
-			// The Handler created by http.FileSystem checks for those errors and
-			// returns http.StatusNotFound instead of http.StatusInternalServerError.
+	for _, key := range b.lookupKeys() {
+		if _, ok := data[key]; ok {
+			if bb, ok := data[key][cleanName]; ok {
+				bb = b.decompress(bb)
+				return newVirtualFile(cleanName, bb), nil
+			}
+			if filepath.Ext(cleanName) != "" {
+				// The Handler created by http.FileSystem checks for those errors and
+				// returns http.StatusNotFound instead of http.StatusInternalServerError.
+				return nil, os.ErrNotExist
+			}
+			if _, ok := b.directories[cleanName]; ok {
+				return newVirtualDir(cleanName), nil
+			}
 			return nil, os.ErrNotExist
 		}
-		if _, ok := b.directories[cleanName]; ok {
-			return newVirtualDir(cleanName), nil
-		}
-		return nil, os.ErrNotExist
 	}
 
 	// Not found in the box virtual fs, try to get it from the file system
@@ -156,28 +155,32 @@ func (b Box) find(name string) (File, error) {
 type WalkFunc func(string, File) error
 
 func (b Box) Walk(wf WalkFunc) error {
-	if data[b.lookupKey()] == nil {
-		base := filepath.Join(b.callingDir, b.Path)
-		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
-			shortPath := strings.TrimPrefix(path, base)
-			if info == nil || info.IsDir() {
-				return nil
-			}
-			f, err := os.Open(path)
+	for _, key := range b.lookupKeys() {
+		for n := range data[key] {
+			f, err := b.find(n)
 			if err != nil {
 				return err
 			}
-			return wf(shortPath, physicalFile{f})
-		})
-	}
-	for n := range data[b.lookupKey()] {
-		f, err := b.find(n)
-		if err != nil {
-			return err
+			err = wf(n, f)
+			if err != nil {
+				return err
+			}
 		}
-		err = wf(n, f)
-		if err != nil {
-			return err
+	}
+	for _, key := range b.lookupKeys() {
+		if data[key] == nil {
+			base := filepath.Join(b.callingDir, b.Path)
+			return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+				shortPath := strings.TrimPrefix(path, base)
+				if info == nil || info.IsDir() {
+					return nil
+				}
+				f, err := os.Open(path)
+				if err != nil {
+					return err
+				}
+				return wf(shortPath, physicalFile{f})
+			})
 		}
 	}
 	return nil
@@ -210,12 +213,14 @@ func (b Box) List() []string {
 
 func (b *Box) indexDirectories() {
 	b.directories = map[string]bool{}
-	if _, ok := data[b.lookupKey()]; ok {
-		for name, _ := range data[b.lookupKey()] {
-			prefix, _ := path.Split(name)
-			// Even on Windows the suffix appears to be a /
-			prefix = strings.TrimSuffix(prefix, "/")
-			b.directories[prefix] = true
+	for _, key := range b.lookupKeys() {
+		if _, ok := data[key]; ok {
+			for name, _ := range data[key] {
+				prefix, _ := path.Split(name)
+				// Even on Windows the suffix appears to be a /
+				prefix = strings.TrimSuffix(prefix, "/")
+				b.directories[prefix] = true
+			}
 		}
 	}
 }
