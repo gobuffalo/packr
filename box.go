@@ -136,8 +136,8 @@ func (b Box) find(name string) (File, error) {
 	// Not found in the box virtual fs, try to get it from the file system
 	cleanName = filepath.FromSlash(cleanName)
 	p := filepath.Join(b.callingDir, b.Path, cleanName)
-	if f, err := os.Open(p); err == nil {
-		return physicalFile{f}, nil
+	if bb, err := ioutil.ReadFile(p); err == nil {
+		return newVirtualFile(cleanName, bb), nil
 	}
 	return nil, os.ErrNotExist
 }
