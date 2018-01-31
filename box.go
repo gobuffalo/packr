@@ -136,10 +136,7 @@ func (b Box) find(name string) (File, error) {
 	// Not found in the box virtual fs, try to get it from the file system
 	cleanName = filepath.FromSlash(cleanName)
 	p := filepath.Join(b.callingDir, b.Path, cleanName)
-	if f, err := os.Open(p); err == nil {
-		return physicalFile{f}, nil
-	}
-	return nil, os.ErrNotExist
+	return fileFor(p, cleanName)
 }
 
 type WalkFunc func(string, File) error
@@ -151,15 +148,19 @@ func (b Box) Walk(wf WalkFunc) error {
 			return errors.WithStack(err)
 		}
 		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
-			shortPath := strings.TrimPrefix(path, base)
+			cleanName := strings.TrimPrefix(path, base)
+			cleanName = filepath.ToSlash(filepath.Clean(cleanName))
+			cleanName = strings.TrimPrefix(cleanName, "/")
+			cleanName = filepath.FromSlash(cleanName)
 			if info == nil || info.IsDir() {
 				return nil
 			}
-			f, err := os.Open(path)
+
+			file, err := fileFor(path, cleanName)
 			if err != nil {
 				return err
 			}
-			return wf(shortPath, physicalFile{f})
+			return wf(cleanName, file)
 		})
 	}
 	for n := range data[b.Path] {
@@ -210,4 +211,18 @@ func (b *Box) indexDirectories() {
 			b.directories[prefix] = true
 		}
 	}
+}
+
+func fileFor(p string, name string) (File, error) {
+	fi, err := os.Stat(p)
+	if err != nil {
+		return nil, err
+	}
+	if fi.IsDir() {
+		return newVirtualDir(p), nil
+	}
+	if bb, err := ioutil.ReadFile(p); err == nil {
+		return newVirtualFile(name, bb), nil
+	}
+	return nil, os.ErrNotExist
 }
