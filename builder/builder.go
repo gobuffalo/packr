@@ -29,7 +29,11 @@ type Builder struct {
 // Run the builder.
 func (b *Builder) Run() error {
 	wg := &errgroup.Group{}
-	err := filepath.Walk(b.RootPath, func(path string, info os.FileInfo, err error) error {
+	root, err := filepath.EvalSymlinks(b.RootPath)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
 			return filepath.SkipDir
 		}
