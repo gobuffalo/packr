@@ -11,6 +11,7 @@ import (
 
 // Clean up an *-packr.go files
 func Clean(root string) {
+	root, _ = filepath.EvalSymlinks(root)
 	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		base := filepath.Base(path)
 		if base == ".git" || base == "vendor" || base == "node_modules" {

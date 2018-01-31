@@ -64,29 +64,10 @@ func Test_Box_Walk_Virtual(t *testing.T) {
 	r.Equal(4, count)
 }
 
-func Test_Box_Walk_Virtual_v1(t *testing.T) {
-	r := require.New(t)
-	count := 0
-	err := v1Box.Walk(func(path string, f File) error {
-		count++
-		return nil
-	})
-	r.NoError(err)
-	r.Equal(4, count)
-}
-
 func Test_List_Virtual(t *testing.T) {
 	r := require.New(t)
 	mustHave := []string{"a", "b", "c", "d/a"}
 	actual := virtualBox.List()
-	sort.Strings(actual)
-	r.Equal(mustHave, actual)
-}
-
-func Test_List_Virtual_v1(t *testing.T) {
-	r := require.New(t)
-	mustHave := []string{"a", "b", "c", "d/a"}
-	actual := v1Box.List()
 	sort.Strings(actual)
 	r.Equal(mustHave, actual)
 }

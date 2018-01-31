@@ -2,14 +2,12 @@ package builder
 
 import (
 	"context"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sync"
 	"text/template"
 
-	"github.com/markbates/inflect"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -31,7 +29,11 @@ type Builder struct {
 // Run the builder.
 func (b *Builder) Run() error {
 	wg := &errgroup.Group{}
-	err := filepath.Walk(b.RootPath, func(path string, info os.FileInfo, err error) error {
+	root, err := filepath.EvalSymlinks(b.RootPath)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
 			return filepath.SkipDir
 		}
@@ -78,19 +80,19 @@ func (b *Builder) dump() error {
 	return nil
 }
 
-func (b *Builder) process(root string) error {
-	ext := filepath.Ext(root)
-	if ext != ".go" || invalidFilePattern.MatchString(root) {
+func (b *Builder) process(path string) error {
+	ext := filepath.Ext(path)
+	if ext != ".go" || invalidFilePattern.MatchString(path) {
 		return nil
 	}
 
-	v := newVisitor(root)
+	v := newVisitor(path)
 	if err := v.Run(); err != nil {
 		return errors.WithStack(err)
 	}
 
 	pk := pkg{
-		Dir:   filepath.Dir(root),
+		Dir:   filepath.Dir(path),
 		Boxes: []box{},
 		Name:  v.Package,
 	}
@@ -107,13 +109,13 @@ func (b *Builder) process(root string) error {
 		if ignored {
 			continue
 		}
-		wp := filepath.Join(filepath.Dir(root), n)
 		bx := &box{
-			Name:     inflect.Name(wp).Package(),
+			Name:     n,
 			Files:    []file{},
 			compress: b.Compress,
 		}
-		if err := bx.Walk(wp); err != nil {
+		p := filepath.Join(pk.Dir, bx.Name)
+		if err := bx.Walk(p); err != nil {
 			return errors.WithStack(err)
 		}
 		if len(bx.Files) > 0 {
@@ -141,10 +143,6 @@ func (b *Builder) addPkg(p pkg) {
 
 // New Builder with a given context and path
 func New(ctx context.Context, path string) *Builder {
-	path, err := filepath.EvalSymlinks(path)
-	if err != nil {
-		log.Fatal(err)
-	}
 	return &Builder{
 		Context:      ctx,
 		RootPath:     path,

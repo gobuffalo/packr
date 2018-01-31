@@ -20,6 +20,10 @@ type box struct {
 }
 
 func (b *box) Walk(root string) error {
+	root, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	if _, err := os.Stat(root); err != nil {
 		// return nil
 		return errors.Errorf("could not find folder for box: %s", root)
