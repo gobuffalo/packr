@@ -72,8 +72,6 @@ func main() {
 }
 ```
 
-Note that should never access a box from the `init` function because it does not have a guaranteed execution order.
-
 ### Development Made Easy
 
 In order to get static files into a Go binary, those files must first be converted to Go code. To do that, Packr, ships with a few tools to help build binaries. See below.
