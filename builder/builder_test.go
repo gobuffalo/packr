@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/packr"
 	"github.com/stretchr/testify/require"
 )
 
@@ -91,7 +91,7 @@ func Test_Binary_Builds(t *testing.T) {
 	r.NoError(err)
 
 	os.Chdir(root)
-	cmd := exec.Command(envy.Get("GO_BIN", "go"), "build", "-v", "-o", "bin/example")
+	cmd := exec.Command(packr.GoBin(), "build", "-v", "-o", "bin/example")
 	err = cmd.Run()
 	r.NoError(err)
 

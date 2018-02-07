@@ -12,7 +12,6 @@ import (
 
 	"compress/gzip"
 
-	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
 )
 
@@ -34,7 +33,7 @@ func NewBox(path string) Box {
 	cov := filepath.Join("_test", "_obj_test")
 	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
 	if !filepath.IsAbs(cd) && cd != "" {
-		cd = filepath.Join(envy.GoPath(), "src", cd)
+		cd = filepath.Join(GoPath(), "src", cd)
 	}
 
 	return Box{

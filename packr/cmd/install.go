@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/packr"
 	"github.com/gobuffalo/packr/builder"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -22,7 +22,7 @@ var installCmd = &cobra.Command{
 		if len(args) > 0 {
 			input = args[len(args)-1]
 			if !strings.HasPrefix(input, ".") {
-				input = filepath.Join(envy.GoPath(), "src", input)
+				input = filepath.Join(packr.GoPath(), "src", input)
 				if _, err := os.Stat(input); err != nil {
 					return errors.WithStack(err)
 				}
@@ -37,7 +37,7 @@ var installCmd = &cobra.Command{
 
 		cargs := []string{"install"}
 		cargs = append(cargs, args...)
-		cp := exec.Command(envy.Get("GO_BIN", "go"), cargs...)
+		cp := exec.Command(packr.GoBin(), cargs...)
 		cp.Stderr = os.Stderr
 		cp.Stdin = os.Stdin
 		cp.Stdout = os.Stdout
