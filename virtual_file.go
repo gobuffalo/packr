@@ -25,7 +25,7 @@ func (f virtualFile) Close() error {
 }
 
 func (f virtualFile) Write(p []byte) (n int, err error) {
-	return 0, fmt.Errorf("Not implemented")
+	return 0, fmt.Errorf("not implemented")
 }
 
 func (f virtualFile) Readdir(count int) ([]os.FileInfo, error) {
@@ -50,7 +50,7 @@ func newVirtualFile(name string, b []byte) File {
 }
 
 func newVirtualDir(name string) File {
-	b := []byte{}
+	var b []byte
 	v := newVirtualFile(name, b).(virtualFile)
 	v.info.isDir = true
 	return v
