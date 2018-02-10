@@ -1,14 +1,13 @@
 package builder
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"bytes"
-	"compress/gzip"
 
 	"github.com/pkg/errors"
 )
