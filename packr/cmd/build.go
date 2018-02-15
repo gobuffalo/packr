@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/packr"
 	"github.com/gobuffalo/packr/builder"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -26,7 +26,7 @@ var buildCmd = &cobra.Command{
 
 		cargs := []string{"build"}
 		cargs = append(cargs, args...)
-		cp := exec.Command(envy.Get("GO_BIN", "go"), cargs...)
+		cp := exec.Command(packr.GoBin(), cargs...)
 		cp.Stderr = os.Stderr
 		cp.Stdin = os.Stdin
 		cp.Stdout = os.Stdout
