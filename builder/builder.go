@@ -12,6 +12,12 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+var DebugLog func(string, ...interface{})
+
+func init() {
+	DebugLog = func(string, ...interface{}) {}
+}
+
 var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 
 // Builder scans folders/files looking for `packr.NewBox` and then compiling
@@ -114,6 +120,7 @@ func (b *Builder) process(path string) error {
 			Files:    []file{},
 			compress: b.Compress,
 		}
+		DebugLog("building box %s\n", bx.Name)
 		p := filepath.Join(pk.Dir, bx.Name)
 		if err := bx.Walk(p); err != nil {
 			return errors.WithStack(err)
@@ -121,6 +128,7 @@ func (b *Builder) process(path string) error {
 		if len(bx.Files) > 0 {
 			pk.Boxes = append(pk.Boxes, *bx)
 		}
+		DebugLog("built box %s with %q\n", bx.Name, bx.Files)
 	}
 
 	if len(pk.Boxes) > 0 {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/gobuffalo/packr/builder"
@@ -14,6 +15,17 @@ var compress bool
 var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "compiles static files into Go files",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		for _, a := range args {
+			if a == "-v" {
+				builder.DebugLog = func(s string, a ...interface{}) {
+					os.Stdout.WriteString(fmt.Sprintf(s, a...))
+				}
+				break
+			}
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b := builder.New(context.Background(), input)
 		b.Compress = compress
