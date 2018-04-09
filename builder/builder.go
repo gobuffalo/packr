@@ -39,7 +39,7 @@ func (b *Builder) Run() error {
 		}
 
 		base := filepath.Base(path)
-		if base == ".git" || base == "vendor" || base == "node_modules" {
+		if base == ".git" || base == "vendor" || base == "node_modules" || base == ".idea" {
 			return filepath.SkipDir
 		}
 
