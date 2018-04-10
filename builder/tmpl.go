@@ -11,10 +11,10 @@ import "github.com/gobuffalo/packr"
 // Go binary. You can use the "packr clean" command to clean up this,
 // and any other packr generated files.
 func init() {
-	{{ range $box := .Boxes -}}
-	{{range .Files -}}
+	{{- range $box := .Boxes }}
+	{{- range .Files }}
 		packr.PackJSONBytes("{{$box.Name}}", "{{.Name}}", "{{.Contents}}")
-	{{end -}}
-	{{end -}}
+	{{- end }}
+	{{- end }}
 }
 `
