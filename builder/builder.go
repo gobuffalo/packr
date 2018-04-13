@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"text/template"
 
@@ -25,11 +26,12 @@ var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
 // be built into Go binaries.
 type Builder struct {
 	context.Context
-	RootPath     string
-	IgnoredBoxes []string
-	pkgs         map[string]pkg
-	moot         *sync.Mutex
-	Compress     bool
+	RootPath       string
+	IgnoredBoxes   []string
+	IgnoredFolders []string
+	pkgs           map[string]pkg
+	moot           *sync.Mutex
+	Compress       bool
 }
 
 // Run the builder.
@@ -44,11 +46,12 @@ func (b *Builder) Run() error {
 			return filepath.SkipDir
 		}
 
-		base := filepath.Base(path)
-		if base == ".git" || base == "vendor" || base == "node_modules" || base == ".idea" {
-			return filepath.SkipDir
+		base := strings.ToLower(filepath.Base(path))
+		for _, f := range b.IgnoredFolders {
+			if strings.ToLower(f) == base {
+				return filepath.SkipDir
+			}
 		}
-
 		if !info.IsDir() {
 			wg.Go(func() error {
 				return b.process(path)
@@ -152,10 +155,11 @@ func (b *Builder) addPkg(p pkg) {
 // New Builder with a given context and path
 func New(ctx context.Context, path string) *Builder {
 	return &Builder{
-		Context:      ctx,
-		RootPath:     path,
-		IgnoredBoxes: []string{},
-		pkgs:         map[string]pkg{},
-		moot:         &sync.Mutex{},
+		Context:        ctx,
+		RootPath:       path,
+		IgnoredBoxes:   []string{},
+		IgnoredFolders: []string{"vendor", ".git", "node_modules", ".idea"},
+		pkgs:           map[string]pkg{},
+		moot:           &sync.Mutex{},
 	}
 }
