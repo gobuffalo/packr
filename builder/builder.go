@@ -70,7 +70,7 @@ func (b *Builder) Run() error {
 
 func (b *Builder) dump() error {
 	for _, p := range b.pkgs {
-		name := filepath.Join(p.Dir, p.Name+"-packr.go")
+		name := filepath.Join(p.Dir, "a_"+p.Name+"-packr.go")
 		f, err := os.Create(name)
 		defer f.Close()
 		if err != nil {
