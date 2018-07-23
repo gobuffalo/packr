@@ -11,6 +11,7 @@ import (
 
 var input string
 var compress bool
+var prefix string
 var verbose bool
 
 var rootCmd = &cobra.Command{
@@ -36,6 +37,7 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b := builder.New(context.Background(), input)
 		b.Compress = compress
+		b.Prefix = prefix
 		return b.Run()
 	},
 }
@@ -44,6 +46,7 @@ func init() {
 	pwd, _ := os.Getwd()
 	rootCmd.Flags().StringVarP(&input, "input", "i", pwd, "path to scan for packr Boxes")
 	rootCmd.Flags().BoolVarP(&compress, "compress", "z", false, "compress box contents")
+	rootCmd.Flags().StringVarP(&prefix, "prefix", "p", "", "prefix before generated file names")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print verbose logging information")
 }
 
