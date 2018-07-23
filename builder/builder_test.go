@@ -19,10 +19,10 @@ func Test_Builder_Run(t *testing.T) {
 	root := filepath.Join("..", "example")
 	defer Clean(root)
 
-	exPackr := filepath.Join(root, "a_example-packr.go")
+	exPackr := filepath.Join(root, "example-packr.go")
 	r.False(fileExists(exPackr))
 
-	fooPackr := filepath.Join(root, "foo", "a_foo-packr.go")
+	fooPackr := filepath.Join(root, "foo", "foo-packr.go")
 	r.False(fileExists(fooPackr))
 
 	b := New(context.Background(), root)
@@ -51,10 +51,10 @@ func Test_Builder_Run_Compress(t *testing.T) {
 	root := filepath.Join("..", "example")
 	defer Clean(root)
 
-	exPackr := filepath.Join(root, "a_example-packr.go")
+	exPackr := filepath.Join(root, "example-packr.go")
 	r.False(fileExists(exPackr))
 
-	fooPackr := filepath.Join(root, "foo", "a_foo-packr.go")
+	fooPackr := filepath.Join(root, "foo", "foo-packr.go")
 	r.False(fileExists(fooPackr))
 
 	b := New(context.Background(), root)
@@ -75,6 +75,39 @@ func Test_Builder_Run_Compress(t *testing.T) {
 	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.css", "\"H4sIAAAAAAAA/0rKT`)))
 	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.js", "\"H4sIAAAAAAAA/0rMSS`)))
 	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../templates", "index.html", "\"H4sIAAAAAAAA`)))
+}
+
+func Test_Builder_Run_Prefix(t *testing.T) {
+	r := require.New(t)
+
+	root := filepath.Join("..", "example")
+	defer Clean(root)
+
+	exPackr := filepath.Join(root, "a_example-packr.go")
+	r.False(fileExists(exPackr))
+
+	fooPackr := filepath.Join(root, "foo", "a_foo-packr.go")
+	r.False(fileExists(fooPackr))
+
+	b := New(context.Background(), root)
+	b.Prefix = "a_"
+	err := b.Run()
+	r.NoError(err)
+
+	r.True(fileExists(exPackr))
+	r.True(fileExists(fooPackr))
+
+	bb, err := ioutil.ReadFile(exPackr)
+	r.NoError(err)
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "app.css", "\"Ym9ke`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./assets", "app.js", "\"YWxlcn`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("./templates", "index.html", "\"PCFET0NUWVBF`)))
+
+	bb, err = ioutil.ReadFile(fooPackr)
+	r.NoError(err)
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.css", "\"Ym9keS`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../assets", "app.js", "\"YWxlcn`)))
+	r.True(bytes.Contains(bb, []byte(`packr.PackJSONBytes("../templates", "index.html", "\"PCFET0NUW`)))
 }
 
 func Test_Binary_Builds(t *testing.T) {
