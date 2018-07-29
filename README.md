@@ -140,6 +140,31 @@ Why do you want to do this? Packr first looks to the information stored in these
 
 ---
 
+## Usage in `init`
+
+There is a issue that *might* arise when using `Box` inside an `init` function, like so:
+
+```go
+func init() {
+	box := packr.NewBox("./files")
+}
+```
+
+This is due to `packr` also using the `init` function. Since Go runs the `init` functions in the order of the files that are passed to it, if your file that uses the `init` function comes after the `*-packr.go` file in alphabetical order, `packr` will not work as expected.
+
+### Fix
+
+A simple fix for this is to use the `--prefix` or `-p` flag to add a `a_` prefix to the generated file names.
+
+```bash
+# Generated files would be a_*-packr.go
+$ packr -p a_
+```
+
+This would place the generated files before your other files in alphabetical order, thus solving the problem.
+
+---
+
 ## Debugging
 
 The `packr` command passes all arguments down to the underlying `go` command, this includes the `-v` flag to print out `go build` information. Packr looks for the `-v` flag, and will turn on its own verbose logging. This is very useful for trying to understand what the `packr` command is doing when it is run.

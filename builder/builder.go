@@ -32,6 +32,7 @@ type Builder struct {
 	pkgs           map[string]pkg
 	moot           *sync.Mutex
 	Compress       bool
+	Prefix         string
 }
 
 // Run the builder.
@@ -73,7 +74,7 @@ func (b *Builder) Run() error {
 
 func (b *Builder) dump() error {
 	for _, p := range b.pkgs {
-		name := filepath.Join(p.Dir, "a_"+p.Name+"-packr.go")
+		name := filepath.Join(p.Dir, b.Prefix+p.Name+"-packr.go")
 		f, err := os.Create(name)
 		defer f.Close()
 		if err != nil {
