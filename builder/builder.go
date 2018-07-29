@@ -47,6 +47,9 @@ func (b *Builder) Run() error {
 		}
 
 		base := strings.ToLower(filepath.Base(path))
+		if strings.HasPrefix(base, "_") {
+			return filepath.SkipDir
+		}
 		for _, f := range b.IgnoredFolders {
 			if strings.ToLower(f) == base {
 				return filepath.SkipDir
