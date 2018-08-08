@@ -149,46 +149,6 @@ func (b Box) find(name string) (File, error) {
 	return fileFor(p, cleanName)
 }
 
-type WalkFunc func(string, File) error
-
-func (b Box) Walk(wf WalkFunc) error {
-	if data[b.Path] == nil {
-		base, err := filepath.EvalSymlinks(filepath.Join(b.callingDir, b.Path))
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
-			cleanName, err := filepath.Rel(base, path)
-			if err != nil {
-				cleanName = strings.TrimPrefix(path, base)
-			}
-			cleanName = filepath.ToSlash(filepath.Clean(cleanName))
-			cleanName = strings.TrimPrefix(cleanName, "/")
-			cleanName = filepath.FromSlash(cleanName)
-			if info == nil || info.IsDir() {
-				return nil
-			}
-
-			file, err := fileFor(path, cleanName)
-			if err != nil {
-				return err
-			}
-			return wf(cleanName, file)
-		})
-	}
-	for n := range data[b.Path] {
-		f, err := b.find(n)
-		if err != nil {
-			return err
-		}
-		err = wf(n, f)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
 	return b.find(name)

@@ -42,28 +42,6 @@ func Test_Box_Has(t *testing.T) {
 	r.False(testBox.Has("idontexist.txt"))
 }
 
-func Test_Box_Walk_Physical(t *testing.T) {
-	r := require.New(t)
-	count := 0
-	err := testBox.Walk(func(path string, f File) error {
-		count++
-		return nil
-	})
-	r.NoError(err)
-	r.Equal(3, count)
-}
-
-func Test_Box_Walk_Virtual(t *testing.T) {
-	r := require.New(t)
-	count := 0
-	err := virtualBox.Walk(func(path string, f File) error {
-		count++
-		return nil
-	})
-	r.NoError(err)
-	r.Equal(4, count)
-}
-
 func Test_List_Virtual(t *testing.T) {
 	r := require.New(t)
 	mustHave := []string{"a", "b", "c", "d/a"}
@@ -74,7 +52,7 @@ func Test_List_Virtual(t *testing.T) {
 
 func Test_List_Physical(t *testing.T) {
 	r := require.New(t)
-	mustHave := []string{"goodbye.txt", "hello.txt", "index.html"}
+	mustHave := []string{"foo/a.txt", "foo/bar/b.txt", "goodbye.txt", "hello.txt", "index.html"}
 	actual := testBox.List()
 	r.Equal(mustHave, actual)
 }
