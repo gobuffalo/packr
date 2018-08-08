@@ -55,7 +55,7 @@ func Test_List_Physical(t *testing.T) {
 	mustHave := []string{"foo/a.txt", "foo/bar/b.txt", "goodbye.txt", "hello.txt", "index.html"}
 	if runtime.GOOS == "windows" {
 		for i, x := range mustHave {
-			mustHave[i] = strings.Replace(x, "/", "\\\\", -1)
+			mustHave[i] = strings.Replace(x, "/", "\\", -1)
 		}
 	}
 	actual := testBox.List()

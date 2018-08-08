@@ -43,7 +43,7 @@ func Test_Box_WalkPrefix_Physical(t *testing.T) {
 	mustHave := []string{"foo/a.txt", "foo/bar/b.txt"}
 	if runtime.GOOS == "windows" {
 		for i, x := range mustHave {
-			mustHave[i] = strings.Replace(x, "/", "\\\\", -1)
+			mustHave[i] = strings.Replace(x, "/", "\\", -1)
 		}
 	}
 	r.Equal(mustHave, files)
