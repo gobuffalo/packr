@@ -1,8 +1,6 @@
 package packr
 
 import (
-	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -40,12 +38,7 @@ func Test_Box_WalkPrefix_Physical(t *testing.T) {
 	})
 	r.NoError(err)
 	r.Equal(2, len(files))
-	mustHave := []string{"foo/a.txt", "foo/bar/b.txt"}
-	if runtime.GOOS == "windows" {
-		for i, x := range mustHave {
-			mustHave[i] = strings.Replace(x, "/", "\\", -1)
-		}
-	}
+	mustHave := osPaths("foo/a.txt", "foo/bar/b.txt")
 	r.Equal(mustHave, files)
 }
 
