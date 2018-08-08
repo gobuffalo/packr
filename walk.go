@@ -51,6 +51,7 @@ func (b Box) Walk(wf WalkFunc) error {
 
 // WalkPrefix will call box.Walk and call the WalkFunc when it finds paths that have a matching prefix
 func (b Box) WalkPrefix(prefix string, wf WalkFunc) error {
+	prefix = strings.Replace(prefix, "/", "\\", -1)
 	return b.Walk(func(path string, f File) error {
 		if strings.HasPrefix(path, prefix) {
 			if err := wf(path, f); err != nil {
