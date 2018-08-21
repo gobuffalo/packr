@@ -11,7 +11,7 @@ import "github.com/gobuffalo/packr"
 func init() {
 	{{- range $box := .Boxes }}
 	{{- range .Files }}
-		packr.PackJSONBytes("{{$box.Name}}", "{{.Name}}", "{{.Contents}}")
+	packr.PackJSONBytes("{{$box.Name}}", "{{.Name}}", "{{.Contents}}")
 	{{- end }}
 	{{- end }}
 }
