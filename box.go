@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// ErrResOutsideBox gets returned in case of the requested resources being outside the box
 	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
 )
 
@@ -51,10 +52,12 @@ type Box struct {
 	directories map[string]bool
 }
 
+// AddString converts t to a byteslice and delegates to AddBytes to add to b.data
 func (b Box) AddString(path string, t string) {
 	b.AddBytes(path, []byte(t))
 }
 
+// AddBytes sets t in b.data by the given path
 func (b Box) AddBytes(path string, t []byte) {
 	b.data[path] = t
 }
