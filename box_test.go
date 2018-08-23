@@ -77,6 +77,10 @@ func Test_Box_find(t *testing.T) {
 		{"assets/app.css", true},
 		{"assets\\app.css", onWindows},
 		{"foo/bar.baz", false},
+		{"bar", true},
+		{"bar/sub", true},
+		{"bar/foo", false},
+		{"bar/sub/sub.html", true},
 	}
 
 	for _, tt := range table {
