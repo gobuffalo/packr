@@ -132,13 +132,13 @@ func (b Box) find(name string) (File, error) {
 			bb = b.decompress(bb)
 			return newVirtualFile(cleanName, bb), nil
 		}
+		if _, ok := b.directories[cleanName]; ok {
+			return newVirtualDir(cleanName), nil
+		}
 		if filepath.Ext(cleanName) != "" {
 			// The Handler created by http.FileSystem checks for those errors and
 			// returns http.StatusNotFound instead of http.StatusInternalServerError.
 			return nil, os.ErrNotExist
-		}
-		if _, ok := b.directories[cleanName]; ok {
-			return newVirtualDir(cleanName), nil
 		}
 		return nil, os.ErrNotExist
 	}
