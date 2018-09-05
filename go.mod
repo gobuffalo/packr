@@ -1,7 +1,7 @@
 module github.com/gobuffalo/packr
 
 require (
-	github.com/gobuffalo/release v1.0.10 // indirect
+	github.com/gobuffalo/release v1.0.11 // indirect
 	github.com/markbates/grift v1.0.1
 	github.com/pkg/errors v0.8.0
 	github.com/spf13/cobra v0.0.3

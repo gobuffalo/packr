@@ -15,10 +15,13 @@ github.com/gobuffalo/genny v0.0.0-20180905180744-ca4140706556/go.mod h1:FZNXcfF+
 github.com/gobuffalo/github_flavored_markdown v1.0.0 h1:e2dK+SoHgOc/vfXuYMdXwEg2vAUlFzp8SBRwTOXckQ0=
 github.com/gobuffalo/github_flavored_markdown v1.0.0/go.mod h1:c8/8gRnd6MSyyk+fp6E8O8cUTHd7P2cnDnH4G7o91l0=
 github.com/gobuffalo/packr v1.13.3/go.mod h1:qdqw8AgJyKw60qj56fnEBiS9fIqqCaP/vWJQvR4Jcss=
+github.com/gobuffalo/packr v1.13.4/go.mod h1:mDIuCJAdKuJD/M4Ub4ulEXde03DEPZc1HZfL2MxAn44=
 github.com/gobuffalo/plush v3.7.16+incompatible h1:nonpy24axg04np13bYi0zNu3gr812cXKJDNLSkKcEwk=
 github.com/gobuffalo/plush v3.7.16+incompatible/go.mod h1:rQ4zdtUUyZNqULlc6bqd5scsPfLKfT0+TGMChgduDvI=
 github.com/gobuffalo/release v1.0.10 h1:PoNnL+dFZMpes6r9qz2H9X9f4zqdNdWg1fWif4TWATk=
 github.com/gobuffalo/release v1.0.10/go.mod h1:HpNe26lUCPWdMOoQqGk5di5WOlDrcdPbqH2ZL/s2jD8=
+github.com/gobuffalo/release v1.0.11 h1:+cGVY0bgKSh+blpTK3eht9l9p+7xhTxb3S276k5rHd4=
+github.com/gobuffalo/release v1.0.11/go.mod h1:f8b4Cc2HaHNH1xCvRKPPK0aNt1wX/xxZkmV3/AdEu14=
 github.com/gobuffalo/shoulders v0.0.0-20180904151418-9cac5899ceee h1:EkfcVBC4WGCgesY08+9NqPWUiUfFo/jJIqpcANMiEpE=
 github.com/gobuffalo/shoulders v0.0.0-20180904151418-9cac5899ceee/go.mod h1:atyzRdR+uoOgsuA3AL82yYx5yJ4vONfDYtQXZCuT9TI=
 github.com/gobuffalo/tags v2.0.10+incompatible h1:gLcbJPHlzAiuZVsxDvTSwoXz/vJmNjgelxP5zrADb9o=
