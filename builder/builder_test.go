@@ -17,6 +17,7 @@ func Test_Builder_Run(t *testing.T) {
 	r := require.New(t)
 
 	root := filepath.Join("..", "example")
+	Clean(root)
 	defer Clean(root)
 
 	exPackr := filepath.Join(root, "a_example-packr.go")
