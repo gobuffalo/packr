@@ -13,4 +13,4 @@ matrix:
     - go: 'tip'
 
 script:
-  - go test -v ./...
+  - make ci-test
