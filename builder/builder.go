@@ -52,7 +52,11 @@ func (b *Builder) Run() error {
 		}
 		for _, f := range b.IgnoredFolders {
 			if strings.ToLower(f) == base {
-				return filepath.SkipDir
+				if info.IsDir() {
+					return filepath.SkipDir
+				} else {
+					return nil
+				}
 			}
 		}
 		if !info.IsDir() {
