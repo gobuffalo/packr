@@ -3,14 +3,35 @@ package packr
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/hex"
 	"encoding/json"
+	"io/ioutil"
 	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 var gil = &sync.Mutex{}
 var data = map[string]map[string][]byte{}
+
+func PackHexGzip(box string, name string, packed string) error {
+	br := bytes.NewBufferString(packed)
+	dec := hex.NewDecoder(br)
+	zr, err := gzip.NewReader(dec)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer zr.Close()
+
+	b, err := ioutil.ReadAll(zr)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	PackBytes(box, name, b)
+	return nil
+}
 
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {

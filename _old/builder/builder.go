@@ -54,9 +54,8 @@ func (b *Builder) Run() error {
 			if strings.ToLower(f) == base {
 				if info.IsDir() {
 					return filepath.SkipDir
-				} else {
-					return nil
 				}
+				return nil
 			}
 		}
 		if !info.IsDir() {

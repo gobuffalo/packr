@@ -1,7 +1,12 @@
 package packr
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/hex"
 	"encoding/json"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,6 +20,28 @@ func init() {
 	PackBytes(virtualBox.Path, "b", []byte("b"))
 	PackBytes(virtualBox.Path, "c", []byte("c"))
 	PackBytes(virtualBox.Path, "d/a", []byte("d/a"))
+}
+
+func hexGzip(s string) (string, error) {
+	bb := &bytes.Buffer{}
+	enc := hex.NewEncoder(bb)
+	zw := gzip.NewWriter(enc)
+	io.Copy(zw, strings.NewReader(s))
+	zw.Close()
+
+	return bb.String(), nil
+}
+
+func Test_PackHexGzip(t *testing.T) {
+	r := require.New(t)
+	in, err := hexGzip("hi!!")
+	r.NoError(err)
+
+	err = PackHexGzip(testBox.Path, "foo", in)
+	r.NoError(err)
+
+	s := testBox.String("foo")
+	r.Equal("hi!!", s)
 }
 
 func Test_PackBytes(t *testing.T) {
