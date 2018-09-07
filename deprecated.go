@@ -1,6 +1,7 @@
 package packr
 
 import (
+	"encoding/json"
 	"errors"
 	"path/filepath"
 	"runtime"
@@ -41,40 +42,26 @@ func NewBox(path string) Box {
 
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {
-	panic("not implemented")
-	// gil.Lock()
-	// defer gil.Unlock()
-	// if _, ok := data[box]; !ok {
-	// 	data[box] = map[string][]byte{}
-	// }
-	// data[box][name] = bb
+	d := resolver.NewInMemory(map[resolver.Ident]file.File{})
+	iname := resolver.Ident(name)
+	d.Pack(iname, file.NewFile(iname.OsPath(), bb))
+	resolver.Register(resolver.Ident(box), iname, d)
 }
 
 // PackBytesGzip packets the gzipped compressed bytes into a box.
 func PackBytesGzip(box string, name string, bb []byte) error {
-	panic("not implemented")
-	// var buf bytes.Buffer
-	// w := gzip.NewWriter(&buf)
-	// _, err := w.Write(bb)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = w.Close()
-	// if err != nil {
-	// 	return err
-	// }
-	// PackBytes(box, name, buf.Bytes())
-	// return nil
+	// TODO: this function never did what it was supposed to do!
+	PackBytes(box, name, bb)
+	return nil
 }
 
 // PackJSONBytes packs JSON encoded bytes for a file into a box.
 func PackJSONBytes(box string, name string, jbb string) error {
-	panic("not implemented")
-	// var bb []byte
-	// err := json.Unmarshal([]byte(jbb), &bb)
-	// if err != nil {
-	// 	return err
-	// }
-	// PackBytes(box, name, bb)
-	// return nil
+	var bb []byte
+	err := json.Unmarshal([]byte(jbb), &bb)
+	if err != nil {
+		return err
+	}
+	PackBytes(box, name, bb)
+	return nil
 }
