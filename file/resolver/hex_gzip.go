@@ -3,12 +3,13 @@ package resolver
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/gobuffalo/packr/file/resolver/internal/hex"
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/pkg/errors"
