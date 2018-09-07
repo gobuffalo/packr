@@ -1,30 +1,60 @@
 package packr
 
 import (
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
+	"runtime"
+	"strings"
+
+	"github.com/gobuffalo/packr/file"
+	"github.com/gobuffalo/packr/file/resolver"
+	"github.com/pkg/errors"
 )
 
 func New(path string) Box {
-	panic("not implemented")
+	var cd string
+	if !filepath.IsAbs(path) {
+		_, filename, _, _ := runtime.Caller(1)
+		cd = filepath.Dir(filename)
+	}
+
+	// this little hack courtesy of the `-cover` flag!!
+	cov := filepath.Join("_test", "_obj_test")
+	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
+	if !filepath.IsAbs(cd) && cd != "" {
+		cd = filepath.Join(GoPath(), "src", cd)
+	}
+	b := Box{
+		Path:       path,
+		Name:       resolver.Ident(path),
+		callingDir: resolver.Ident(cd),
+	}
+	return b
 }
 
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path string
-	// callingDir  string
+	Path       string
+	Name       resolver.Ident
+	callingDir resolver.Ident
 	// data        map[string][]byte
 	// directories map[string]bool
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
-func (b Box) AddString(path string, t string) {
-	b.AddBytes(path, []byte(t))
+func (b Box) AddString(path string, t string) error {
+	return b.AddBytes(path, []byte(t))
 }
 
 // AddBytes sets t in b.data by the given path
-func (b Box) AddBytes(path string, t []byte) {
-	// b.data[path] = t
+func (b Box) AddBytes(path string, t []byte) error {
+	p, ok := resolver.DefaultResolver.(resolver.Packable)
+	if !ok {
+		return errors.Errorf("unable to pack %s - resolver.DefaultResolver is not resolver.Packable", path)
+	}
+	return p.Pack(resolver.Key(b.Name, resolver.Ident(path)), file.NewFile(path, t))
 }
 
 // String of the file asked for or an empty string.
@@ -48,14 +78,11 @@ func (b Box) Bytes(name string) []byte {
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
 func (b Box) MustBytes(name string) ([]byte, error) {
-	panic("not implemented")
-	// f, err := b.find(name)
-	// if err == nil {
-	// 	bb := &bytes.Buffer{}
-	// 	bb.ReadFrom(f)
-	// 	return bb.Bytes(), err
-	// }
-	// return nil, err
+	f, err := resolver.Resolve(b.Name, resolver.Ident(name))
+	if err != nil {
+		return []byte(""), err
+	}
+	return ioutil.ReadAll(f)
 }
 
 // Has returns true if the resource exists in the box

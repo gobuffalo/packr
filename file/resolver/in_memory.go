@@ -24,6 +24,15 @@ func (d *inMemory) Find(name Ident) (file.File, error) {
 	return f, nil
 }
 
+func (d *inMemory) Pack(name Ident, f file.File) error {
+	d.moot.Lock()
+	defer d.moot.Unlock()
+	d.files[name] = f
+	return nil
+}
+
+var DefaultResolver = NewInMemory(map[Ident]file.File{})
+
 func NewInMemory(files map[Ident]file.File) Resolver {
 	if files == nil {
 		files = map[Ident]file.File{}
