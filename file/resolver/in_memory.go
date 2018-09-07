@@ -31,7 +31,15 @@ func (d *inMemory) Pack(name Ident, f file.File) error {
 	return nil
 }
 
-var DefaultResolver = NewInMemory(map[Ident]file.File{})
+func (d *inMemory) FileMap() map[string]file.File {
+	d.moot.RLock()
+	defer d.moot.RUnlock()
+	m := map[string]file.File{}
+	for k, v := range d.files {
+		m[k.Name()] = v
+	}
+	return m
+}
 
 func NewInMemory(files map[Ident]file.File) Resolver {
 	if files == nil {
