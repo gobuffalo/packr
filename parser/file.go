@@ -1,0 +1,44 @@
+package parser
+
+import (
+	"bytes"
+	"io"
+	"io/ioutil"
+	"path/filepath"
+)
+
+type File struct {
+	io.Reader
+	Path    string
+	AbsPath string
+}
+
+func (f File) Name() string {
+	return f.Path
+}
+
+func (f *File) String() string {
+	src, _ := ioutil.ReadAll(f)
+	f.Reader = bytes.NewReader(src)
+	return string(src)
+}
+
+// NewFile takes the name of the file you want to
+// write to and a reader to reader from
+func NewFile(path string, r io.Reader) *File {
+	if r == nil {
+		r = &bytes.Buffer{}
+	}
+	if seek, ok := r.(io.Seeker); ok {
+		seek.Seek(0, 0)
+	}
+	abs := path
+	if !filepath.IsAbs(path) {
+		abs, _ = filepath.Abs(path)
+	}
+	return &File{
+		Reader:  r,
+		Path:    path,
+		AbsPath: abs,
+	}
+}

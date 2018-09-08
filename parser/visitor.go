@@ -1,4 +1,4 @@
-package resolver
+package parser
 
 import (
 	"go/ast"
@@ -17,7 +17,7 @@ type Visitor struct {
 	Errors  []error
 }
 
-func NewVisitor(f genny.File) *Visitor {
+func NewVisitor(f *File) *Visitor {
 	return &Visitor{
 		File:   f,
 		Boxes:  []string{},
