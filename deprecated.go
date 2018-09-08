@@ -3,9 +3,6 @@ package packr
 import (
 	"encoding/json"
 	"errors"
-	"path/filepath"
-	"runtime"
-	"strings"
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/gobuffalo/packr/file/resolver"
@@ -24,19 +21,19 @@ var (
 // binary.
 func NewBox(path string) Box {
 	b := New(path)
-	var cd string
-	if !filepath.IsAbs(path) {
-		_, filename, _, _ := runtime.Caller(1)
-		cd = filepath.Dir(filename)
-	}
-
-	// this little hack courtesy of the `-cover` flag!!
-	cov := filepath.Join("_test", "_obj_test")
-	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
-	if !filepath.IsAbs(cd) && cd != "" {
-		cd = filepath.Join(GoPath(), "src", cd)
-	}
-	b.ResolutionDir = resolver.Ident(cd)
+	// var cd string
+	// if !filepath.IsAbs(path) {
+	// 	_, filename, _, _ := runtime.Caller(1)
+	// 	cd = filepath.Dir(filename)
+	// }
+	//
+	// // this little hack courtesy of the `-cover` flag!!
+	// cov := filepath.Join("_test", "_obj_test")
+	// cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
+	// if !filepath.IsAbs(cd) && cd != "" {
+	// 	cd = filepath.Join(GoPath(), "src", cd)
+	// }
+	// b.ResolutionDir = resolver.Ident(cd)
 	return b
 }
 

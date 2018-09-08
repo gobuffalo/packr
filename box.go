@@ -25,6 +25,7 @@ func New(path string) Box {
 	if !filepath.IsAbs(cd) && cd != "" {
 		cd = filepath.Join(GoPath(), "src", cd)
 	}
+	cd = filepath.Join(cd, path)
 	b := Box{
 		Path:          path,
 		Name:          resolver.Ident(path),
