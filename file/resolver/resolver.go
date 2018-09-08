@@ -7,13 +7,13 @@ import (
 )
 
 type Resolver interface {
-	Find(Ident) (file.File, error)
+	Find(string) (file.File, error)
 }
 
 func defaultResolver() Resolver {
 	pwd, _ := os.Getwd()
 	return &Disk{
-		Root: Ident(pwd),
+		Root: pwd,
 	}
 }
 

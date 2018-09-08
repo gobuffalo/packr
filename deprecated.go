@@ -19,8 +19,8 @@ var (
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {
 	b := NewBox(box)
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{})
-	if err := d.Pack(resolver.Ident(name), file.NewFile(name, bb)); err != nil {
+	d := resolver.NewInMemory(map[string]file.File{})
+	if err := d.Pack(name, file.NewFile(name, bb)); err != nil {
 		panic(err)
 	}
 	b.SetResolver(name, d)

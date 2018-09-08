@@ -16,8 +16,7 @@ func Test_Ident_Key(t *testing.T) {
 	for in, out := range table {
 		t.Run(in, func(st *testing.T) {
 			r := require.New(st)
-			i := Ident(in)
-			r.Equal(out, i.Key())
+			r.Equal(out, Key(in))
 		})
 	}
 }
@@ -35,8 +34,7 @@ func Test_Ident_OsPath(t *testing.T) {
 	for in, out := range table {
 		t.Run(in, func(st *testing.T) {
 			r := require.New(st)
-			i := Ident(in)
-			r.Equal(out, i.OsPath())
+			r.Equal(out, OsPath(in))
 		})
 	}
 }

@@ -12,7 +12,7 @@ func Test_Disk_Find(t *testing.T) {
 	r := require.New(t)
 
 	d := &Disk{
-		Root: Ident("_fixtures\\templates"),
+		Root: "_fixtures\\templates",
 	}
 
 	f, err := d.Find("foo.txt")

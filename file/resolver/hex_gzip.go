@@ -19,12 +19,12 @@ import (
 var _ Resolver = &HexGzip{}
 
 type HexGzip struct {
-	packed   map[Ident]string
-	unpacked map[Ident]file.File
+	packed   map[string]string
+	unpacked map[string]file.File
 	moot     *sync.RWMutex
 }
 
-func (hg *HexGzip) Find(name Ident) (file.File, error) {
+func (hg *HexGzip) Find(name string) (file.File, error) {
 	fmt.Println("HexGzip: Find", name)
 	hg.moot.RLock()
 	if f, ok := hg.unpacked[name]; ok {
@@ -42,20 +42,20 @@ func (hg *HexGzip) Find(name Ident) (file.File, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	f := file.NewFile(name.Name(), []byte(unpacked))
+	f := file.NewFile(OsPath(name), []byte(unpacked))
 	hg.moot.Lock()
 	hg.unpacked[name] = f
 	hg.moot.Unlock()
 	return f, nil
 }
 
-func NewHexGzip(files map[Ident]string) (*HexGzip, error) {
+func NewHexGzip(files map[string]string) (*HexGzip, error) {
 	if files == nil {
-		files = map[Ident]string{}
+		files = map[string]string{}
 	}
 	hg := &HexGzip{
 		packed:   files,
-		unpacked: map[Ident]file.File{},
+		unpacked: map[string]file.File{},
 		moot:     &sync.RWMutex{},
 	}
 

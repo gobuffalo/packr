@@ -47,7 +47,7 @@ func Test_Box_String(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box.SetResolver("foo.txt", d)
@@ -75,7 +75,7 @@ func Test_Box_MustString(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box.SetResolver("foo.txt", d)
@@ -107,7 +107,7 @@ func Test_Box_Bytes(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box.SetResolver("foo.txt", d)
@@ -135,7 +135,7 @@ func Test_Box_MustBytes(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box.SetResolver("foo.txt", d)
@@ -167,7 +167,7 @@ func Test_Box_Has(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box.SetResolver("foo.txt", d)
@@ -179,7 +179,7 @@ func Test_Box_Has(t *testing.T) {
 func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
-	d := resolver.NewInMemory(map[resolver.Ident]file.File{
+	d := resolver.NewInMemory(map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
 	box := NewBox("./templates")

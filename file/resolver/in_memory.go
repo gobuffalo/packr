@@ -11,11 +11,11 @@ import (
 var _ Resolver = &InMemory{}
 
 type InMemory struct {
-	files map[Ident]file.File
+	files map[string]file.File
 	moot  *sync.RWMutex
 }
 
-func (d *InMemory) Find(name Ident) (file.File, error) {
+func (d *InMemory) Find(name string) (file.File, error) {
 	fmt.Println("InMemory: Find", name)
 	d.moot.RLock()
 	f, ok := d.files[name]
@@ -26,7 +26,7 @@ func (d *InMemory) Find(name Ident) (file.File, error) {
 	return nil, os.ErrNotExist
 }
 
-func (d *InMemory) Pack(name Ident, f file.File) error {
+func (d *InMemory) Pack(name string, f file.File) error {
 	d.moot.Lock()
 	d.files[name] = f
 	d.moot.Unlock()
@@ -37,15 +37,15 @@ func (d *InMemory) FileMap() map[string]file.File {
 	d.moot.RLock()
 	m := map[string]file.File{}
 	for k, v := range d.files {
-		m[k.Name()] = v
+		m[Key(k)] = v
 	}
 	d.moot.RUnlock()
 	return m
 }
 
-func NewInMemory(files map[Ident]file.File) *InMemory {
+func NewInMemory(files map[string]file.File) *InMemory {
 	if files == nil {
-		files = map[Ident]file.File{}
+		files = map[string]file.File{}
 	}
 	return &InMemory{
 		files: files,

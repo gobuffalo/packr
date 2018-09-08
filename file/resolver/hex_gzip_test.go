@@ -13,7 +13,7 @@ func Test_HexGzip_Find(t *testing.T) {
 
 	x, err := hexGzip("foo!")
 	r.NoError(err)
-	files := map[Ident]string{
+	files := map[string]string{
 		"foo.txt": x,
 	}
 	d, err := NewHexGzip(files)

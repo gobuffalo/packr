@@ -6,28 +6,16 @@ import (
 	"strings"
 )
 
-type Ident string
-
-func (i Ident) Key() string {
-	s := string(i)
+func Key(s string) string {
 	s = strings.Replace(s, "\\", "/", -1)
 	return strings.ToLower(s)
 }
 
-func (i Ident) OsPath() string {
-	s := string(i)
+func OsPath(s string) string {
 	if runtime.GOOS == "windows" {
 		s = strings.Replace(s, "/", string(filepath.Separator), -1)
 	} else {
 		s = strings.Replace(s, "\\", string(filepath.Separator), -1)
 	}
 	return s
-}
-
-func (i Ident) String() string {
-	return i.OsPath()
-}
-
-func (i Ident) Name() string {
-	return i.OsPath()
 }

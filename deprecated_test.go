@@ -12,7 +12,7 @@ func Test_PackBytes(t *testing.T) {
 	box := NewBox("my/box")
 	name := "foo.txt"
 	body := []byte("foo!!")
-	PackBytes(box.Name.Name(), name, body)
+	PackBytes(box.Name, name, body)
 
 	f, err := box.MustString(name)
 	r.NoError(err)
@@ -25,7 +25,7 @@ func Test_PackBytesGzip(t *testing.T) {
 	box := NewBox("my/box")
 	name := "foo.txt"
 	body := []byte("foo!!")
-	PackBytesGzip(box.Name.Name(), name, body)
+	PackBytesGzip(box.Name, name, body)
 
 	f, err := box.MustString(name)
 	r.NoError(err)
@@ -38,7 +38,7 @@ func Test_PackJSONBytes(t *testing.T) {
 	box := NewBox("my/box")
 	name := "foo.txt"
 	body := "\"PGgxPnRlbXBsYXRlcy9tYWlsZXJzL2xheW91dC5odG1sPC9oMT4KCjwlPSB5aWVsZCAlPgo=\""
-	PackJSONBytes(box.Name.Name(), name, body)
+	PackJSONBytes(box.Name, name, body)
 
 	f, err := box.MustString(name)
 	r.NoError(err)

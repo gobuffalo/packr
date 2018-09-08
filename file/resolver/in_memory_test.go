@@ -12,7 +12,7 @@ import (
 func Test_inMemory_Find(t *testing.T) {
 	r := require.New(t)
 
-	files := map[Ident]file.File{
+	files := map[string]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	}
 	d := NewInMemory(files)

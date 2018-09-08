@@ -16,24 +16,24 @@ import (
 var _ Resolver = &Disk{}
 
 type Disk struct {
-	Root Ident
+	Root string
 }
 
-func (d *Disk) Find(name Ident) (file.File, error) {
+func (d *Disk) Find(name string) (file.File, error) {
 	fmt.Println("Disk: Find", name)
-	path := name.OsPath()
+	path := OsPath(name)
 	if !filepath.IsAbs(path) {
-		path = filepath.Join(d.Root.OsPath(), path)
+		path = filepath.Join(OsPath(d.Root), path)
 	}
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
 	if fi.IsDir() {
-		return file.NewDir(name.OsPath()), nil
+		return file.NewDir(OsPath(name)), nil
 	}
 	if bb, err := ioutil.ReadFile(path); err == nil {
-		return file.NewFile(name.Name(), bb), nil
+		return file.NewFile(OsPath(name), bb), nil
 	}
 	return nil, os.ErrNotExist
 }
@@ -48,7 +48,7 @@ func (d *Disk) FileMap() map[string]file.File {
 			return nil
 		}
 		moot.Lock()
-		name := strings.TrimPrefix(path, d.Root.OsPath()+string(filepath.Separator))
+		name := strings.TrimPrefix(path, OsPath(d.Root)+string(filepath.Separator))
 		b, err := ioutil.ReadFile(path)
 		if err != nil {
 			return errors.WithStack(err)
@@ -57,12 +57,12 @@ func (d *Disk) FileMap() map[string]file.File {
 		moot.Unlock()
 		return nil
 	}
-	err := godirwalk.Walk(d.Root.OsPath(), &godirwalk.Options{
+	err := godirwalk.Walk(OsPath(d.Root), &godirwalk.Options{
 		FollowSymbolicLinks: true,
 		Callback:            callback,
 	})
 	if err != nil {
-		fmt.Println("error walking", d.Root.OsPath(), err)
+		fmt.Println("error walking", OsPath(d.Root), err)
 	}
 	return m
 }

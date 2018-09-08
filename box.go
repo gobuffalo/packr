@@ -23,8 +23,7 @@ func NewBox(path string) *Box {
 }
 
 func New(name string, path string) *Box {
-	iname := resolver.Ident(name)
-	b := findBox(iname)
+	b := findBox(name)
 	if b != nil {
 		return b
 	}
@@ -43,8 +42,8 @@ func New(name string, path string) *Box {
 	cd = filepath.Join(cd, path)
 	b = &Box{
 		Path:          path,
-		Name:          iname,
-		ResolutionDir: resolver.Ident(cd),
+		Name:          name,
+		ResolutionDir: cd,
 		resolvers:     map[string]resolver.Resolver{},
 		moot:          &sync.RWMutex{},
 	}
@@ -55,15 +54,15 @@ func New(name string, path string) *Box {
 // have access to in the built Go binary.
 type Box struct {
 	Path          string // Path is deprecated and should no longer be used
-	Name          resolver.Ident
-	ResolutionDir resolver.Ident
+	Name          string
+	ResolutionDir string
 	resolvers     map[string]resolver.Resolver
 	moot          *sync.RWMutex
 }
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
 	b.moot.Lock()
-	b.resolvers[resolver.Ident(file).Key()] = res
+	b.resolvers[resolver.Key(file)] = res
 	b.moot.Unlock()
 }
 
@@ -74,9 +73,8 @@ func (b *Box) AddString(path string, t string) error {
 
 // AddBytes sets t in b.data by the given path
 func (b *Box) AddBytes(path string, t []byte) error {
-	ipath := resolver.Ident(path)
-	m := map[resolver.Ident]file.File{}
-	m[ipath] = file.NewFile(path, t)
+	m := map[string]file.File{}
+	m[resolver.Key(path)] = file.NewFile(path, t)
 	res := resolver.NewInMemory(m)
 	b.SetResolver(path, res)
 	return nil
@@ -103,7 +101,7 @@ func (b *Box) Bytes(name string) []byte {
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
 func (b *Box) MustBytes(name string) ([]byte, error) {
-	f, err := b.resolve(resolver.Ident(name))
+	f, err := b.resolve(name)
 	if err != nil {
 		return []byte(""), err
 	}
@@ -121,7 +119,7 @@ func (b *Box) Has(name string) bool {
 
 // Open returns a File using the http.File interface
 func (b *Box) Open(name string) (http.File, error) {
-	return b.resolve(resolver.Ident(name))
+	return b.resolve(name)
 }
 
 // List shows "What's in the box?"
@@ -139,9 +137,9 @@ func (b *Box) List() []string {
 	return keys
 }
 
-func (b *Box) resolve(key resolver.Ident) (file.File, error) {
+func (b *Box) resolve(key string) (file.File, error) {
 	b.moot.RLock()
-	r, ok := b.resolvers[key.Key()]
+	r, ok := b.resolvers[resolver.Key(key)]
 	b.moot.RUnlock()
 	if !ok {
 		r = resolver.DefaultResolver
@@ -153,8 +151,8 @@ func (b *Box) resolve(key resolver.Ident) (file.File, error) {
 
 	f, err := r.Find(key)
 	if err != nil {
-		z := filepath.Join(b.ResolutionDir.OsPath(), key.OsPath())
-		f, err = r.Find(resolver.Ident(z))
+		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
+		f, err = r.Find(string(z))
 		if err != nil {
 			return f, errors.WithStack(err)
 		}
@@ -162,7 +160,7 @@ func (b *Box) resolve(key resolver.Ident) (file.File, error) {
 		if err != nil {
 			return f, errors.WithStack(err)
 		}
-		f = file.NewFile(key.Name(), b)
+		f = file.NewFile(key, b)
 	}
 	return f, nil
 }
