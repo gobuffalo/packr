@@ -150,13 +150,14 @@ func (b *Builder) process(path string) error {
 func (b *Builder) addPkg(p pkg) {
 	b.moot.Lock()
 	defer b.moot.Unlock()
-	if _, ok := b.pkgs[p.Name]; !ok {
-		b.pkgs[p.Name] = p
+	key := filepath.Join(p.Dir, p.Name)
+	if _, ok := b.pkgs[key]; !ok {
+		b.pkgs[key] = p
 		return
 	}
-	pp := b.pkgs[p.Name]
+	pp := b.pkgs[key]
 	pp.Boxes = append(pp.Boxes, p.Boxes...)
-	b.pkgs[p.Name] = pp
+	b.pkgs[key] = pp
 }
 
 // New Builder with a given context and path
