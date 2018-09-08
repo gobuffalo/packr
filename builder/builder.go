@@ -150,7 +150,7 @@ func (b *Builder) process(path string) error {
 func (b *Builder) addPkg(p pkg) {
 	b.moot.Lock()
 	defer b.moot.Unlock()
-	key := filepath.Join(p.Dir[len(b.RootPath) + 1:], p.Name)
+	key := filepath.Join(p.Dir, p.Name)
 	if _, ok := b.pkgs[key]; !ok {
 		b.pkgs[key] = p
 		return
