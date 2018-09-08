@@ -20,7 +20,11 @@ type Disk struct {
 }
 
 func (d *Disk) Find(name Ident) (file.File, error) {
-	path := filepath.Join(d.Root.OsPath(), name.OsPath())
+	fmt.Println("Disk: Find", name)
+	path := name.OsPath()
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(d.Root.OsPath(), path)
+	}
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, err

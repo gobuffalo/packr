@@ -10,7 +10,7 @@ import (
 func Test_Box_Walk(t *testing.T) {
 	r := require.New(t)
 
-	box := New("./_fixtures/list_test")
+	box := NewBox("./_fixtures/list_test")
 	r.NoError(box.AddString("d/d.txt", "D"))
 
 	var act []string
@@ -25,7 +25,7 @@ func Test_Box_Walk(t *testing.T) {
 func Test_Box_WalkPrefix(t *testing.T) {
 	r := require.New(t)
 
-	box := New("./_fixtures/list_test")
+	box := NewBox("./_fixtures/list_test")
 	r.NoError(box.AddString("d/d.txt", "D"))
 
 	var act []string

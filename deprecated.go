@@ -16,33 +16,14 @@ var (
 	ErrResOutsideBox = errors.New("can't find a resource outside the box")
 )
 
-// NewBox returns a Box that can be used to
-// retrieve files from either disk or the embedded
-// binary.
-func NewBox(path string) Box {
-	b := New(path)
-	// var cd string
-	// if !filepath.IsAbs(path) {
-	// 	_, filename, _, _ := runtime.Caller(1)
-	// 	cd = filepath.Dir(filename)
-	// }
-	//
-	// // this little hack courtesy of the `-cover` flag!!
-	// cov := filepath.Join("_test", "_obj_test")
-	// cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
-	// if !filepath.IsAbs(cd) && cd != "" {
-	// 	cd = filepath.Join(GoPath(), "src", cd)
-	// }
-	// b.ResolutionDir = resolver.Ident(cd)
-	return b
-}
-
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {
+	b := NewBox(box)
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{})
-	iname := resolver.Ident(name)
-	d.Pack(iname, file.NewFile(iname.OsPath(), bb))
-	resolver.Register(resolver.Ident(box), iname, d)
+	if err := d.Pack(resolver.Ident(name), file.NewFile(name, bb)); err != nil {
+		panic(err)
+	}
+	b.SetResolver(name, d)
 }
 
 // PackBytesGzip packets the gzipped compressed bytes into a box.

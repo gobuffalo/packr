@@ -8,12 +8,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func Test_NewBox(t *testing.T) {
+	r := require.New(t)
+
+	b := NewBox("./_fixtures/list_test")
+	r.Len(b.List(), 4)
+
+}
 func Test_Box_AddString(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./templates")
+	box := NewBox("./templates")
 	s, err := box.MustString("foo.txt")
 	r.Error(err)
 	r.Equal("", s)
@@ -27,9 +32,7 @@ func Test_Box_AddString(t *testing.T) {
 func Test_Box_AddBytes(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./templates")
+	box := NewBox("Test_Box_AddBytes")
 	s, err := box.MustString("foo.txt")
 	r.Error(err)
 	r.Equal("", s)
@@ -43,13 +46,11 @@ func Test_Box_AddBytes(t *testing.T) {
 func Test_Box_String(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
+	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
-
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	s := box.String("foo.txt")
 	r.Equal("foo!", s)
@@ -61,9 +62,7 @@ func Test_Box_String(t *testing.T) {
 func Test_Box_String_Miss(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./_fixtures/templates")
+	box := NewBox("./_fixtures/templates")
 
 	s := box.String("foo.txt")
 	r.Equal("FOO!!!\n", s)
@@ -75,13 +74,11 @@ func Test_Box_String_Miss(t *testing.T) {
 func Test_Box_MustString(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
+	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
-
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	s, err := box.MustString("foo.txt")
 	r.NoError(err)
@@ -95,9 +92,7 @@ func Test_Box_MustString(t *testing.T) {
 func Test_Box_MustString_Miss(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./_fixtures/templates")
+	box := NewBox("./_fixtures/templates")
 
 	s, err := box.MustString("foo.txt")
 	r.NoError(err)
@@ -111,13 +106,11 @@ func Test_Box_MustString_Miss(t *testing.T) {
 func Test_Box_Bytes(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
+	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
-
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	s := box.Bytes("foo.txt")
 	r.Equal([]byte("foo!"), s)
@@ -129,9 +122,7 @@ func Test_Box_Bytes(t *testing.T) {
 func Test_Box_Bytes_Miss(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./_fixtures/templates")
+	box := NewBox("./_fixtures/templates")
 
 	s := box.Bytes("foo.txt")
 	r.Equal([]byte("FOO!!!\n"), s)
@@ -143,13 +134,11 @@ func Test_Box_Bytes_Miss(t *testing.T) {
 func Test_Box_MustBytes(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
+	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
-
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	s, err := box.MustBytes("foo.txt")
 	r.NoError(err)
@@ -163,9 +152,7 @@ func Test_Box_MustBytes(t *testing.T) {
 func Test_Box_MustBytes_Miss(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
-
-	box := New("./_fixtures/templates")
+	box := NewBox("./_fixtures/templates")
 
 	s, err := box.MustBytes("foo.txt")
 	r.NoError(err)
@@ -179,13 +166,11 @@ func Test_Box_MustBytes_Miss(t *testing.T) {
 func Test_Box_Has(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
+	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
-
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	r.True(box.Has("foo.txt"))
 	r.False(box.Has("idontexist"))
@@ -194,13 +179,12 @@ func Test_Box_Has(t *testing.T) {
 func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
-	resolver.ClearRegistry()
 	d := resolver.NewInMemory(map[resolver.Ident]file.File{
 		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
 	})
-	resolver.Register("./templates", "foo.txt", d)
+	box := NewBox("./templates")
 
-	box := New("./templates")
+	box.SetResolver("foo.txt", d)
 
 	f, err := box.Open("foo.txt")
 	r.NoError(err)
@@ -214,7 +198,7 @@ func Test_Box_Open(t *testing.T) {
 func Test_Box_List(t *testing.T) {
 	r := require.New(t)
 
-	box := New("./_fixtures/list_test")
+	box := NewBox("./_fixtures/list_test")
 	r.NoError(box.AddString("d/d.txt", "D"))
 
 	act := box.List()

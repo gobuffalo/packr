@@ -12,7 +12,7 @@ import (
 type WalkFunc func(string, file.File) error
 
 // Walk will traverse the box and call the WalkFunc for each file in the box/folder.
-func (b Box) Walk(wf WalkFunc) error {
+func (b *Box) Walk(wf WalkFunc) error {
 	m := map[string]file.File{}
 
 	cd := b.ResolutionDir.OsPath()
@@ -21,15 +21,16 @@ func (b Box) Walk(wf WalkFunc) error {
 		m[resolver.Ident(n).Name()] = f
 	}
 
-	res := resolver.BoxResolvers(b.Name)
-
-	for n, r := range res {
-		f, err := r.Find(n)
+	b.moot.RLock()
+	for n, r := range b.resolvers {
+		iname := resolver.Ident(n)
+		f, err := r.Find(iname)
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		m[n.Name()] = f
+		m[n] = f
 	}
+	b.moot.RUnlock()
 
 	var keys = make([]string, 0, len(m))
 	for k := range m {

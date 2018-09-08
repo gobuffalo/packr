@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"fmt"
 	"os"
 	"sync"
 
@@ -15,29 +16,30 @@ type InMemory struct {
 }
 
 func (d *InMemory) Find(name Ident) (file.File, error) {
+	fmt.Println("InMemory: Find", name)
 	d.moot.RLock()
-	defer d.moot.RUnlock()
 	f, ok := d.files[name]
-	if !ok {
-		return nil, os.ErrNotExist
+	d.moot.RUnlock()
+	if ok {
+		return f, nil
 	}
-	return f, nil
+	return nil, os.ErrNotExist
 }
 
 func (d *InMemory) Pack(name Ident, f file.File) error {
 	d.moot.Lock()
-	defer d.moot.Unlock()
 	d.files[name] = f
+	d.moot.Unlock()
 	return nil
 }
 
 func (d *InMemory) FileMap() map[string]file.File {
 	d.moot.RLock()
-	defer d.moot.RUnlock()
 	m := map[string]file.File{}
 	for k, v := range d.files {
 		m[k.Name()] = v
 	}
+	d.moot.RUnlock()
 	return m
 }
 

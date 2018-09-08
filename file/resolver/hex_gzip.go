@@ -3,6 +3,7 @@ package resolver
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -24,6 +25,7 @@ type HexGzip struct {
 }
 
 func (hg *HexGzip) Find(name Ident) (file.File, error) {
+	fmt.Println("HexGzip: Find", name)
 	hg.moot.RLock()
 	if f, ok := hg.unpacked[name]; ok {
 		hg.moot.RUnlock()

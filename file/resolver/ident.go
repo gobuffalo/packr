@@ -21,7 +21,7 @@ func (i Ident) OsPath() string {
 	} else {
 		s = strings.Replace(s, "\\", string(filepath.Separator), -1)
 	}
-	return filepath.FromSlash(s)
+	return s
 }
 
 func (i Ident) String() string {
