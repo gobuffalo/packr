@@ -13,7 +13,7 @@ type WalkFunc func(string, File) error
 // Walk will traverse the box and call the WalkFunc for each file in the box/folder.
 func (b Box) Walk(wf WalkFunc) error {
 	if data[b.Path] == nil {
-		base, err := filepath.EvalSymlinks(filepath.Join(b.callingDir, b.Path))
+		base, err := filepath.EvalSymlinks(filepath.Join(b.ResolutionDir, b.Path))
 		if err != nil {
 			return errors.WithStack(err)
 		}

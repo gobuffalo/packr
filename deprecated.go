@@ -36,7 +36,7 @@ func NewBox(path string) Box {
 	if !filepath.IsAbs(cd) && cd != "" {
 		cd = filepath.Join(GoPath(), "src", cd)
 	}
-	b.callingDir = resolver.Ident(cd)
+	b.ResolutionDir = resolver.Ident(cd)
 	return b
 }
 

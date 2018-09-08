@@ -37,19 +37,19 @@ func NewBox(path string) Box {
 	}
 
 	return Box{
-		Path:       path,
-		callingDir: cd,
-		data:       map[string][]byte{},
+		Path:          path,
+		ResolutionDir: cd,
+		data:          map[string][]byte{},
 	}
 }
 
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path        string
-	callingDir  string
-	data        map[string][]byte
-	directories map[string]bool
+	Path          string
+	ResolutionDir string
+	data          map[string][]byte
+	directories   map[string]bool
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
@@ -148,7 +148,7 @@ func (b Box) find(name string) (File, error) {
 
 	// Not found in the box virtual fs, try to get it from the file system
 	cleanName = filepath.FromSlash(cleanName)
-	p := filepath.Join(b.callingDir, b.Path, cleanName)
+	p := filepath.Join(b.ResolutionDir, b.Path, cleanName)
 	return fileFor(p, cleanName)
 }
 

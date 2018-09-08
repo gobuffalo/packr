@@ -26,9 +26,9 @@ func New(path string) Box {
 		cd = filepath.Join(GoPath(), "src", cd)
 	}
 	b := Box{
-		Path:       path,
-		Name:       resolver.Ident(path),
-		callingDir: resolver.Ident(cd),
+		Path:          path,
+		Name:          resolver.Ident(path),
+		ResolutionDir: resolver.Ident(cd),
 	}
 	return b
 }
@@ -36,9 +36,9 @@ func New(path string) Box {
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path       string // Path is deprecated and should no longer be used
-	Name       resolver.Ident
-	callingDir resolver.Ident
+	Path          string // Path is deprecated and should no longer be used
+	Name          resolver.Ident
+	ResolutionDir resolver.Ident
 	// data        map[string][]byte
 	// directories map[string]bool
 }

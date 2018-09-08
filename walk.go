@@ -16,7 +16,7 @@ type WalkFunc func(string, file.File) error
 func (b Box) Walk(wf WalkFunc) error {
 	m := map[string]file.File{}
 
-	cd := filepath.Join(b.callingDir.OsPath(), b.Name.OsPath())
+	cd := filepath.Join(b.ResolutionDir.OsPath(), b.Name.OsPath())
 	d := &resolver.Disk{Root: resolver.Ident(cd)}
 	for n, f := range d.FileMap() {
 		m[resolver.Ident(n).Name()] = f
