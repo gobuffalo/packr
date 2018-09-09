@@ -10,17 +10,24 @@ type Parser struct {
 	Prospects []*File
 }
 
-func (p *Parser) Run() error {
+func (p *Parser) Run() ([]*Box, error) {
+	var boxes []*Box
 	for _, pros := range p.Prospects {
 		fmt.Println("Parser: parsing", pros.Name())
 		v := NewVisitor(pros)
-		boxes, err := v.Run()
+		pbr, err := v.Run()
 		if err != nil {
-			return errors.WithStack(err)
+			return boxes, errors.WithStack(err)
 		}
-		for _, n := range boxes {
-			fmt.Println("### n ->", n)
+		for _, b := range pbr {
+			boxes = append(boxes, b)
 		}
 	}
-	return nil
+	return boxes, nil
+}
+
+func New(prospects ...*File) *Parser {
+	return &Parser{
+		Prospects: prospects,
+	}
 }

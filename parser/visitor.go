@@ -267,16 +267,18 @@ func (v *Visitor) addBox(name string, path string) {
 		name = path
 	}
 	name = strings.Replace(name, "\"", "", -1)
-	fmt.Println("### name ->", name)
-	fmt.Println("### path ->", path)
 	if _, ok := v.boxes[name]; !ok {
 		pwd, _ := os.Getwd()
+		pd := filepath.Dir(v.File.Name())
+		if !filepath.IsAbs(pd) {
+			pd = filepath.Join(pwd, pd)
+		}
 		box := &Box{
 			Name:       name,
+			Path:       path,
 			Package:    v.Package,
-			PackageDir: filepath.Dir(v.File.Name()),
+			PackageDir: pd,
 			PWD:        pwd,
-			Files:      map[string]*File{},
 		}
 		v.boxes[name] = box
 	}
@@ -292,8 +294,6 @@ func (v *Visitor) fromVariable(as *ast.AssignStmt) (string, error) {
 
 func (v *Visitor) addVariable(bn string, as *ast.AssignStmt) error {
 	bv, err := v.fromVariable(as)
-	fmt.Println("### bv ->", bv)
-	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil
 	}
