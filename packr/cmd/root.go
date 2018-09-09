@@ -19,6 +19,9 @@ var rootCmd = &cobra.Command{
 			return errors.WithStack(err)
 		}
 		roots := append(args, pwd)
+		for _, r := range roots {
+			store.Clean(r)
+		}
 		p, err := parser.NewFromRoots(roots)
 		if err != nil {
 			return errors.WithStack(err)

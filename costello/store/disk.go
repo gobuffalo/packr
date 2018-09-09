@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -28,10 +29,13 @@ type Disk struct {
 
 func NewDisk(path string, pkg string) *Disk {
 	if len(path) == 0 {
-		path = "packr-packed"
+		path = "packrd"
 	}
 	if len(pkg) == 0 {
-		pkg = "packed"
+		pkg = "packrd"
+	}
+	if !filepath.IsAbs(path) {
+		path, _ = filepath.Abs(path)
 	}
 	return &Disk{
 		DBPath:    path,
@@ -153,10 +157,7 @@ func (d *Disk) Close() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	bb := &bytes.Buffer{}
-	if err := t.Execute(bb, opts); err != nil {
-		return errors.WithStack(err)
-	}
+
 	os.MkdirAll(d.DBPath, 0755)
 	fp := filepath.Join(d.DBPath, "packed-packr.go")
 	f, err := os.Create(fp)
@@ -164,8 +165,46 @@ func (d *Disk) Close() error {
 		return errors.WithStack(err)
 	}
 	defer f.Close()
-	io.Copy(f, bb)
-	// fmt.Println("### bb.String() ->", bb.String())
+
+	if err := t.Execute(f, opts); err != nil {
+		return errors.WithStack(err)
+	}
+
+	ip := filepath.Dir(d.DBPath)
+	ip = strings.TrimPrefix(ip, filepath.Join(GoPath(), "src"))
+	ip = strings.TrimPrefix(ip, string(filepath.Separator))
+	ip = path.Join(ip, d.DBPackage)
+
+	for _, n := range opts.Boxes {
+		b := d.boxes[n.Name]
+		if b == nil {
+			continue
+		}
+
+		os.MkdirAll(b.PackageDir, 0755)
+
+		t, err := template.New("").Parse(diskImportTmpl)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		f, err := os.Create(filepath.Join(b.PackageDir, "_"+b.Package+"-packr.go"))
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		defer f.Close()
+
+		o := struct {
+			Package string
+			Import  string
+		}{
+			Package: b.Package,
+			Import:  ip,
+		}
+		if err := t.Execute(f, o); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
 	return nil
 }
 
