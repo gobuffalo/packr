@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/gobuffalo/packr"
 	"github.com/gobuffalo/packr/costello/parser"
 	"github.com/stretchr/testify/require"
 )
@@ -59,12 +60,37 @@ func Test_Disk_Pack(t *testing.T) {
 	r.Len(global, 3)
 
 	r.Len(d.boxes, 3)
-	for _, br := range d.boxes {
-		for fn, ky := range d.global {
-			fk, ok := br[fn]
-			r.True(ok)
-			r.Equal(ky, fk)
-		}
-	}
 
+}
+
+func Test_Disk_Packed_Test(t *testing.T) {
+	r := require.New(t)
+
+	b := packr.NewBox("simpsons")
+
+	s, err := b.MustString("parents/homer.txt")
+	r.NoError(err)
+	r.Equal("HOMER Simpson", s)
+
+	s, err = b.MustString("parents/marge.txt")
+	r.NoError(err)
+	r.Equal("MARGE Simpson", s)
+
+	_, err = b.MustString("idontexist")
+	r.Error(err)
+}
+
+func Test_Disk_Close(t *testing.T) {
+	r := require.New(t)
+
+	p, err := parser.NewFromRoots([]string{"../store/_fixtures/disk-pack"})
+	r.NoError(err)
+	boxes, err := p.Run()
+	r.NoError(err)
+
+	d := NewDisk("", "")
+	for _, b := range boxes {
+		r.NoError(d.Pack(b))
+	}
+	r.NoError(d.Close())
 }

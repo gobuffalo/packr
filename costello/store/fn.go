@@ -6,10 +6,13 @@ import (
 	"github.com/gobuffalo/packr/costello/parser"
 )
 
+var _ Store = &FnStore{}
+
 type FnStore struct {
 	FileNamesFn func(*parser.Box) ([]string, error)
 	FilesFn     func(*parser.Box) ([]*parser.File, error)
 	PackFn      func(*parser.Box) error
+	CleanFn     func(*parser.Box) error
 }
 
 func (f *FnStore) FileNames(box *parser.Box) ([]string, error) {
@@ -31,4 +34,11 @@ func (f *FnStore) Pack(box *parser.Box) error {
 		return errors.New("Pack not implemented")
 	}
 	return f.PackFn(box)
+}
+
+func (f *FnStore) Clean(box *parser.Box) error {
+	if f.CleanFn == nil {
+		return errors.New("Clean not implemented")
+	}
+	return f.Clean(box)
 }

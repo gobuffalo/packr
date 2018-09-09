@@ -2,12 +2,14 @@ package store
 
 import (
 	"bytes"
-	"crypto/md5"
+	"compress/gzip"
 	"encoding/hex"
-	"fmt"
+	"html/template"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/gobuffalo/packr/costello/parser"
@@ -17,21 +19,16 @@ import (
 
 var _ Store = &Disk{}
 
-type fileInfo struct {
-	Key  string
-	File *parser.File
-}
-
 type Disk struct {
 	DBPath    string
 	DBPackage string
 	global    map[string]string
-	boxes     map[string]map[string]string
+	boxes     map[string]*parser.Box
 }
 
 func NewDisk(path string, pkg string) *Disk {
 	if len(path) == 0 {
-		path = filepath.Join("internal", "packr-packed")
+		path = "packr-packed"
 	}
 	if len(pkg) == 0 {
 		pkg = "packed"
@@ -40,7 +37,7 @@ func NewDisk(path string, pkg string) *Disk {
 		DBPath:    path,
 		DBPackage: pkg,
 		global:    map[string]string{},
-		boxes:     map[string]map[string]string{},
+		boxes:     map[string]*parser.Box{},
 	}
 }
 
@@ -81,23 +78,19 @@ func (d *Disk) Files(box *parser.Box) ([]*parser.File, error) {
 }
 
 func (d *Disk) Pack(box *parser.Box) error {
-	br, ok := d.boxes[box.Name]
-	if !ok {
-		br = map[string]string{}
-		d.boxes[box.Name] = br
-	}
+	d.boxes[box.Name] = box
 	names, err := d.FileNames(box)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	for _, n := range names {
 		k, ok := d.global[n]
-		if !ok {
-			k = makeKey(n)
-			// not in the global, so add it!
-			d.global[n] = k
+		if ok {
+			continue
 		}
-		br[n] = k
+		k = makeKey(box, n)
+		// not in the global, so add it!
+		d.global[n] = k
 	}
 	return nil
 }
@@ -110,39 +103,70 @@ func (d *Disk) Clean(box *parser.Box) error {
 	return Clean(root)
 }
 
-func (d *Disk) Close() error {
-	fmt.Println("not implemented")
-	return nil
+type options struct {
+	Package     string
+	GlobalFiles map[string]string
+	Boxes       []optsBox
 }
 
-func Clean(root string) error {
-	if len(root) == 0 {
-		pwd, err := os.Getwd()
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		root = pwd
+type optsBox struct {
+	Name string
+	Path string
+}
+
+func (d *Disk) Close() error {
+	opts := options{
+		Package:     d.DBPackage,
+		GlobalFiles: map[string]string{},
 	}
-	callback := func(path string, info *godirwalk.Dirent) error {
-		base := filepath.Base(path)
-		if base == ".git" || base == "vendor" || base == "node_modules" {
-			return filepath.SkipDir
-		}
-		if info == nil || info.IsDir() {
-			return nil
-		}
-		if strings.Contains(base, "-packr.go") {
-			err := os.Remove(path)
+	for k, v := range d.global {
+		err := func() error {
+			bb := &bytes.Buffer{}
+			enc := hex.NewEncoder(bb)
+			zw := gzip.NewWriter(enc)
+			f, err := os.Open(k)
 			if err != nil {
 				return errors.WithStack(err)
 			}
+			defer f.Close()
+			io.Copy(zw, f)
+			if err := zw.Close(); err != nil {
+				return errors.WithStack(err)
+			}
+			opts.GlobalFiles[v] = bb.String()
+			return nil
+		}()
+		if err != nil {
+			return errors.WithStack(err)
 		}
-		return nil
 	}
-	return godirwalk.Walk(root, &godirwalk.Options{
-		FollowSymbolicLinks: true,
-		Callback:            callback,
+	for _, b := range d.boxes {
+		ob := optsBox{
+			Name: b.Name,
+		}
+		opts.Boxes = append(opts.Boxes, ob)
+	}
+	sort.Slice(opts.Boxes, func(a, b int) bool {
+		return opts.Boxes[a].Name < opts.Boxes[b].Name
 	})
+	t, err := template.New("").Parse(diskGlobalTmpl)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	bb := &bytes.Buffer{}
+	if err := t.Execute(bb, opts); err != nil {
+		return errors.WithStack(err)
+	}
+	os.MkdirAll(d.DBPath, 0755)
+	fp := filepath.Join(d.DBPath, "packed-packr.go")
+	f, err := os.Create(fp)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer f.Close()
+	io.Copy(f, bb)
+	// fmt.Println("### bb.String() ->", bb.String())
+	return nil
 }
 
 // resolve file paths (only) for the boxes
@@ -152,8 +176,7 @@ func Clean(root string) error {
 // write boxes db to disk (default internal/packr)
 // write -packr.go files in each package (1 per package) that init the global db
 
-func makeKey(text string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(text))
-	return hex.EncodeToString(hasher.Sum(nil))
+func makeKey(box *parser.Box, path string) string {
+	s := strings.TrimPrefix(path, box.AbsPath)
+	return strings.TrimPrefix(s, string(filepath.Separator))
 }

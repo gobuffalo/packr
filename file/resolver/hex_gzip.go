@@ -24,6 +24,24 @@ type HexGzip struct {
 	moot     *sync.RWMutex
 }
 
+var _ file.FileMappable = &HexGzip{}
+
+func (hg *HexGzip) FileMap() map[string]file.File {
+	hg.moot.RLock()
+	var names []string
+	for k := range hg.packed {
+		names = append(names, k)
+	}
+	hg.moot.RUnlock()
+	m := map[string]file.File{}
+	for _, n := range names {
+		if f, err := hg.Find("", n); err == nil {
+			m[n] = f
+		}
+	}
+	return m
+}
+
 func (hg *HexGzip) Find(box string, name string) (file.File, error) {
 	fmt.Println("HexGzip: Find", name)
 	hg.moot.RLock()

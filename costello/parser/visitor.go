@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -153,9 +152,6 @@ func (v *Visitor) evalArgs(expr ast.Expr) error {
 				return errors.WithStack(err)
 			}
 		}
-	// case *ast.BasicLit:
-	// fmt.Println("evalArgs", at.Value)
-	// v.addBox(at.Value)
 	case *ast.CallExpr:
 		if at.Fun == nil {
 			return nil
@@ -185,7 +181,6 @@ func (v *Visitor) evalSelector(expr *ast.CallExpr, sel *ast.SelectorExpr) error 
 	if x.Name == "packr" {
 		switch sel.Sel.Name {
 		case "New":
-			fmt.Println("### expr.Args ->", expr.Args)
 			if len(expr.Args) != 2 {
 				return errors.New("`New` requires two arguments")
 			}
@@ -216,12 +211,10 @@ func (v *Visitor) evalSelector(expr *ast.CallExpr, sel *ast.SelectorExpr) error 
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			fmt.Println("### k1 ->", k1)
 			k2, err := zz(expr.Args[1])
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			fmt.Println("### k2 ->", k2)
 			v.addBox(k1, k2)
 
 			return nil
@@ -280,13 +273,10 @@ func (v *Visitor) addBox(name string, path string) {
 		}
 		box.PackageDir = pd
 
-		fmt.Println("### pd ->", pd)
-		fmt.Println("### abs ->", abs)
 		if !filepath.IsAbs(abs) {
 			abs = filepath.Join(pd, abs)
 		}
 		box.AbsPath = abs
-		fmt.Println("### box.AbsPath ->", box.AbsPath)
 		v.boxes[name] = box
 	}
 }

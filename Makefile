@@ -2,23 +2,21 @@ TAGS ?= "sqlite"
 GO_BIN ?= go
 
 install: deps
-	packr
 	$(GO_BIN) install -v .
 
 deps:
-	# $(GO_BIN) get github.com/gobuffalo/packr/packr
 	$(GO_BIN) get -tags ${TAGS} -t ./...
 
 build: deps
-	packr
 	$(GO_BIN) build -v .
 
 test:
-	packr
 	$(GO_BIN) test -tags ${TAGS} ./...
+	packr clean
 
 ci-test: deps
 	$(GO_BIN) test -tags ${TAGS} -race ./...
+	packr clean
 
 lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal
@@ -26,7 +24,6 @@ lint:
 update:
 	$(GO_BIN) get -u
 	$(GO_BIN) mod tidy
-	packr
 	make test
 	make install
 

@@ -53,11 +53,12 @@ func New(name string, path string) *Box {
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path          string // Path is deprecated and should no longer be used
-	Name          string
-	ResolutionDir string
-	resolvers     map[string]resolver.Resolver
-	moot          *sync.RWMutex
+	Path            string // Path is deprecated and should no longer be used
+	Name            string
+	ResolutionDir   string
+	resolvers       map[string]resolver.Resolver
+	DefaultResolver resolver.Resolver
+	moot            *sync.RWMutex
 }
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
@@ -142,9 +143,12 @@ func (b *Box) Resolve(key string) (file.File, error) {
 	r, ok := b.resolvers[resolver.Key(key)]
 	b.moot.RUnlock()
 	if !ok {
-		r = resolver.DefaultResolver
+		r = b.DefaultResolver
 		if r == nil {
-			return nil, errors.New("resolver.DefaultResolver is nil")
+			r = resolver.DefaultResolver
+			if r == nil {
+				return nil, errors.New("resolver.DefaultResolver is nil")
+			}
 		}
 	}
 	fmt.Println(b.Name, key, fmt.Sprintf("using resolver - %T", r))

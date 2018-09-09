@@ -15,10 +15,15 @@ type WalkFunc func(string, file.File) error
 func (b *Box) Walk(wf WalkFunc) error {
 	m := map[string]file.File{}
 
-	cd := resolver.OsPath(b.ResolutionDir)
-	d := &resolver.Disk{Root: string(cd)}
-	for n, f := range d.FileMap() {
-		m[n] = f
+	dr := b.DefaultResolver
+	if dr == nil {
+		cd := resolver.OsPath(b.ResolutionDir)
+		dr = &resolver.Disk{Root: string(cd)}
+	}
+	if fm, ok := dr.(file.FileMappable); ok {
+		for n, f := range fm.FileMap() {
+			m[n] = f
+		}
 	}
 
 	b.moot.RLock()
