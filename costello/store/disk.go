@@ -2,7 +2,11 @@ package store
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gobuffalo/packr/costello/parser"
 	"github.com/karrick/godirwalk"
@@ -14,6 +18,21 @@ var _ Store = &Disk{}
 type Disk struct {
 	DBPath    string
 	DBPackage string
+	global    map[string]*parser.File
+}
+
+func NewDisk(path string, pkg string) *Disk {
+	if len(path) == 0 {
+		path = filepath.Join("internal", "packr-packed")
+	}
+	if len(pkg) == 0 {
+		pkg = "packed"
+	}
+	return &Disk{
+		DBPath:    path,
+		DBPackage: pkg,
+		global:    map[string]*parser.File{},
+	}
 }
 
 func (d *Disk) FileNames(box *parser.Box) ([]string, error) {
@@ -57,11 +76,46 @@ func (d *Disk) Pack(box *parser.Box) error {
 }
 
 func (d *Disk) Clean(box *parser.Box) error {
-	panic("not implemented")
+	root := box.PackageDir
+	if len(root) == 0 {
+		return errors.New("can't clean an empty box.PackageDir")
+	}
+	return Clean(root)
 }
 
 func (d *Disk) Close() error {
-	panic("not implemented")
+	fmt.Println("not implemented")
+	return nil
+}
+
+func Clean(root string) error {
+	if len(root) == 0 {
+		pwd, err := os.Getwd()
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		root = pwd
+	}
+	callback := func(path string, info *godirwalk.Dirent) error {
+		base := filepath.Base(path)
+		if base == ".git" || base == "vendor" || base == "node_modules" {
+			return filepath.SkipDir
+		}
+		if info == nil || info.IsDir() {
+			return nil
+		}
+		if strings.Contains(base, "-packr.go") {
+			err := os.Remove(path)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+		}
+		return nil
+	}
+	return godirwalk.Walk(root, &godirwalk.Options{
+		FollowSymbolicLinks: true,
+		Callback:            callback,
+	})
 }
 
 // resolve file paths (only) for the boxes

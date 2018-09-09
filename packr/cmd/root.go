@@ -36,22 +36,13 @@ var rootCmd = &cobra.Command{
 		fmt.Printf("Found %d boxes\n", len(boxes))
 
 		// "pack" boxes
-		d := &store.Disk{
-			DBPath:    "./internal/packed",
-			DBPackage: "./internal/packed",
-		}
+		d := store.NewDisk("", "")
 		for _, b := range boxes {
 			if err := d.Pack(b); err != nil {
 				return errors.WithStack(err)
 			}
 		}
 		return d.Close()
-
-		// resolve file paths (only) for the boxes
-		// compile "global" db
-		// resolve files for boxes to point at global db
-		// write global db to disk (default internal/packed)
-		// write -packr.go files in each package (1 per package)
 	},
 }
 
