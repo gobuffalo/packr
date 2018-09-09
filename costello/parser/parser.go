@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
+	"strings"
 
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
@@ -36,9 +38,16 @@ func New(prospects ...*File) *Parser {
 }
 
 func NewFromRoots(roots []string, ignore ...string) (*Parser, error) {
+	fmt.Println("Parser: prospecting roots\n", strings.Join(roots, "\n"))
 	p := New()
 	callback := func(path string, de *godirwalk.Dirent) error {
-		if !IsProspect(path, ignore...) || de.IsDir() {
+		if !IsProspect(path, ignore...) {
+			if de.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if de.IsDir() {
 			return nil
 		}
 		b, err := ioutil.ReadFile(path)

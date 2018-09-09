@@ -15,11 +15,12 @@ func Test_IsProspect(t *testing.T) {
 		{"foo/.git/baz.go", false},
 		{"a.go", true},
 		{"a/b.go", true},
+		{"a/b_test.go", false},
 		{"a/b-packr.go", false},
 		{"a/vendor/b.go", false},
 		{"a/_c/c.go", false},
 		{"a/d/_d.go", true},
-		{"a/d/", true},
+		{"a/d/", false},
 	}
 
 	for _, tt := range table {

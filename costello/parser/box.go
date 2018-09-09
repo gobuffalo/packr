@@ -9,6 +9,7 @@ import (
 type Box struct {
 	Name       string
 	Path       string
+	AbsPath    string
 	Package    string
 	PWD        string
 	PackageDir string

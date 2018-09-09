@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -8,9 +9,19 @@ import (
 var defaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea"}
 
 func IsProspect(path string, ignore ...string) bool {
+	if fi, err := os.Stat(path); err == nil {
+		if fi.IsDir() {
+			un := filepath.Base(path)
+			return !strings.HasPrefix(un, "_")
+		}
+	}
 	path = strings.ToLower(path)
 
 	if strings.HasSuffix(path, "-packr.go") {
+		return false
+	}
+
+	if strings.HasSuffix(path, "_test.go") {
 		return false
 	}
 
@@ -43,5 +54,5 @@ func IsProspect(path string, ignore ...string) bool {
 		return false
 	}
 
-	return ext == ".go" || ext == ""
+	return ext == ".go"
 }
