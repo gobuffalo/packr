@@ -21,6 +21,17 @@ func Test_Parser_Run(t *testing.T) {
 	r.Len(boxes, 4)
 }
 
+func Test_NewFrom_Roots(t *testing.T) {
+	r := require.New(t)
+	p, err := NewFromRoots([]string{"../parser/_fixtures/new_from_roots"})
+	r.NoError(err)
+
+	boxes, err := p.Run()
+	r.NoError(err)
+
+	r.Len(boxes, 3)
+}
+
 const basicGoTmpl = `package %s
 
 import "github.com/gobuffalo/packr"

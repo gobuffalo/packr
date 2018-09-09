@@ -268,18 +268,14 @@ func (v *Visitor) addBox(name string, path string) {
 	}
 	name = strings.Replace(name, "\"", "", -1)
 	if _, ok := v.boxes[name]; !ok {
-		pwd, _ := os.Getwd()
+		box := NewBox(name, path)
 		pd := filepath.Dir(v.File.Name())
+		pwd, _ := os.Getwd()
 		if !filepath.IsAbs(pd) {
 			pd = filepath.Join(pwd, pd)
 		}
-		box := &Box{
-			Name:       name,
-			Path:       path,
-			Package:    v.Package,
-			PackageDir: pd,
-			PWD:        pwd,
-		}
+		box.PackageDir = pd
+		box.Package = v.Package
 		v.boxes[name] = box
 	}
 }
