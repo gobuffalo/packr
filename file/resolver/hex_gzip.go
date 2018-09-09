@@ -24,7 +24,7 @@ type HexGzip struct {
 	moot     *sync.RWMutex
 }
 
-func (hg *HexGzip) Find(name string) (file.File, error) {
+func (hg *HexGzip) Find(box string, name string) (file.File, error) {
 	fmt.Println("HexGzip: Find", name)
 	hg.moot.RLock()
 	if f, ok := hg.unpacked[name]; ok {

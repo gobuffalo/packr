@@ -17,7 +17,7 @@ func Test_inMemory_Find(t *testing.T) {
 	}
 	d := NewInMemory(files)
 
-	f, err := d.Find("foo.txt")
+	f, err := d.Find("", "foo.txt")
 	r.NoError(err)
 
 	fi, err := f.FileInfo()

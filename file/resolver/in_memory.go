@@ -15,7 +15,7 @@ type InMemory struct {
 	moot  *sync.RWMutex
 }
 
-func (d *InMemory) Find(name string) (file.File, error) {
+func (d *InMemory) Find(box string, name string) (file.File, error) {
 	fmt.Println("InMemory: Find", name)
 	d.moot.RLock()
 	f, ok := d.files[name]

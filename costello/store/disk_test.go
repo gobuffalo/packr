@@ -40,3 +40,31 @@ func Test_Disk_Files(t *testing.T) {
 	r.Equal("think.txt", filepath.Base(f.Name()))
 	r.Equal("THINK!\n", f.String())
 }
+
+func Test_Disk_Pack(t *testing.T) {
+	r := require.New(t)
+
+	d := NewDisk("", "")
+
+	p, err := parser.NewFromRoots([]string{"../store/_fixtures/disk-pack"})
+	r.NoError(err)
+	boxes, err := p.Run()
+	r.NoError(err)
+
+	for _, b := range boxes {
+		r.NoError(d.Pack(b))
+	}
+
+	global := d.global
+	r.Len(global, 3)
+
+	r.Len(d.boxes, 3)
+	for _, br := range d.boxes {
+		for fn, ky := range d.global {
+			fk, ok := br[fn]
+			r.True(ok)
+			r.Equal(ky, fk)
+		}
+	}
+
+}

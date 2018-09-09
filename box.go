@@ -101,7 +101,7 @@ func (b *Box) Bytes(name string) []byte {
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
 func (b *Box) MustBytes(name string) ([]byte, error) {
-	f, err := b.resolve(name)
+	f, err := b.Resolve(name)
 	if err != nil {
 		return []byte(""), err
 	}
@@ -119,7 +119,7 @@ func (b *Box) Has(name string) bool {
 
 // Open returns a File using the http.File interface
 func (b *Box) Open(name string) (http.File, error) {
-	return b.resolve(name)
+	return b.Resolve(name)
 }
 
 // List shows "What's in the box?"
@@ -137,7 +137,7 @@ func (b *Box) List() []string {
 	return keys
 }
 
-func (b *Box) resolve(key string) (file.File, error) {
+func (b *Box) Resolve(key string) (file.File, error) {
 	b.moot.RLock()
 	r, ok := b.resolvers[resolver.Key(key)]
 	b.moot.RUnlock()
@@ -149,10 +149,10 @@ func (b *Box) resolve(key string) (file.File, error) {
 	}
 	fmt.Println(b.Name, key, fmt.Sprintf("using resolver - %T", r))
 
-	f, err := r.Find(key)
+	f, err := r.Find(b.Name, key)
 	if err != nil {
 		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
-		f, err = r.Find(string(z))
+		f, err = r.Find(b.Name, z)
 		if err != nil {
 			return f, errors.WithStack(err)
 		}

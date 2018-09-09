@@ -19,7 +19,7 @@ type Disk struct {
 	Root string
 }
 
-func (d *Disk) Find(name string) (file.File, error) {
+func (d *Disk) Find(box string, name string) (file.File, error) {
 	fmt.Println("Disk: Find", name)
 	path := OsPath(name)
 	if !filepath.IsAbs(path) {

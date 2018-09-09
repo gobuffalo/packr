@@ -7,7 +7,7 @@ import (
 )
 
 type Resolver interface {
-	Find(string) (file.File, error)
+	Find(string, string) (file.File, error)
 }
 
 func defaultResolver() Resolver {

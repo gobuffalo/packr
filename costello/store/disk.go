@@ -2,6 +2,8 @@ package store
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,10 +17,16 @@ import (
 
 var _ Store = &Disk{}
 
+type fileInfo struct {
+	Key  string
+	File *parser.File
+}
+
 type Disk struct {
 	DBPath    string
 	DBPackage string
-	global    map[string]*parser.File
+	global    map[string]string
+	boxes     map[string]map[string]string
 }
 
 func NewDisk(path string, pkg string) *Disk {
@@ -31,7 +39,8 @@ func NewDisk(path string, pkg string) *Disk {
 	return &Disk{
 		DBPath:    path,
 		DBPackage: pkg,
-		global:    map[string]*parser.File{},
+		global:    map[string]string{},
+		boxes:     map[string]map[string]string{},
 	}
 }
 
@@ -72,7 +81,25 @@ func (d *Disk) Files(box *parser.Box) ([]*parser.File, error) {
 }
 
 func (d *Disk) Pack(box *parser.Box) error {
-	panic("not implemented")
+	br, ok := d.boxes[box.Name]
+	if !ok {
+		br = map[string]string{}
+		d.boxes[box.Name] = br
+	}
+	names, err := d.FileNames(box)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	for _, n := range names {
+		k, ok := d.global[n]
+		if !ok {
+			k = makeKey(n)
+			// not in the global, so add it!
+			d.global[n] = k
+		}
+		br[n] = k
+	}
+	return nil
 }
 
 func (d *Disk) Clean(box *parser.Box) error {
@@ -124,3 +151,9 @@ func Clean(root string) error {
 // write global db to disk (default internal/packr)
 // write boxes db to disk (default internal/packr)
 // write -packr.go files in each package (1 per package) that init the global db
+
+func makeKey(text string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(text))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
