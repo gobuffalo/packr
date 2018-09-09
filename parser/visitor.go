@@ -1,7 +1,10 @@
 package parser
 
 import (
+	"fmt"
 	"go/ast"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -13,46 +16,44 @@ import (
 type Visitor struct {
 	File    genny.File
 	Package string
-	Boxes   []string
-	Errors  []error
+	boxes   map[string]*Box
+	errors  []error
 }
 
 func NewVisitor(f *File) *Visitor {
 	return &Visitor{
 		File:   f,
-		Boxes:  []string{},
-		Errors: []error{},
+		boxes:  map[string]*Box{},
+		errors: []error{},
 	}
 }
 
-func (v *Visitor) Run() error {
+func (v *Visitor) Run() ([]*Box, error) {
+	var boxes []*Box
 	pf, err := gotools.ParseFile(v.File)
 	if err != nil {
-		return errors.WithStack(err)
+		return boxes, errors.WithStack(err)
 	}
 
 	v.Package = pf.Ast.Name.Name
 	ast.Walk(v, pf.Ast)
 
-	m := map[string]string{}
-	for _, s := range v.Boxes {
-		m[s] = s
-	}
-	v.Boxes = []string{}
-	for k := range m {
-		v.Boxes = append(v.Boxes, k)
+	for _, vb := range v.boxes {
+		boxes = append(boxes, vb)
 	}
 
-	sort.Strings(v.Boxes)
+	sort.Slice(boxes, func(i, j int) bool {
+		return boxes[i].Name < boxes[j].Name
+	})
 
-	if len(v.Errors) > 0 {
-		s := make([]string, len(v.Errors))
-		for i, e := range v.Errors {
+	if len(v.errors) > 0 {
+		s := make([]string, len(v.errors))
+		for i, e := range v.errors {
 			s[i] = e.Error()
 		}
-		return errors.New(strings.Join(s, "\n"))
+		return boxes, errors.New(strings.Join(s, "\n"))
 	}
-	return nil
+	return boxes, nil
 }
 
 func (v *Visitor) Visit(node ast.Node) ast.Visitor {
@@ -60,7 +61,7 @@ func (v *Visitor) Visit(node ast.Node) ast.Visitor {
 		return v
 	}
 	if err := v.eval(node); err != nil {
-		v.Errors = append(v.Errors, err)
+		v.errors = append(v.errors, err)
 	}
 	return v
 }
@@ -181,25 +182,69 @@ func (v *Visitor) evalSelector(expr *ast.CallExpr, sel *ast.SelectorExpr) error 
 	if !ok {
 		return nil
 	}
-	if x.Name == "packr" && sel.Sel.Name == "NewBox" {
-		for _, e := range expr.Args {
-			switch at := e.(type) {
-			case *ast.Ident:
-				switch at.Obj.Kind {
-				case ast.Var:
-					if as, ok := at.Obj.Decl.(*ast.AssignStmt); ok {
-						v.addVariable(as)
+	if x.Name == "packr" {
+		switch sel.Sel.Name {
+		case "New":
+			fmt.Println("### expr.Args ->", expr.Args)
+			if len(expr.Args) != 2 {
+				return errors.New("`New` requires two arguments")
+			}
+
+			zz := func(e ast.Expr) (string, error) {
+				switch at := e.(type) {
+				case *ast.Ident:
+					switch at.Obj.Kind {
+					case ast.Var:
+						if as, ok := at.Obj.Decl.(*ast.AssignStmt); ok {
+							return v.fromVariable(as)
+						}
+					case ast.Con:
+						if vs, ok := at.Obj.Decl.(*ast.ValueSpec); ok {
+							return v.fromConstant(vs)
+						}
 					}
-				case ast.Con:
-					if vs, ok := at.Obj.Decl.(*ast.ValueSpec); ok {
-						v.addConstant(vs)
-					}
+					return "", v.evalIdent(at)
+				case *ast.BasicLit:
+					return at.Value, nil
+				case *ast.CallExpr:
+					return "", v.evalExpr(at)
 				}
-				return v.evalIdent(at)
-			case *ast.BasicLit:
-				v.addBox(at.Value)
-			case *ast.CallExpr:
-				return v.evalExpr(at)
+				return "", errors.Errorf("can't handle %T", e)
+			}
+
+			k1, err := zz(expr.Args[0])
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			fmt.Println("### k1 ->", k1)
+			k2, err := zz(expr.Args[1])
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			fmt.Println("### k2 ->", k2)
+			v.addBox(k1, k2)
+
+			return nil
+		case "NewBox":
+			for _, e := range expr.Args {
+				switch at := e.(type) {
+				case *ast.Ident:
+					switch at.Obj.Kind {
+					case ast.Var:
+						if as, ok := at.Obj.Decl.(*ast.AssignStmt); ok {
+							v.addVariable("", as)
+						}
+					case ast.Con:
+						if vs, ok := at.Obj.Decl.(*ast.ValueSpec); ok {
+							v.addConstant("", vs)
+						}
+					}
+					return v.evalIdent(at)
+				case *ast.BasicLit:
+					v.addBox("", at.Value)
+				case *ast.CallExpr:
+					return v.evalExpr(at)
+				}
 			}
 		}
 	}
@@ -217,24 +262,65 @@ func (v *Visitor) evalIdent(i *ast.Ident) error {
 	return nil
 }
 
-func (v *Visitor) addBox(b string) {
-	b = strings.Replace(b, "\"", "", -1)
-	v.Boxes = append(v.Boxes, b)
+func (v *Visitor) addBox(name string, path string) {
+	if len(name) == 0 {
+		name = path
+	}
+	name = strings.Replace(name, "\"", "", -1)
+	fmt.Println("### name ->", name)
+	fmt.Println("### path ->", path)
+	if _, ok := v.boxes[name]; !ok {
+		pwd, _ := os.Getwd()
+		box := &Box{
+			Name:       name,
+			Package:    v.Package,
+			PackageDir: filepath.Dir(v.File.Name()),
+			PWD:        pwd,
+			Files:      map[string]*File{},
+		}
+		v.boxes[name] = box
+	}
 }
-
-func (v *Visitor) addVariable(as *ast.AssignStmt) error {
+func (v *Visitor) fromVariable(as *ast.AssignStmt) (string, error) {
 	if len(as.Rhs) == 1 {
 		if bs, ok := as.Rhs[0].(*ast.BasicLit); ok {
-			v.addBox(bs.Value)
+			return bs.Value, nil
 		}
 	}
+	return "", errors.New("unable to find value from variable")
+}
+
+func (v *Visitor) addVariable(bn string, as *ast.AssignStmt) error {
+	bv, err := v.fromVariable(as)
+	fmt.Println("### bv ->", bv)
+	fmt.Println("### err ->", err)
+	if err != nil {
+		return nil
+	}
+	if len(bn) == 0 {
+		bn = bv
+	}
+	v.addBox(bn, bv)
 	return nil
 }
 
-func (v *Visitor) addConstant(vs *ast.ValueSpec) error {
+func (v *Visitor) fromConstant(vs *ast.ValueSpec) (string, error) {
 	if len(vs.Values) == 1 {
 		if bs, ok := vs.Values[0].(*ast.BasicLit); ok {
-			v.addBox(bs.Value)
+			return bs.Value, nil
+		}
+	}
+	return "", errors.New("unable to find value from constant")
+}
+
+func (v *Visitor) addConstant(bn string, vs *ast.ValueSpec) error {
+	if len(vs.Values) == 1 {
+		if bs, ok := vs.Values[0].(*ast.BasicLit); ok {
+			bv := bs.Value
+			if len(bn) == 0 {
+				bn = bv
+			}
+			v.addBox(bn, bv)
 		}
 	}
 	return nil

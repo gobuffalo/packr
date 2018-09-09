@@ -10,12 +10,21 @@ import (
 func Test_Visitor(t *testing.T) {
 	r := require.New(t)
 	v := NewVisitor(NewFile("example/example.go", strings.NewReader(example)))
-	r.NoError(v.Run())
+
+	boxes, err := v.Run()
+	r.NoError(err)
 
 	r.Equal("example", v.Package)
-	r.Len(v.Errors, 0)
-	r.Len(v.Boxes, 7)
-	r.Equal([]string{"./assets", "./bar", "./constant", "./foo", "./sf", "./templates", "./variable"}, v.Boxes)
+	r.Len(v.errors, 0)
+
+	var act []string
+	for _, b := range boxes {
+		act = append(act, b.Name)
+	}
+
+	exp := []string{"./assets", "./bar", "./constant", "./foo", "./sf", "./templates", "./variable", "beatles"}
+	r.Len(act, len(exp))
+	r.Equal(exp, act)
 }
 
 const example = `package example
@@ -25,6 +34,7 @@ import (
 )
 
 var a = packr.NewBox("./foo")
+var pw = packr.New("beatles", "./paperback-writer")
 
 const constString = "./constant"
 
@@ -37,6 +47,8 @@ func init() {
 
 	b := "./variable"
 	packr.NewBox(b)
+
+	packr.New("beatles", "./day-tripper")
 
 	packr.NewBox(constString)
 

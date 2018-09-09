@@ -5,5 +5,5 @@ type Box struct {
 	Package    string
 	PWD        string
 	PackageDir string
-	Files      map[string]File
+	Files      map[string]*File
 }
