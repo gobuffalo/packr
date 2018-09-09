@@ -11,10 +11,12 @@ build: deps
 	$(GO_BIN) build -v .
 
 test:
+	packr clean
 	$(GO_BIN) test -tags ${TAGS} ./...
 	packr clean
 
 ci-test: deps
+	packr clean
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 	packr clean
 

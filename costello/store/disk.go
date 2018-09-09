@@ -3,7 +3,8 @@ package store
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/hex"
+	"crypto/md5"
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -12,10 +13,14 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
+
+	"github.com/gobuffalo/packr/internal/hex"
 
 	"github.com/gobuffalo/packr/costello/parser"
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 var _ Store = &Disk{}
@@ -25,6 +30,7 @@ type Disk struct {
 	DBPackage string
 	global    map[string]string
 	boxes     map[string]*parser.Box
+	moot      *sync.RWMutex
 }
 
 func NewDisk(path string, pkg string) *Disk {
@@ -42,6 +48,7 @@ func NewDisk(path string, pkg string) *Disk {
 		DBPackage: pkg,
 		global:    map[string]string{},
 		boxes:     map[string]*parser.Box{},
+		moot:      &sync.RWMutex{},
 	}
 }
 
@@ -123,26 +130,33 @@ func (d *Disk) Close() error {
 		Package:     d.DBPackage,
 		GlobalFiles: map[string]string{},
 	}
+	wg := errgroup.Group{}
 	for k, v := range d.global {
-		err := func() error {
-			bb := &bytes.Buffer{}
-			enc := hex.NewEncoder(bb)
-			zw := gzip.NewWriter(enc)
-			f, err := os.Open(k)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			defer f.Close()
-			io.Copy(zw, f)
-			if err := zw.Close(); err != nil {
-				return errors.WithStack(err)
-			}
-			opts.GlobalFiles[v] = bb.String()
-			return nil
-		}()
-		if err != nil {
-			return errors.WithStack(err)
-		}
+		func(k, v string) {
+			wg.Go(func() error {
+				fmt.Println("encoding", k, v)
+				bb := &bytes.Buffer{}
+				enc := hex.NewEncoder(bb)
+				zw := gzip.NewWriter(enc)
+				f, err := os.Open(k)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+				defer f.Close()
+				io.Copy(zw, f)
+				if err := zw.Close(); err != nil {
+					return errors.WithStack(err)
+				}
+				d.moot.Lock()
+				opts.GlobalFiles[v] = bb.String()
+				d.moot.Unlock()
+				return nil
+			})
+		}(k, v)
+	}
+
+	if err := wg.Wait(); err != nil {
+		return errors.WithStack(err)
 	}
 	for _, b := range d.boxes {
 		ob := optsBox{
@@ -153,7 +167,29 @@ func (d *Disk) Close() error {
 	sort.Slice(opts.Boxes, func(a, b int) bool {
 		return opts.Boxes[a].Name < opts.Boxes[b].Name
 	})
-	t, err := template.New("").Parse(diskGlobalTmpl)
+
+	t := template.New("").Funcs(template.FuncMap{
+		"printFiles": func(ob optsBox) (template.HTML, error) {
+			box := d.boxes[ob.Name]
+			if box == nil {
+				return "", errors.Errorf("could not find box %s", ob.Name)
+			}
+			bb := &bytes.Buffer{}
+			fn, err := d.FileNames(box)
+			if err != nil {
+				return "", errors.WithStack(err)
+			}
+			const ln = "\t\tb.SetResolver(\"%s\", &packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n"
+			for _, s := range fn {
+				p := strings.TrimPrefix(s, box.AbsPath)
+				p = strings.TrimPrefix(p, string(filepath.Separator))
+				bb.WriteString(fmt.Sprintf(ln, p, makeKey(box, s)))
+			}
+			return template.HTML(bb.String()), nil
+		},
+	})
+
+	t, err := t.Parse(diskGlobalTmpl)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -216,6 +252,10 @@ func (d *Disk) Close() error {
 // write -packr.go files in each package (1 per package) that init the global db
 
 func makeKey(box *parser.Box, path string) string {
-	s := strings.TrimPrefix(path, box.AbsPath)
-	return strings.TrimPrefix(s, string(filepath.Separator))
+	// return path
+	// s := strings.TrimPrefix(path, box.AbsPath)
+	// return strings.TrimPrefix(s, string(filepath.Separator))
+	hasher := md5.New()
+	hasher.Write([]byte(path))
+	return hex.EncodeToString(hasher.Sum(nil))
 }

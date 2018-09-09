@@ -23,8 +23,11 @@ func init() {
 	g.DefaultResolver = hgr
 
 	{{- range $box := .Boxes}}
-	packr.New("{{$box.Name}}", "{{$box.Path}}").DefaultResolver = hgr
-	{{- end }}
+	func() {
+		b := packr.New("{{$box.Name}}", "{{$box.Path}}")
+{{ printFiles $box}}
+	}()
+	{{ end }}
 }
 `
 
