@@ -14,7 +14,7 @@ func Test_Disk_FileNames(t *testing.T) {
 
 	d := &Disk{}
 
-	box := parser.NewBox("Test_Disk_FileNames", "../store/_fixtures/disk/franklin")
+	box := parser.NewBox("Test_Disk_FileNames", "./_fixtures/disk/franklin")
 	names, err := d.FileNames(box)
 	r.NoError(err)
 	r.Len(names, 2)
@@ -28,7 +28,7 @@ func Test_Disk_Files(t *testing.T) {
 
 	d := &Disk{}
 
-	box := parser.NewBox("Test_Disk_Files", "../store/_fixtures/disk/franklin")
+	box := parser.NewBox("Test_Disk_Files", "./_fixtures/disk/franklin")
 	files, err := d.Files(box)
 	r.NoError(err)
 	r.Len(files, 2)
@@ -47,7 +47,7 @@ func Test_Disk_Pack(t *testing.T) {
 
 	d := NewDisk("", "")
 
-	p, err := parser.NewFromRoots([]string{"../store/_fixtures/disk-pack"})
+	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"})
 	r.NoError(err)
 	boxes, err := p.Run()
 	r.NoError(err)
@@ -83,7 +83,7 @@ func Test_Disk_Packed_Test(t *testing.T) {
 func Test_Disk_Close(t *testing.T) {
 	r := require.New(t)
 
-	p, err := parser.NewFromRoots([]string{"../store/_fixtures/disk-pack"})
+	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"})
 	r.NoError(err)
 	boxes, err := p.Run()
 	r.NoError(err)
