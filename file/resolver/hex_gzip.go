@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gobuffalo/packr/file/resolver/internal/hex"
+	"github.com/gobuffalo/packr/encoding/hex"
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/pkg/errors"

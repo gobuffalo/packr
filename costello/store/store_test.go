@@ -3,10 +3,11 @@ package store
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	"github.com/gobuffalo/packr/encoding/hex"
 
 	"github.com/pkg/errors"
 )
