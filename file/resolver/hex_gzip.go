@@ -3,14 +3,13 @@ package resolver
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
-
-	"github.com/gobuffalo/packr/encoding/hex"
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/pkg/errors"
@@ -55,7 +54,7 @@ func (hg *HexGzip) Find(box string, name string) (file.File, error) {
 		return nil, os.ErrNotExist
 	}
 
-	unpacked, err := unHexGzip(packed)
+	unpacked, err := UnGzip(packed)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -80,28 +79,36 @@ func NewHexGzip(files map[string]string) (*HexGzip, error) {
 	return hg, nil
 }
 
-func hexGzip(s string) (string, error) {
+func Gzip(s string) (string, error) {
 	bb := &bytes.Buffer{}
-	enc := hex.NewEncoder(bb)
-	zw := gzip.NewWriter(enc)
-	io.Copy(zw, strings.NewReader(s))
-	zw.Close()
+	var w io.Writer = bb
+	w, err := gzip.NewWriterLevel(w, gzip.BestCompression)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	io.Copy(w, strings.NewReader(s))
+	if cl, ok := w.(io.Closer); ok {
+		cl.Close()
+	}
 
-	return bb.String(), nil
+	encoded := base64.StdEncoding.EncodeToString(bb.Bytes())
+	return encoded, nil
 }
 
-func unHexGzip(packed string) (string, error) {
-	br := bytes.NewBufferString(packed)
-	dec := hex.NewDecoder(br)
-	zr, err := gzip.NewReader(dec)
+func UnGzip(packed string) (string, error) {
+	decoded, err := base64.StdEncoding.DecodeString(packed)
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
-	defer zr.Close()
-
-	b, err := ioutil.ReadAll(zr)
+	br := bytes.NewBuffer(decoded)
+	r, err := gzip.NewReader(br)
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	r.Close()
 	return string(b), nil
 }
