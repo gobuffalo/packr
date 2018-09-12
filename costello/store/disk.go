@@ -2,6 +2,7 @@ package store
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/md5"
 	"fmt"
 	"html/template"
@@ -15,7 +16,6 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/encoding/hex"
-	"github.com/gobuffalo/packr/file/resolver"
 
 	"github.com/gobuffalo/packr/costello/parser"
 	"github.com/karrick/godirwalk"
@@ -136,20 +136,19 @@ func (d *Disk) Close() error {
 			wg.Go(func() error {
 				fmt.Println("encoding", k, v)
 				bb := &bytes.Buffer{}
+				enc := hex.NewEncoder(bb)
+				zw := gzip.NewWriter(enc)
 				f, err := os.Open(k)
 				if err != nil {
 					return errors.WithStack(err)
 				}
 				defer f.Close()
-				io.Copy(bb, f)
-
-				encoded, err := resolver.Gzip(bb.String())
-				if err != nil {
+				io.Copy(zw, f)
+				if err := zw.Close(); err != nil {
 					return errors.WithStack(err)
 				}
 				d.moot.Lock()
-
-				opts.GlobalFiles[v] = encoded
+				opts.GlobalFiles[v] = bb.String()
 				d.moot.Unlock()
 				return nil
 			})
@@ -224,7 +223,7 @@ func (d *Disk) Close() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		f, err := os.Create(filepath.Join(b.PackageDir, "a_"+b.Package+"-packr.go"))
+		f, err := os.Create(filepath.Join(b.PackageDir, "_"+b.Package+"-packr.go"))
 		if err != nil {
 			return errors.WithStack(err)
 		}
