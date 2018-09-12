@@ -2,6 +2,7 @@ module github.com/gobuffalo/packr
 
 require (
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/gobuffalo/envy v1.6.4
 	github.com/gobuffalo/genny v0.0.0-20180906222443-5915ba7ba494
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/hpcloud/tail v1.0.0 // indirect

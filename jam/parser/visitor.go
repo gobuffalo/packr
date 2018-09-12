@@ -62,6 +62,7 @@ func (v *Visitor) Visit(node ast.Node) ast.Visitor {
 	if err := v.eval(node); err != nil {
 		v.errors = append(v.errors, err)
 	}
+
 	return v
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	const gk = "__packr_global__"
+	const gk = DISK_GLOBAL_KEY
 	g := packr.New(gk, "")
 	hgr, err := resolver.NewHexGzip(map[string]string{
 		"4abf3a9b652ecec6b347eb6acb7ce363": "1f8b08000000000000fff2750c72775508cecc2d28cecfe302040000fffffb1d273b0e000000",

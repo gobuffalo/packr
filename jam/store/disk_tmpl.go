@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	const gk = "__packr_global__"
+	const gk = "{{.GK}}"
 	g := packr.New(gk, "")
 	hgr, err := resolver.NewHexGzip(map[string]string{
 	{{- range $k, $v := .GlobalFiles }}

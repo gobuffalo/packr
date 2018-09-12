@@ -25,6 +25,8 @@ import (
 
 var _ Store = &Disk{}
 
+const DISK_GLOBAL_KEY = "__packr_global__"
+
 type Disk struct {
 	DBPath    string
 	DBPackage string
@@ -118,6 +120,7 @@ type options struct {
 	Package     string
 	GlobalFiles map[string]string
 	Boxes       []optsBox
+	GK          string
 }
 
 type optsBox struct {
@@ -129,6 +132,7 @@ func (d *Disk) Close() error {
 	opts := options{
 		Package:     d.DBPackage,
 		GlobalFiles: map[string]string{},
+		GK:          DISK_GLOBAL_KEY,
 	}
 	wg := errgroup.Group{}
 	for k, v := range d.global {
