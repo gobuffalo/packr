@@ -18,8 +18,8 @@ import (
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
 // binary.
-func NewBox(path string) *Box {
-	return New(path, path)
+func NewBox(path string) Box {
+	return *New(path, path)
 }
 
 func New(name string, path string) *Box {
@@ -29,7 +29,7 @@ func New(name string, path string) *Box {
 	}
 	var cd string
 	if !filepath.IsAbs(path) {
-		_, filename, _, _ := runtime.Caller(1)
+		_, filename, _, _ := runtime.Caller(2)
 		cd = filepath.Dir(filename)
 	}
 
@@ -82,26 +82,26 @@ func (b *Box) AddBytes(path string, t []byte) error {
 }
 
 // String of the file asked for or an empty string.
-func (b *Box) String(name string) string {
+func (b Box) String(name string) string {
 	return string(b.Bytes(name))
 }
 
 // MustString returns either the string of the requested
 // file or an error if it can not be found.
-func (b *Box) MustString(name string) (string, error) {
+func (b Box) MustString(name string) (string, error) {
 	bb, err := b.MustBytes(name)
 	return string(bb), err
 }
 
 // Bytes of the file asked for or an empty byte slice.
-func (b *Box) Bytes(name string) []byte {
+func (b Box) Bytes(name string) []byte {
 	bb, _ := b.MustBytes(name)
 	return bb
 }
 
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
-func (b *Box) MustBytes(name string) ([]byte, error) {
+func (b Box) MustBytes(name string) ([]byte, error) {
 	f, err := b.Resolve(name)
 	if err != nil {
 		return []byte(""), err
@@ -110,7 +110,7 @@ func (b *Box) MustBytes(name string) ([]byte, error) {
 }
 
 // Has returns true if the resource exists in the box
-func (b *Box) Has(name string) bool {
+func (b Box) Has(name string) bool {
 	_, err := b.MustBytes(name)
 	if err != nil {
 		return false
@@ -119,12 +119,12 @@ func (b *Box) Has(name string) bool {
 }
 
 // Open returns a File using the http.File interface
-func (b *Box) Open(name string) (http.File, error) {
+func (b Box) Open(name string) (http.File, error) {
 	return b.Resolve(name)
 }
 
 // List shows "What's in the box?"
-func (b *Box) List() []string {
+func (b Box) List() []string {
 	var keys []string
 
 	b.Walk(func(path string, info File) error {

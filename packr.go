@@ -17,7 +17,7 @@ func findBox(name string) *Box {
 
 func placeBox(b *Box) *Box {
 	gil.Lock()
-	defer gil.Unlock()
 	boxes[resolver.Key(b.Name)] = b
+	gil.Unlock()
 	return b
 }

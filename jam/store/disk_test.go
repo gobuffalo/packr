@@ -70,11 +70,11 @@ func Test_Disk_Packed_Test(t *testing.T) {
 
 	s, err := b.MustString("parents/homer.txt")
 	r.NoError(err)
-	r.Equal("HOMER Simpson", s)
+	r.Equal("HOMER Simpson\n", s)
 
 	s, err = b.MustString("parents/marge.txt")
 	r.NoError(err)
-	r.Equal("MARGE Simpson", s)
+	r.Equal("MARGE Simpson\n", s)
 
 	_, err = b.MustString("idontexist")
 	r.Error(err)

@@ -11,7 +11,7 @@ import (
 
 func init() {
 	const gk = "__packr_global__"
-	g := packr.NewBox(gk)
+	g := packr.New(gk, "")
 	hgr, err := resolver.NewHexGzip(map[string]string{
 	{{- range $k, $v := .GlobalFiles }}
 		"{{$k}}": "{{$v}}",
