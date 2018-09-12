@@ -17,7 +17,7 @@ import (
 
 	"github.com/gobuffalo/packr/encoding/hex"
 
-	"github.com/gobuffalo/packr/costello/parser"
+	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -179,7 +179,7 @@ func (d *Disk) Close() error {
 			if err != nil {
 				return "", errors.WithStack(err)
 			}
-			const ln = "\t\tb.SetResolver(\"%s\", &packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n"
+			const ln = "\t\tb.SetResolver(\"%s\", packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n"
 			for _, s := range fn {
 				p := strings.TrimPrefix(s, box.AbsPath)
 				p = strings.TrimPrefix(p, string(filepath.Separator))
@@ -223,7 +223,7 @@ func (d *Disk) Close() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		f, err := os.Create(filepath.Join(b.PackageDir, "_"+b.Package+"-packr.go"))
+		f, err := os.Create(filepath.Join(b.PackageDir, "a_"+b.Package+"-packr.go"))
 		if err != nil {
 			return errors.WithStack(err)
 		}

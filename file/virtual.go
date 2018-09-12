@@ -40,19 +40,6 @@ func (f virtualFile) Stat() (os.FileInfo, error) {
 	return f.info, nil
 }
 
-func NewFile(name string, b []byte) File {
-	return virtualFile{
-		Reader: bytes.NewReader(b),
-		name:   name,
-		info: info{
-			Path:     name,
-			Contents: b,
-			size:     int64(len(b)),
-			modTime:  virtualFileModTime,
-		},
-	}
-}
-
 func NewDir(name string) File {
 	var b []byte
 	v := NewFile(name, b).(virtualFile)

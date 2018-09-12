@@ -3,7 +3,7 @@ package store
 import (
 	"errors"
 
-	"github.com/gobuffalo/packr/costello/parser"
+	"github.com/gobuffalo/packr/jam/parser"
 )
 
 var _ Store = &FnStore{}

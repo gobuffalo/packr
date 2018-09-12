@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gobuffalo/packr"
-	"github.com/gobuffalo/packr/costello/parser"
+	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/stretchr/testify/require"
 )
 

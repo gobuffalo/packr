@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/gobuffalo/packr/costello/parser"
+	"github.com/gobuffalo/packr/jam/parser"
 )
 
 type Store interface {
