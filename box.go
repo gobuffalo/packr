@@ -1,7 +1,6 @@
 package packr
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/gobuffalo/packr/file/resolver"
+	"github.com/gobuffalo/packr/plog"
 	"github.com/pkg/errors"
 )
 
@@ -151,7 +151,7 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			}
 		}
 	}
-	fmt.Println(b.Name, key, fmt.Sprintf("using resolver - %T", r))
+	plog.Debugf("resolving %q, %q: %T", b.Name, key, r)
 
 	f, err := r.Find(b.Name, key)
 	if err != nil {

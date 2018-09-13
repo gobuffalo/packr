@@ -1,7 +1,6 @@
 package resolver
 
 import (
-	"fmt"
 	"os"
 	"sync"
 
@@ -16,7 +15,6 @@ type InMemory struct {
 }
 
 func (d *InMemory) Find(box string, name string) (file.File, error) {
-	fmt.Println("InMemory: Find", name)
 	d.moot.RLock()
 	f, ok := d.files[name]
 	d.moot.RUnlock()

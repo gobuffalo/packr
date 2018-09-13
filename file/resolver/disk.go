@@ -20,7 +20,6 @@ type Disk struct {
 }
 
 func (d *Disk) Find(box string, name string) (file.File, error) {
-	fmt.Println("Disk: Find", name)
 	path := OsPath(name)
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(OsPath(d.Root), path)
