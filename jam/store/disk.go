@@ -15,7 +15,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gobuffalo/packr/encoding/hex"
+	"github.com/gobuffalo/packr/file/resolver/encoding/hex"
 
 	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/karrick/godirwalk"

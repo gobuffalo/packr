@@ -11,7 +11,7 @@ import (
 func Test_HexGzip_Find(t *testing.T) {
 	r := require.New(t)
 
-	x, err := hexGzip("foo!")
+	x, err := HexGzipString("foo!")
 	r.NoError(err)
 	files := map[string]string{
 		"foo.txt": x,
