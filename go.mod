@@ -9,6 +9,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/karrick/godirwalk v1.7.3
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/markbates/oncer v0.0.0-20180911185008-7302a2cd9114
 	github.com/onsi/ginkgo v1.6.0 // indirect
 	github.com/onsi/gomega v1.4.1 // indirect
 	github.com/pkg/errors v0.8.0

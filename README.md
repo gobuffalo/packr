@@ -21,8 +21,8 @@ $ go get -u github.com/gobuffalo/packr/...
 The first step in using Packr is to create a new box. A box represents a folder on disk. Once you have a box you can get `string` or `[]byte` representations of the file.
 
 ```go
-// set up a new box by giving it a (relative) path to a folder on disk:
-box := packr.NewBox("./templates")
+// set up a new box by giving it a name and an optional (relative) path to a folder on disk:
+box := packr.New("My Box", "./templates")
 
 // Get the string representation of a file:
 html := box.String("index.html")

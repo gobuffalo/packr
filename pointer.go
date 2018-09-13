@@ -21,6 +21,7 @@ func (p Pointer) Find(box string, path string) (file.File, error) {
 	if err != nil {
 		return f, errors.WithStack(err)
 	}
+	f.Seek(0, 0)
 	x, err := ioutil.ReadAll(f)
 	if err != nil {
 		return f, errors.WithStack(err)

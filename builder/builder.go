@@ -9,6 +9,7 @@ import (
 	"sync"
 	"text/template"
 
+	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -16,6 +17,7 @@ import (
 var DebugLog func(string, ...interface{})
 
 func init() {
+	oncer.Deprecate(3, "github.com/gobuffalo/packr/buildr", "Use github.com/gobuffalo/packr/store instead.")
 	DebugLog = func(string, ...interface{}) {}
 }
 
