@@ -227,7 +227,7 @@ func (d *Disk) Close() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		f, err := os.Create(filepath.Join(b.PackageDir, "a_"+b.Package+"-packr.go"))
+		f, err := os.Create(filepath.Join(b.PackageDir, b.Package+"-packr.go"))
 		if err != nil {
 			return errors.WithStack(err)
 		}

@@ -40,7 +40,7 @@ func goCmd(name string, args ...string) error {
 			}
 			for _, b := range boxes {
 				if b.PackageDir == path {
-					pk := fmt.Sprintf("a_%s-packr.go", b.Package)
+					pk := fmt.Sprintf("%s-packr.go", b.Package)
 					filepath.Join(path, pk)
 					cargs = append(cargs, pk)
 				}
