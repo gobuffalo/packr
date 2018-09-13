@@ -1,15 +1,14 @@
 package store
 
 import (
-	"log"
-
 	"github.com/gobuffalo/packr"
 	"github.com/gobuffalo/packr/file/resolver"
 )
 
-func init() {
+var _ = func() error {
 	const gk = DISK_GLOBAL_KEY
 	g := packr.New(gk, "")
+
 	hgr, err := resolver.NewHexGzip(map[string]string{
 		"4abf3a9b652ecec6b347eb6acb7ce363": "1f8b08000000000000fff2750c72775508cecc2d28cecfe302040000fffffb1d273b0e000000",
 		"5cfc8f95f98237a10affc14a76e3e20b": "1f8b08000000000000fff2757477f7745508cecc2d28cecfe302040000ffffb09167470f000000",
@@ -18,7 +17,7 @@ func init() {
 		"bb006aa6261a80f6c52c640f713659c1": "1f8b08000000000000ff72720c0a5108cecc2d28cecfe302040000ffff89742ac20d000000",
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	g.DefaultResolver = hgr
 	func() {
@@ -29,4 +28,5 @@ func init() {
 		b.SetResolver("parents/homer.txt", packr.Pointer{ForwardBox: gk, ForwardPath: "6d8be986fa35821e7e869fbb118e51ba"})
 		b.SetResolver("parents/marge.txt", packr.Pointer{ForwardBox: gk, ForwardPath: "4abf3a9b652ecec6b347eb6acb7ce363"})
 	}()
-}
+	return nil
+}()

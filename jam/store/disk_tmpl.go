@@ -9,8 +9,9 @@ import (
 	"github.com/gobuffalo/packr/file/resolver"
 )
 
-func init() {
+var _ = func() error {
 	const gk = "{{.GK}}"
+	log.Println("initializing packr global store", gk)
 	g := packr.New(gk, "")
 	hgr, err := resolver.NewHexGzip(map[string]string{
 	{{- range $k, $v := .GlobalFiles }}
@@ -18,7 +19,7 @@ func init() {
 	{{- end }}
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	g.DefaultResolver = hgr
 
@@ -28,7 +29,8 @@ func init() {
 {{ printFiles $box}}
 	}()
 	{{ end }}
-}
+	return nil
+}()
 `
 
 const diskImportTmpl = `package {{.Package}}
