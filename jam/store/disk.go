@@ -16,6 +16,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/file/resolver/encoding/hex"
+	"github.com/gobuffalo/packr/plog"
 
 	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/karrick/godirwalk"
@@ -94,6 +95,7 @@ func (d *Disk) Files(box *parser.Box) ([]*parser.File, error) {
 }
 
 func (d *Disk) Pack(box *parser.Box) error {
+	plog.Debug(d, "Pack", "box", box.Name)
 	d.boxes[box.Name] = box
 	names, err := d.FileNames(box)
 	if err != nil {
@@ -116,6 +118,7 @@ func (d *Disk) Clean(box *parser.Box) error {
 	if len(root) == 0 {
 		return errors.New("can't clean an empty box.PackageDir")
 	}
+	plog.Debug(d, "Clean", "box", box.Name, "root", root)
 	return Clean(root)
 }
 
@@ -132,6 +135,7 @@ type optsBox struct {
 }
 
 func (d *Disk) Close() error {
+	plog.Debug(d, "Close")
 	opts := options{
 		Package:     d.DBPackage,
 		GlobalFiles: map[string]string{},
@@ -141,7 +145,7 @@ func (d *Disk) Close() error {
 	for k, v := range d.global {
 		func(k, v string) {
 			wg.Go(func() error {
-				fmt.Println("encoding", k, v)
+				plog.Debug(d, "Close/encoding", k, v)
 				bb := &bytes.Buffer{}
 				enc := hex.NewEncoder(bb)
 				zw := gzip.NewWriter(enc)

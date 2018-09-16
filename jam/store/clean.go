@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/pkg/errors"
 
 	"github.com/karrick/godirwalk"
@@ -20,8 +21,10 @@ func Clean(root string) error {
 	}
 	callback := func(path string, info *godirwalk.Dirent) error {
 		base := filepath.Base(path)
-		if base == ".git" || base == "vendor" || base == "node_modules" {
-			return filepath.SkipDir
+		for _, d := range parser.DefaultIgnoredFolders {
+			if base == d {
+				return filepath.SkipDir
+			}
 		}
 		if info == nil || info.IsDir() {
 			return nil

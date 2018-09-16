@@ -44,6 +44,9 @@ func (d *Disk) FileMap() map[string]file.File {
 	moot := &sync.Mutex{}
 	m := map[string]file.File{}
 	root := OsPath(d.Root)
+	if _, err := os.Stat(root); err != nil {
+		return m
+	}
 	callback := func(path string, de *godirwalk.Dirent) error {
 		if !de.IsRegular() {
 			return nil

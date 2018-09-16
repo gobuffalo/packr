@@ -45,7 +45,6 @@ func pack(args ...string) error {
 		if b.Name == store.DISK_GLOBAL_KEY {
 			continue
 		}
-		fmt.Println("box", b.Name, b.AbsPath)
 		if err := d.Pack(b); err != nil {
 			return errors.WithStack(err)
 		}

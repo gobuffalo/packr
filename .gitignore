@@ -31,3 +31,4 @@ gin-bin
 .vscode/
 debug.test
 .grifter/
+*-packr.go
