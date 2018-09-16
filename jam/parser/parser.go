@@ -3,19 +3,20 @@ package parser
 import (
 	"bytes"
 	"fmt"
-	"go/build"
 	"io/ioutil"
-	"path/filepath"
 	"strings"
 
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
 )
 
+// Parser to find boxes
 type Parser struct {
-	Prospects []*File
+	Prospects     []*File // a list of files to check for boxes
+	IgnoreImports bool
 }
 
+// Run the parser and run any boxes found
 func (p *Parser) Run() ([]*Box, error) {
 	var boxes []*Box
 	for _, pros := range p.Prospects {
@@ -32,28 +33,39 @@ func (p *Parser) Run() ([]*Box, error) {
 	return boxes, nil
 }
 
+// New Parser from a list of File
 func New(prospects ...*File) *Parser {
 	return &Parser{
 		Prospects: prospects,
 	}
 }
 
-func NewFromRoots(roots []string, ignore ...string) (*Parser, error) {
+type RootsOptions struct {
+	IgnoreImports bool
+	Ignores       []string
+}
+
+// NewFromRoots scans the file roots provided and returns a
+// new Parser containing the prospects
+func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
+	if opts == nil {
+		opts = &RootsOptions{}
+	}
 	fmt.Println("Parser: prospecting roots\n", strings.Join(roots, "\n"))
 	p := New()
 	callback := func(path string, de *godirwalk.Dirent) error {
-		if IsProspect(path, ignore...) && de.IsDir() {
+		if IsProspect(path, opts.Ignores...) && de.IsDir() {
 			roots = append(roots, path)
 			return nil
 		}
 		return nil
 	}
-	opts := &godirwalk.Options{
+	wopts := &godirwalk.Options{
 		FollowSymbolicLinks: true,
 		Callback:            callback,
 	}
 	for _, root := range roots {
-		err := godirwalk.Walk(root, opts)
+		err := godirwalk.Walk(root, wopts)
 		if err != nil {
 			return p, errors.WithStack(err)
 		}
@@ -64,9 +76,16 @@ func NewFromRoots(roots []string, ignore ...string) (*Parser, error) {
 		fd := &finder{
 			seen: map[string]string{},
 		}
-		names, _ := fd.findAllGoFiles(r)
+		var names []string
+		if opts.IgnoreImports {
+			names, _ = fd.findAllGoFiles(r)
+		} else {
+			names, _ = fd.findAllGoFilesImports(r)
+		}
 		for _, n := range names {
-			dd[n] = n
+			if IsProspect(n) {
+				dd[n] = n
+			}
 		}
 	}
 	for path := range dd {
@@ -77,49 +96,4 @@ func NewFromRoots(roots []string, ignore ...string) (*Parser, error) {
 		p.Prospects = append(p.Prospects, NewFile(path, bytes.NewReader(b)))
 	}
 	return p, nil
-}
-
-type finder struct {
-	seen map[string]string
-}
-
-func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
-	ctx := build.Default
-	var names []string
-	pkg, err := ctx.ImportDir(dir, 0)
-
-	if err != nil {
-		if !strings.Contains(err.Error(), "cannot find package") {
-			if _, ok := errors.Cause(err).(*build.NoGoError); !ok {
-				return names, errors.WithStack(err)
-			}
-		}
-	}
-
-	if pkg.Goroot {
-		return names, nil
-	}
-
-	if len(pkg.GoFiles) <= 0 {
-		return names, nil
-	}
-	for _, n := range pkg.GoFiles {
-		names = append(names, filepath.Join(pkg.Dir, n))
-	}
-	for _, imp := range pkg.Imports {
-		if _, ok := fd.seen[imp]; ok {
-			continue
-		}
-		fd.seen[imp] = imp
-		// fmt.Println("resolving package", pkg.ImportPath, pkg.GoFiles)
-		for _, d := range ctx.SrcDirs() {
-			ip := filepath.Join(d, imp)
-			n, err := fd.findAllGoFiles(ip)
-			if err != nil {
-				return n, nil
-			}
-			names = append(names, n...)
-		}
-	}
-	return names, nil
 }

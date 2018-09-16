@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// File represents a virtual, or physical, backing of
+// a file object in a Box
 type File interface {
 	Name() string
 	io.ReadCloser
@@ -16,10 +18,13 @@ type File interface {
 	Stat() (os.FileInfo, error)
 }
 
+// FileMappable types are capable of returning a map of
+// path => File
 type FileMappable interface {
 	FileMap() map[string]File
 }
 
+// NewFile returns a virtual File implementation
 func NewFile(name string, b []byte) File {
 	return virtualFile{
 		Reader: bytes.NewReader(b),
@@ -31,4 +36,12 @@ func NewFile(name string, b []byte) File {
 			modTime:  virtualFileModTime,
 		},
 	}
+}
+
+// NewDir returns a virtual dir implementation
+func NewDir(name string) File {
+	var b []byte
+	v := NewFile(name, b).(virtualFile)
+	v.info.isDir = true
+	return v
 }

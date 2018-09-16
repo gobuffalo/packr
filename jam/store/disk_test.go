@@ -47,7 +47,9 @@ func Test_Disk_Pack(t *testing.T) {
 
 	d := NewDisk("", "")
 
-	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"})
+	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"}, &parser.RootsOptions{
+		IgnoreImports: true,
+	})
 	r.NoError(err)
 	boxes, err := p.Run()
 	r.NoError(err)
@@ -83,7 +85,7 @@ func Test_Disk_Packed_Test(t *testing.T) {
 func Test_Disk_Close(t *testing.T) {
 	r := require.New(t)
 
-	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"})
+	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"}, nil)
 	r.NoError(err)
 	boxes, err := p.Run()
 	r.NoError(err)

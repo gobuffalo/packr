@@ -6,6 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var globalOptions = struct {
+	Verbose       bool
+	IgnoreImports bool
+}{}
+
 var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "A brief description of your application",
@@ -23,4 +28,6 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().BoolVarP(&globalOptions.Verbose, "verbose", "v", false, "enables verbose logging")
+	rootCmd.PersistentFlags().BoolVar(&globalOptions.IgnoreImports, "ignore-imports", false, "when set to true packr won't resolve imports for boxes")
 }

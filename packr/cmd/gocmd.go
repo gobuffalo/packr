@@ -29,7 +29,7 @@ func goCmd(name string, args ...string) error {
 				return errors.WithStack(err)
 			}
 
-			p, err := parser.NewFromRoots([]string{path})
+			p, err := parser.NewFromRoots([]string{path}, nil)
 			if err != nil {
 				return errors.WithStack(err)
 			}

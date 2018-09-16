@@ -60,6 +60,9 @@ func (d *Disk) FileNames(box *parser.Box) ([]string, error) {
 		path = box.Path
 	}
 	var names []string
+	if _, err := os.Stat(path); err != nil {
+		return names, nil
+	}
 	err := godirwalk.Walk(path, &godirwalk.Options{
 		FollowSymbolicLinks: true,
 		Callback: func(path string, de *godirwalk.Dirent) error {

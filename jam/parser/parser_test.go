@@ -21,14 +21,31 @@ func Test_Parser_Run(t *testing.T) {
 	r.Len(boxes, 4)
 }
 
-func Test_NewFrom_Roots(t *testing.T) {
+func Test_NewFrom_Roots_Imports(t *testing.T) {
 	r := require.New(t)
-	p, err := NewFromRoots([]string{"./_fixtures/new_from_roots"})
+	p, err := NewFromRoots([]string{"./_fixtures/new_from_roots"}, &RootsOptions{})
 	r.NoError(err)
 
 	boxes, err := p.Run()
 	r.NoError(err)
+	for _, b := range boxes {
+		fmt.Println(b.Name)
+	}
+	r.True(len(boxes) > 3)
+}
 
+func Test_NewFrom_Roots_Disk(t *testing.T) {
+	r := require.New(t)
+	p, err := NewFromRoots([]string{"./_fixtures/new_from_roots"}, &RootsOptions{
+		IgnoreImports: true,
+	})
+	r.NoError(err)
+
+	boxes, err := p.Run()
+	r.NoError(err)
+	for _, b := range boxes {
+		fmt.Println(b.Name)
+	}
 	r.Len(boxes, 3)
 }
 

@@ -6,20 +6,23 @@ import (
 	"strings"
 )
 
+// Box found while parsing a file
 type Box struct {
-	Name       string
-	Path       string
-	AbsPath    string
-	Package    string
-	PWD        string
-	PackageDir string
+	Name       string // name of the box
+	Path       string // relative path of folder NewBox("./templates")
+	AbsPath    string // absolute path of Path
+	Package    string // the package name the box was found in
+	PWD        string // the PWD when the parser was run
+	PackageDir string // the absolute path of the package where the box was found
 }
 
+// String - json returned
 func (b Box) String() string {
 	x, _ := json.Marshal(b)
 	return string(x)
 }
 
+// NewBox stub from the name and the path provided
 func NewBox(name string, path string) *Box {
 	if len(name) == 0 {
 		name = path

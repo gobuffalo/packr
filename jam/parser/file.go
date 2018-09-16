@@ -7,16 +7,19 @@ import (
 	"path/filepath"
 )
 
+// File that is to be parsed
 type File struct {
 	io.Reader
 	Path    string
 	AbsPath string
 }
 
+// Name of the file "app.go"
 func (f File) Name() string {
 	return f.Path
 }
 
+// String returns the contents of the reader
 func (f *File) String() string {
 	src, _ := ioutil.ReadAll(f)
 	f.Reader = bytes.NewReader(src)

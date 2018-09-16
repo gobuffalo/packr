@@ -39,10 +39,3 @@ func (f virtualFile) Readdir(count int) ([]os.FileInfo, error) {
 func (f virtualFile) Stat() (os.FileInfo, error) {
 	return f.info, nil
 }
-
-func NewDir(name string) File {
-	var b []byte
-	v := NewFile(name, b).(virtualFile)
-	v.info.isDir = true
-	return v
-}

@@ -21,7 +21,9 @@ func pack(args ...string) error {
 	for _, r := range roots {
 		store.Clean(r)
 	}
-	p, err := parser.NewFromRoots(roots)
+	p, err := parser.NewFromRoots(roots, &parser.RootsOptions{
+		IgnoreImports: globalOptions.IgnoreImports,
+	})
 	if err != nil {
 		return errors.WithStack(err)
 	}
