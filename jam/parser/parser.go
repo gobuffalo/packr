@@ -2,10 +2,10 @@ package parser
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
-	"strings"
 
+	"github.com/gobuffalo/packr/plog"
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
 )
@@ -45,14 +45,19 @@ type RootsOptions struct {
 	Ignores       []string
 }
 
+func (r RootsOptions) String() string {
+	x, _ := json.Marshal(r)
+	return string(x)
+}
+
 // NewFromRoots scans the file roots provided and returns a
 // new Parser containing the prospects
 func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 	if opts == nil {
 		opts = &RootsOptions{}
 	}
-	fmt.Println("Parser: prospecting roots\n", strings.Join(roots, "\n"))
 	p := New()
+	plog.Debug(p, "NewFromRoots", "roots", roots, "options", opts)
 	callback := func(path string, de *godirwalk.Dirent) error {
 		if IsProspect(path, opts.Ignores...) && de.IsDir() {
 			roots = append(roots, path)

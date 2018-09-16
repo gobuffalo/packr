@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/file"
+	"github.com/gobuffalo/packr/plog"
 )
 
 var _ Resolver = &InMemory{}
@@ -15,6 +16,7 @@ type InMemory struct {
 }
 
 func (d *InMemory) Find(box string, name string) (file.File, error) {
+	plog.Debug(d, "Find", "box", box, "name", name)
 	d.moot.RLock()
 	f, ok := d.files[name]
 	d.moot.RUnlock()
@@ -25,6 +27,7 @@ func (d *InMemory) Find(box string, name string) (file.File, error) {
 }
 
 func (d *InMemory) Pack(name string, f file.File) error {
+	plog.Debug(d, "Pack", "name", name)
 	d.moot.Lock()
 	d.files[name] = f
 	d.moot.Unlock()

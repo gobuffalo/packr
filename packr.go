@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/file/resolver"
+	"github.com/gobuffalo/packr/plog"
 )
 
 var boxes = map[string]*Box{}
@@ -17,6 +18,7 @@ func findBox(name string) *Box {
 
 func placeBox(b *Box) *Box {
 	gil.Lock()
+	plog.Debug(b, "placeBox", "name", b.Name, "path", b.Path, "resolution directory", b.ResolutionDir)
 	boxes[resolver.Key(b.Name)] = b
 	gil.Unlock()
 	return b

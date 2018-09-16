@@ -13,10 +13,12 @@ type File = file.File
 
 var (
 	// ErrResOutsideBox gets returned in case of the requested resources being outside the box
+	// Deprecated
 	ErrResOutsideBox = errors.New("can't find a resource outside the box")
 )
 
 // PackBytes packs bytes for a file into a box.
+// Deprecated
 func PackBytes(box string, name string, bb []byte) {
 	b := NewBox(box)
 	d := resolver.NewInMemory(map[string]file.File{})
@@ -27,6 +29,7 @@ func PackBytes(box string, name string, bb []byte) {
 }
 
 // PackBytesGzip packets the gzipped compressed bytes into a box.
+// Deprecated
 func PackBytesGzip(box string, name string, bb []byte) error {
 	// TODO: this function never did what it was supposed to do!
 	PackBytes(box, name, bb)
@@ -34,6 +37,7 @@ func PackBytesGzip(box string, name string, bb []byte) error {
 }
 
 // PackJSONBytes packs JSON encoded bytes for a file into a box.
+// Deprecated
 func PackJSONBytes(box string, name string, jbb string) error {
 	var bb []byte
 	err := json.Unmarshal([]byte(jbb), &bb)

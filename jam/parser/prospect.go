@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var defaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea"}
+var DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea", "_fixtures"}
 
 func IsProspect(path string, ignore ...string) bool {
 	if fi, err := os.Stat(path); err == nil {
@@ -28,7 +28,7 @@ func IsProspect(path string, ignore ...string) bool {
 	ext := filepath.Ext(path)
 
 	if len(ignore) == 0 {
-		ignore = append(ignore, defaultIgnoredFolders...)
+		ignore = append(ignore, DefaultIgnoredFolders...)
 	}
 	for i, x := range ignore {
 		ignore[i] = strings.TrimSpace(strings.ToLower(x))

@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/gobuffalo/packr/plog"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +17,9 @@ var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "A brief description of your application",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if globalOptions.Verbose {
+			plog.Default.SetLevel(logrus.DebugLevel)
+		}
 		return pack(args...)
 	},
 }

@@ -1,7 +1,6 @@
 package resolver
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/file"
+	"github.com/gobuffalo/packr/plog"
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
 )
@@ -24,6 +24,7 @@ func (d *Disk) Find(box string, name string) (file.File, error) {
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(OsPath(d.Root), path)
 	}
+	plog.Debug(d, "Find", "box", box, "name", name, "path", path)
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -42,12 +43,13 @@ var _ file.FileMappable = &Disk{}
 func (d *Disk) FileMap() map[string]file.File {
 	moot := &sync.Mutex{}
 	m := map[string]file.File{}
+	root := OsPath(d.Root)
 	callback := func(path string, de *godirwalk.Dirent) error {
 		if !de.IsRegular() {
 			return nil
 		}
 		moot.Lock()
-		name := strings.TrimPrefix(path, OsPath(d.Root)+string(filepath.Separator))
+		name := strings.TrimPrefix(path, root+string(filepath.Separator))
 		b, err := ioutil.ReadFile(path)
 		if err != nil {
 			return errors.WithStack(err)
@@ -56,12 +58,12 @@ func (d *Disk) FileMap() map[string]file.File {
 		moot.Unlock()
 		return nil
 	}
-	err := godirwalk.Walk(OsPath(d.Root), &godirwalk.Options{
+	err := godirwalk.Walk(root, &godirwalk.Options{
 		FollowSymbolicLinks: true,
 		Callback:            callback,
 	})
 	if err != nil {
-		fmt.Println("error walking", OsPath(d.Root), err)
+		plog.Default.Errorf("[%s] error walking %v", root, err)
 	}
 	return m
 }

@@ -1,45 +1,31 @@
 package plog
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
 )
 
-// Logger interface for a logger to be used
-// with genny. Logrus is 100% compatible.
-type Logger interface {
-	Debugf(string, ...interface{})
-	Debug(...interface{})
-	Infof(string, ...interface{})
-	Info(...interface{})
-	Printf(string, ...interface{})
-	Print(...interface{})
-	Warnf(string, ...interface{})
-	Warn(...interface{})
-	Errorf(string, ...interface{})
-	Error(...interface{})
-	Fatalf(string, ...interface{})
-	Fatal(...interface{})
-}
-
-var Default = func() Logger {
+var Default = func() *logrus.Logger {
 	l := logrus.New()
 	l.SetOutput(os.Stdout)
-	l.SetLevel(logrus.DebugLevel)
-	// l.SetLevel(logrus.InfoLevel)
+	// l.SetLevel(logrus.DebugLevel)
+	l.SetLevel(logrus.InfoLevel)
+	// l.Formatter = &logrus.JSONFormatter{}
 	return l
 }()
 
-var Debugf = Default.Debugf
-var Debug = Default.Debug
-var Infof = Default.Infof
-var Info = Default.Info
-var Printf = Default.Printf
-var Print = Default.Print
-var Warnf = Default.Warnf
-var Warn = Default.Warn
-var Errorf = Default.Errorf
-var Error = Default.Error
-var Fatalf = Default.Fatalf
-var Fatal = Default.Fatal
+func Debug(t interface{}, m string, args ...interface{}) {
+	if len(args)%2 == 1 {
+		args = append(args, "")
+	}
+	f := logrus.Fields{}
+	for i := 0; i < len(args); i += 2 {
+		k := args[i]
+		v := args[i+1]
+		f[fmt.Sprint(k)] = v
+	}
+	e := Default.WithFields(f)
+	e.Debugf("%T#%s", t, m)
+}

@@ -9,6 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func init() {
+	parser.DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea"}
+}
+
 func Test_Disk_FileNames(t *testing.T) {
 	r := require.New(t)
 

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gobuffalo/packr/plog"
 	"github.com/karrick/godirwalk"
 	"github.com/pkg/errors"
 )
@@ -15,6 +16,7 @@ type finder struct {
 
 // findAllGoFiles *.go files for a given diretory
 func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
+	plog.Debug(fd, "findAllGoFiles", "dir", dir)
 	var names []string
 
 	callback := func(path string, do *godirwalk.Dirent) error {
@@ -34,8 +36,14 @@ func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
 }
 
 func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
-	names, _ := fd.findAllGoFiles(dir)
+	var names []string
+
 	ctx := build.Default
+
+	if len(ctx.SrcDirs()) == 0 {
+		return names, errors.New("no src directories found")
+	}
+
 	pkg, err := ctx.ImportDir(dir, 0)
 
 	if err != nil {
@@ -52,6 +60,10 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 	if len(pkg.GoFiles) <= 0 {
 		return names, nil
 	}
+
+	plog.Debug(fd, "findAllGoFilesImports", "dir", dir)
+
+	names, _ = fd.findAllGoFiles(dir)
 	for _, n := range pkg.GoFiles {
 		names = append(names, filepath.Join(pkg.Dir, n))
 	}
@@ -60,14 +72,16 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 			continue
 		}
 		fd.seen[imp] = imp
-		for _, d := range ctx.SrcDirs() {
-			ip := filepath.Join(d, imp)
-			n, err := fd.findAllGoFilesImports(ip)
-			if err != nil {
-				return n, nil
-			}
-			names = append(names, n...)
+		if len(ctx.SrcDirs()) == 0 {
+			continue
 		}
+		d := ctx.SrcDirs()[len(ctx.SrcDirs())-1]
+		ip := filepath.Join(d, imp)
+		n, err := fd.findAllGoFilesImports(ip)
+		if err != nil {
+			return n, nil
+		}
+		names = append(names, n...)
 	}
 	return names, nil
 }

@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/file/resolver/encoding/hex"
+	"github.com/gobuffalo/packr/plog"
 
 	"github.com/gobuffalo/packr/file"
 	"github.com/pkg/errors"
@@ -42,6 +43,8 @@ func (hg *HexGzip) FileMap() map[string]file.File {
 }
 
 func (hg *HexGzip) Find(box string, name string) (file.File, error) {
+	plog.Debug(hg, "Find", "box", box, "name", name)
+
 	hg.moot.RLock()
 	if f, ok := hg.unpacked[name]; ok {
 		hg.moot.RUnlock()

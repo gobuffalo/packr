@@ -1,6 +1,7 @@
 package packr
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -53,7 +54,7 @@ func New(name string, path string) *Box {
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path            string // Path is deprecated and should no longer be used
+	Path            string
 	Name            string
 	ResolutionDir   string
 	resolvers       map[string]resolver.Resolver
@@ -63,6 +64,7 @@ type Box struct {
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
 	b.moot.Lock()
+	plog.Debug(b, "SetResolver", "file", file, "resolver", fmt.Sprintf("%T", res))
 	b.resolvers[resolver.Key(file)] = res
 	b.moot.Unlock()
 }
@@ -151,7 +153,7 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			}
 		}
 	}
-	plog.Debugf("resolving %q, %q: %T", b.Name, key, r)
+	plog.Debug(b, "Resolve", "key", key)
 
 	f, err := r.Find(b.Name, key)
 	if err != nil {
