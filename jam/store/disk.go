@@ -102,11 +102,11 @@ func (d *Disk) Pack(box *parser.Box) error {
 		return errors.WithStack(err)
 	}
 	for _, n := range names {
-		k, ok := d.global[n]
+		_, ok := d.global[n]
 		if ok {
 			continue
 		}
-		k = makeKey(box, n)
+		k := makeKey(box, n)
 		// not in the global, so add it!
 		d.global[n] = k
 	}

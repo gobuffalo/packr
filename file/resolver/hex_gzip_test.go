@@ -17,6 +17,7 @@ func Test_HexGzip_Find(t *testing.T) {
 		"foo.txt": x,
 	}
 	d, err := NewHexGzip(files)
+	r.NoError(err)
 
 	f, err := d.Find("", "foo.txt")
 	r.NoError(err)
