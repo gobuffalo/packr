@@ -11,6 +11,7 @@ import (
 var globalOptions = struct {
 	Verbose       bool
 	IgnoreImports bool
+	Legacy        bool
 }{}
 
 var rootCmd = &cobra.Command{
@@ -34,5 +35,6 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&globalOptions.Verbose, "verbose", "v", false, "enables verbose logging")
+	rootCmd.PersistentFlags().BoolVar(&globalOptions.Legacy, "legacy", false, "uses the legacy resolution and packing system (assumes first arg || pwd for input path)")
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.IgnoreImports, "ignore-imports", false, "when set to true packr won't resolve imports for boxes")
 }

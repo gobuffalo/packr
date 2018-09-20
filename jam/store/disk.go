@@ -3,6 +3,7 @@ package store
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/md5"
 	"fmt"
 	"html/template"
@@ -15,6 +16,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gobuffalo/genny"
+	"github.com/gobuffalo/genny/movinglater/gotools"
 	"github.com/gobuffalo/packr/file/resolver/encoding/hex"
 	"github.com/gobuffalo/packr/plog"
 
@@ -134,18 +137,19 @@ type optsBox struct {
 	Path string
 }
 
-func (d *Disk) Close() error {
-	plog.Debug(d, "Close")
+func (d *Disk) Generator() (*genny.Generator, error) {
+	g := genny.New()
+
 	opts := options{
 		Package:     d.DBPackage,
 		GlobalFiles: map[string]string{},
 		GK:          DISK_GLOBAL_KEY,
 	}
+
 	wg := errgroup.Group{}
 	for k, v := range d.global {
 		func(k, v string) {
 			wg.Go(func() error {
-				plog.Debug(d, "Close/encoding", k, v)
 				bb := &bytes.Buffer{}
 				enc := hex.NewEncoder(bb)
 				zw := gzip.NewWriter(enc)
@@ -167,19 +171,21 @@ func (d *Disk) Close() error {
 	}
 
 	if err := wg.Wait(); err != nil {
-		return errors.WithStack(err)
+		return g, errors.WithStack(err)
 	}
+
 	for _, b := range d.boxes {
 		ob := optsBox{
 			Name: b.Name,
 		}
 		opts.Boxes = append(opts.Boxes, ob)
 	}
+
 	sort.Slice(opts.Boxes, func(a, b int) bool {
 		return opts.Boxes[a].Name < opts.Boxes[b].Name
 	})
 
-	t := template.New("").Funcs(template.FuncMap{
+	t := gotools.TemplateTransformer(opts, template.FuncMap{
 		"printFiles": func(ob optsBox) (template.HTML, error) {
 			box := d.boxes[ob.Name]
 			if box == nil {
@@ -199,23 +205,9 @@ func (d *Disk) Close() error {
 			return template.HTML(bb.String()), nil
 		},
 	})
-
-	t, err := t.Parse(diskGlobalTmpl)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	os.MkdirAll(d.DBPath, 0755)
-	fp := filepath.Join(d.DBPath, "packed-packr.go")
-	f, err := os.Create(fp)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	defer f.Close()
-
-	if err := t.Execute(f, opts); err != nil {
-		return errors.WithStack(err)
-	}
+	g.Transformer(t)
+	fp := filepath.Join(d.DBPath, "packed-packr.go.tmpl")
+	g.File(genny.NewFile(fp, strings.NewReader(diskGlobalTmpl)))
 
 	ip := filepath.Dir(d.DBPath)
 	ip = strings.TrimPrefix(ip, filepath.Join(GoPath(), "src"))
@@ -227,18 +219,8 @@ func (d *Disk) Close() error {
 		if b == nil {
 			continue
 		}
-
-		os.MkdirAll(b.PackageDir, 0755)
-
-		t, err := template.New("").Parse(diskImportTmpl)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		f, err := os.Create(filepath.Join(b.PackageDir, b.Package+"-packr.go"))
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		defer f.Close()
+		p := filepath.Join(b.PackageDir, b.Package+"-packr.go.tmpl")
+		f := genny.NewFile(p, strings.NewReader(diskImportTmpl))
 
 		o := struct {
 			Package string
@@ -247,12 +229,26 @@ func (d *Disk) Close() error {
 			Package: b.Package,
 			Import:  ip,
 		}
-		if err := t.Execute(f, o); err != nil {
-			return errors.WithStack(err)
+
+		t := gotools.TemplateTransformer(o, template.FuncMap{})
+		f, err := t.Transform(f)
+		if err != nil {
+			return g, nil
 		}
+		g.File(f)
 	}
 
-	return nil
+	g.Transformer(gotools.FmtTransformer())
+	return g, nil
+}
+
+func (d *Disk) Close() error {
+	plog.Debug(d, "Close")
+	run := genny.WetRunner(context.Background())
+	if err := run.WithNew(d.Generator()); err != nil {
+		return errors.WithStack(err)
+	}
+	return run.Run()
 }
 
 // resolve file paths (only) for the boxes

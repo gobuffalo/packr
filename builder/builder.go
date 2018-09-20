@@ -17,7 +17,6 @@ import (
 var DebugLog func(string, ...interface{})
 
 func init() {
-	oncer.Deprecate(3, "github.com/gobuffalo/packr/buildr", "Use github.com/gobuffalo/packr/store instead.")
 	DebugLog = func(string, ...interface{}) {}
 }
 
@@ -162,6 +161,7 @@ func (b *Builder) addPkg(p pkg) {
 
 // New Builder with a given context and path
 func New(ctx context.Context, path string) *Builder {
+	oncer.Deprecate(3, "github.com/gobuffalo/packr/builder", "Use github.com/gobuffalo/packr/store instead.")
 	return &Builder{
 		Context:        ctx,
 		RootPath:       path,
