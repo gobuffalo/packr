@@ -65,7 +65,7 @@ import (
 )
 
 func main() {
-	box := packr.NewBox("./templates")
+	box := packr.New("myBox", "./templates")
 
 	s := box.String("admin/index.html")
 	fmt.Println(s)
@@ -103,7 +103,7 @@ import (
 )
 
 func main() {
-	box := packr.NewBox("./templates")
+	box := packr.New("someBoxName", "./templates")
 
 	http.Handle("/", http.FileServer(box))
 	http.ListenAndServe(":3000", nil)
