@@ -12,15 +12,21 @@ var globalOptions = struct {
 	Verbose       bool
 	IgnoreImports bool
 	Legacy        bool
+	Silent        bool
 }{}
 
 var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "A brief description of your application",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if globalOptions.Verbose {
 			plog.Default.SetLevel(logrus.DebugLevel)
 		}
+		if globalOptions.Silent {
+			plog.Default.SetLevel(logrus.ErrorLevel)
+		}
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
 		return pack(args...)
 	},
 }
@@ -36,5 +42,6 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&globalOptions.Verbose, "verbose", "v", false, "enables verbose logging")
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.Legacy, "legacy", false, "uses the legacy resolution and packing system (assumes first arg || pwd for input path)")
+	rootCmd.PersistentFlags().BoolVar(&globalOptions.Silent, "silent", false, "silences all output")
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.IgnoreImports, "ignore-imports", false, "when set to true packr won't resolve imports for boxes")
 }

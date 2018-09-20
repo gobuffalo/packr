@@ -2,20 +2,24 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/gobuffalo/packr/builder"
 	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/gobuffalo/packr/jam/store"
+	"github.com/gobuffalo/packr/plog"
 	"github.com/pkg/errors"
 )
 
 func pack(args ...string) error {
+	if err := clean(args...); err != nil {
+		return errors.WithStack(err)
+	}
 	pwd, err := os.Getwd()
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	if globalOptions.Legacy {
 		input := pwd
 		if len(args) > 0 {
@@ -24,13 +28,8 @@ func pack(args ...string) error {
 		b := builder.New(context.Background(), input)
 		return b.Run()
 	}
-	if err := clean(args...); err != nil {
-		return errors.WithStack(err)
-	}
+
 	roots := append(args, pwd)
-	for _, r := range roots {
-		store.Clean(r)
-	}
 	p, err := parser.NewFromRoots(roots, &parser.RootsOptions{
 		IgnoreImports: globalOptions.IgnoreImports,
 	})
@@ -47,7 +46,7 @@ func pack(args ...string) error {
 	// boxes, just adding a comment suggesting they're
 	// might be a reason to exclude some
 
-	fmt.Printf("Found %d boxes\n", len(boxes))
+	plog.Default.Debugf("found %d boxes", len(boxes))
 
 	// "pack" boxes
 	d := store.NewDisk("", "")

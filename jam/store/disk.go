@@ -238,13 +238,13 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		g.File(f)
 	}
 
-	g.Transformer(gotools.FmtTransformer())
 	return g, nil
 }
 
 func (d *Disk) Close() error {
 	plog.Debug(d, "Close")
 	run := genny.WetRunner(context.Background())
+	run.Logger = plog.Default
 	if err := run.WithNew(d.Generator()); err != nil {
 		return errors.WithStack(err)
 	}
