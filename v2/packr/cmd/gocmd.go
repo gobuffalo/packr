@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/gobuffalo/packr/v2"
+	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/pkg/errors"
 )
@@ -57,8 +57,7 @@ func goCmd(name string, args ...string) error {
 			return errors.WithStack(err)
 		}
 	}
-	cp := exec.Command(packr.GoBin(), cargs...)
-	fmt.Println("### cp.Args ->", cp.Args)
+	cp := exec.Command(genny.GoBin(), cargs...)
 	cp.Stderr = os.Stderr
 	cp.Stdin = os.Stdin
 	cp.Stdout = os.Stdout

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/plog"
@@ -40,7 +41,7 @@ func New(name string, path string) *Box {
 	cov := filepath.Join("_test", "_obj_test")
 	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
 	if !filepath.IsAbs(cd) && cd != "" {
-		cd = filepath.Join(GoPath(), "src", cd)
+		cd = filepath.Join(envy.GoPath(), "src", cd)
 	}
 	cd = filepath.Join(cd, path)
 	b = &Box{
