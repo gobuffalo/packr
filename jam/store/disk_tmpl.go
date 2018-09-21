@@ -25,10 +25,7 @@ var _ = func() error {
 	g.DefaultResolver = hgr
 
 	{{- range $box := .Boxes}}
-	func() {
-		b := packr.New("{{$box.Name}}", "{{$box.Path}}")
-{{ printFiles $box -}}
-	}()
+		{{ printBox $box -}}
 	{{ end }}
 	return nil
 }()
@@ -44,9 +41,9 @@ import _ "{{.Import}}"
 `
 
 const diskGlobalBoxTmpl = `func() {
-		b := packr.New("{{$box.Name}}", "{{$box.Path}}")
-		{{- range $box.Files }}
-		b.SetResolver("{{}}", packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n
+		b := packr.New("{{.Box.Name}}", "{{.Box.Path}}")
+		{{ range $file := .Files -}}
+			b.SetResolver("{{$file.Resolver}}", packr.Pointer{ForwardBox: gk, ForwardPath: "{{$file.ForwardPath}}"})
 		{{ end -}}
 }()
 `

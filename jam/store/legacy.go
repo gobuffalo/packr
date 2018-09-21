@@ -2,10 +2,8 @@ package store
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"path/filepath"
 	"sort"
@@ -22,23 +20,23 @@ import (
 var _ Store = &Legacy{}
 
 type Legacy struct {
+	disk  *Disk
 	boxes map[string][]legacyBox
 }
 
 func NewLegacy() *Legacy {
 	return &Legacy{
+		disk:  NewDisk("", ""),
 		boxes: map[string][]legacyBox{},
 	}
 }
 
 func (l *Legacy) FileNames(box *parser.Box) ([]string, error) {
-	d := NewDisk("", "")
-	return d.FileNames(box)
+	return l.disk.FileNames(box)
 }
 
 func (l *Legacy) Files(box *parser.Box) ([]*parser.File, error) {
-	d := NewDisk("", "")
-	return d.Files(box)
+	return l.disk.Files(box)
 }
 
 func (l *Legacy) Pack(box *parser.Box) error {
@@ -51,7 +49,7 @@ func (l *Legacy) Pack(box *parser.Box) error {
 
 	for _, f := range files {
 		n := strings.TrimPrefix(f.Name(), box.AbsPath+string(filepath.Separator))
-		c, err := l.compressFile(f)
+		c, err := l.prepFile(f)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -78,14 +76,9 @@ func (l *Legacy) Pack(box *parser.Box) error {
 	// return run.Run()
 }
 
-func (l *Legacy) compressFile(r io.Reader) (string, error) {
+func (l *Legacy) prepFile(r io.Reader) (string, error) {
 	bb := &bytes.Buffer{}
-	w := gzip.NewWriter(bb)
-
-	if _, err := io.Copy(w, r); err != nil {
-		return "", errors.WithStack(err)
-	}
-	if err := w.Close(); err != nil {
+	if _, err := io.Copy(bb, r); err != nil {
 		return "", errors.WithStack(err)
 	}
 	b, err := json.Marshal(bb.Bytes())
@@ -97,9 +90,7 @@ func (l *Legacy) compressFile(r io.Reader) (string, error) {
 
 func (l *Legacy) Generator() (*genny.Generator, error) {
 	g := genny.New()
-	fmt.Println("### l.boxes ->", l.boxes)
 	for _, b := range l.boxes {
-		fmt.Println("### len(b) ->", len(b))
 		if len(b) == 0 {
 			continue
 		}
@@ -115,24 +106,8 @@ func (l *Legacy) Generator() (*genny.Generator, error) {
 		if err != nil {
 			return g, errors.WithStack(err)
 		}
-		fmt.Println("### f ->", f)
 		g.File(f)
 	}
-	// bb, err := ioutil.ReadFile(path)
-	// if err != nil {
-	// 	return errors.WithStack(err)
-	// }
-	// if b.compress {
-	// 	bb, err = compressFile(bb)
-	// 	if err != nil {
-	// 		return errors.WithStack(err)
-	// 	}
-	// }
-	// bb, err = json.Marshal(bb)
-	// if err != nil {
-	// 	return errors.WithStack(err)
-	// }
-	// f.Contents = strings.Replace(string(bb), "\"", "\\\"", -1)
 	return g, nil
 }
 
@@ -146,8 +121,7 @@ func (l *Legacy) Close() error {
 }
 
 func (l *Legacy) Clean(box *parser.Box) error {
-	d := NewDisk("", "")
-	return d.Clean(box)
+	return l.disk.Clean(box)
 }
 
 type legacyBox struct {

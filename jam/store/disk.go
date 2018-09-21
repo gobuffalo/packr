@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/md5"
-	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -186,23 +185,44 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	})
 
 	t := gotools.TemplateTransformer(opts, template.FuncMap{
-		"printFiles": func(ob optsBox) (template.HTML, error) {
+		"printBox": func(ob optsBox) (template.HTML, error) {
 			box := d.boxes[ob.Name]
 			if box == nil {
 				return "", errors.Errorf("could not find box %s", ob.Name)
 			}
-			bb := &bytes.Buffer{}
 			fn, err := d.FileNames(box)
 			if err != nil {
 				return "", errors.WithStack(err)
 			}
-			const ln = "\t\tb.SetResolver(\"%s\", packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n"
+			if len(fn) == 0 {
+				return "", nil
+			}
+
+			type file struct {
+				Resolver    string
+				ForwardPath string
+			}
+
+			gf := genny.NewFile("box.go.tmpl", strings.NewReader(diskGlobalBoxTmpl))
+			var files []file
 			for _, s := range fn {
 				p := strings.TrimPrefix(s, box.AbsPath)
 				p = strings.TrimPrefix(p, string(filepath.Separator))
-				bb.WriteString(fmt.Sprintf(ln, p, makeKey(box, s)))
+				files = append(files, file{
+					Resolver:    p,
+					ForwardPath: makeKey(box, s),
+				})
 			}
-			return template.HTML(bb.String()), nil
+			opts := map[string]interface{}{
+				"Box":   ob,
+				"Files": files,
+			}
+			t := gotools.TemplateTransformer(opts, nil)
+			gf, err = t.Transform(gf)
+			if err != nil {
+				return "", errors.WithStack(err)
+			}
+			return template.HTML(gf.String()), nil
 		},
 	})
 	g.Transformer(t)
@@ -232,6 +252,10 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 
 		t := gotools.TemplateTransformer(o, template.FuncMap{})
 		f, err := t.Transform(f)
+		if err != nil {
+			return g, nil
+		}
+		f, err = gotools.FmtTransformer().Transform(f)
 		if err != nil {
 			return g, nil
 		}

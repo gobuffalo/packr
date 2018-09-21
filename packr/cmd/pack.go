@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"context"
+	"io"
 	"os"
 
-	"github.com/gobuffalo/packr/builder"
 	"github.com/gobuffalo/packr/jam/parser"
 	"github.com/gobuffalo/packr/jam/store"
 	"github.com/gobuffalo/packr/plog"
@@ -18,19 +17,6 @@ func pack(args ...string) error {
 	pwd, err := os.Getwd()
 	if err != nil {
 		return errors.WithStack(err)
-	}
-
-	if globalOptions.Legacy {
-		input := pwd
-		if len(args) > 0 {
-			input = args[0]
-		}
-		b := builder.New(context.Background(), input)
-		b.Compress = true
-		if err := b.Run(); err != nil {
-			return errors.WithStack(err)
-		}
-		return nil
 	}
 
 	roots := append(args, pwd)
@@ -52,15 +38,22 @@ func pack(args ...string) error {
 
 	plog.Default.Debugf("found %d boxes", len(boxes))
 
-	// "pack" boxes
-	d := store.NewDisk("", "")
+	var st store.Store = store.NewDisk("", "")
+
+	if globalOptions.Legacy {
+		st = store.NewLegacy()
+	}
+
 	for _, b := range boxes {
 		if b.Name == store.DISK_GLOBAL_KEY {
 			continue
 		}
-		if err := d.Pack(b); err != nil {
+		if err := st.Pack(b); err != nil {
 			return errors.WithStack(err)
 		}
 	}
-	return d.Close()
+	if cl, ok := st.(io.Closer); ok {
+		return cl.Close()
+	}
+	return nil
 }
