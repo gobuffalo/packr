@@ -1,4 +1,4 @@
-# packr
+# Packr (v2)
 
 [![GoDoc](https://godoc.org/github.com/gobuffalo/packr/v2?status.svg)](https://godoc.org/github.com/gobuffalo/packr/v2)
 
