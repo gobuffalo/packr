@@ -41,8 +41,14 @@ func goCmd(name string, args ...string) error {
 			for _, b := range boxes {
 				if b.PackageDir == path {
 					pk := fmt.Sprintf("%s-packr.go", b.Package)
-					filepath.Join(path, pk)
-					cargs = append(cargs, pk)
+					for _, x := range []string{pk, "a_" + pk} {
+						y := filepath.Join(path, x)
+						if _, err := os.Stat(y); err != nil {
+							continue
+						}
+						cargs = append(cargs, y)
+						break
+					}
 				}
 			}
 			return nil

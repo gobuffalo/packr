@@ -26,7 +26,11 @@ func pack(args ...string) error {
 			input = args[0]
 		}
 		b := builder.New(context.Background(), input)
-		return b.Run()
+		b.Compress = true
+		if err := b.Run(); err != nil {
+			return errors.WithStack(err)
+		}
+		return nil
 	}
 
 	roots := append(args, pwd)

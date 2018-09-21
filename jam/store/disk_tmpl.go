@@ -42,3 +42,11 @@ package {{.Package}}
 
 import _ "{{.Import}}"
 `
+
+const diskGlobalBoxTmpl = `func() {
+		b := packr.New("{{$box.Name}}", "{{$box.Path}}")
+		{{- range $box.Files }}
+		b.SetResolver("{{}}", packr.Pointer{ForwardBox: gk, ForwardPath: \"%s\"})\n
+		{{ end -}}
+}()
+`

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"text/template"
 
+	"github.com/gobuffalo/packr/plog"
 	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -17,7 +18,7 @@ import (
 var DebugLog func(string, ...interface{})
 
 func init() {
-	DebugLog = func(string, ...interface{}) {}
+	DebugLog = plog.Default.Debugf
 }
 
 var invalidFilePattern = regexp.MustCompile(`(_test|-packr).go$`)
@@ -37,12 +38,14 @@ type Builder struct {
 
 // Run the builder.
 func (b *Builder) Run() error {
-	wg := &errgroup.Group{}
 	root, err := filepath.EvalSymlinks(b.RootPath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	DebugLog("starting to build %s", root)
+	wg := &errgroup.Group{}
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		DebugLog("walking %s", path)
 		if info == nil {
 			return filepath.SkipDir
 		}

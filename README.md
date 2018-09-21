@@ -14,6 +14,30 @@ To get an idea of the what and why of packr, please enjoy this short video: [htt
 $ go get -u github.com/gobuffalo/packr/...
 ```
 
+## New File Format FAQs
+
+In version `v2.0.0` the file format changed and is not backward compatible with the `packr-v1.x` library.
+
+#### Can `packr-v1.x` read the new format?
+
+No, it can not. Because of the way the new file format works porting it to `packr-v1.x` would be difficult. PR's are welcome though. :)
+
+#### Can `packr-v2.x` read `packr-v1.x` files?
+
+Yes it can, but that ability will eventually be phased out. Because of that we recommend moving to the new format.
+
+#### Can `packr-v2.x` generate `packr-v1.x` files?
+
+Yes it can, but that ability will eventually be phased out. Because of that we recommend moving to the new format.
+
+The `--legacy` command is available on all commands that generate `-packr.go` files.
+
+```bash
+$ packr --legacy
+$ packr install --legacy
+$ packr build --legacy
+```
+
 ## Usage
 
 ### In Code
