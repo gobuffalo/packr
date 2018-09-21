@@ -255,10 +255,6 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		if err != nil {
 			return g, nil
 		}
-		f, err = gotools.FmtTransformer().Transform(f)
-		if err != nil {
-			return g, nil
-		}
 		g.File(f)
 	}
 
