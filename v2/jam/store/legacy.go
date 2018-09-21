@@ -20,23 +20,15 @@ import (
 var _ Store = &Legacy{}
 
 type Legacy struct {
-	disk  *Disk
+	*Disk
 	boxes map[string][]legacyBox
 }
 
 func NewLegacy() *Legacy {
 	return &Legacy{
-		disk:  NewDisk("", ""),
+		Disk:  NewDisk("", ""),
 		boxes: map[string][]legacyBox{},
 	}
-}
-
-func (l *Legacy) FileNames(box *parser.Box) ([]string, error) {
-	return l.disk.FileNames(box)
-}
-
-func (l *Legacy) Files(box *parser.Box) ([]*parser.File, error) {
-	return l.disk.Files(box)
 }
 
 func (l *Legacy) Pack(box *parser.Box) error {
@@ -118,10 +110,6 @@ func (l *Legacy) Close() error {
 	}
 	run.Logger = plog.Default
 	return run.Run()
-}
-
-func (l *Legacy) Clean(box *parser.Box) error {
-	return l.disk.Clean(box)
 }
 
 type legacyBox struct {
