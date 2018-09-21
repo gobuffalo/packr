@@ -13,6 +13,7 @@ import (
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/plog"
+	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 )
 
@@ -20,6 +21,7 @@ import (
 // retrieve files from either disk or the embedded
 // binary.
 func NewBox(path string) Box {
+	oncer.Deprecate(0, "packr.NewBox", "Use packr.New instead.")
 	return *New(path, path)
 }
 

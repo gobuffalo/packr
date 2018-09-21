@@ -2,6 +2,7 @@ TAGS ?= "sqlite"
 GO_BIN ?= go
 
 install: deps
+	echo "installing packr v2"
 	$(GO_BIN) install -v .
 
 deps:

@@ -6,6 +6,7 @@ require (
 	github.com/gobuffalo/packr v1.13.5
 	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/karrick/godirwalk v1.7.3
+	github.com/markbates/oncer v0.0.0-20180911185008-7302a2cd9114
 	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.0.6
 	github.com/spf13/cobra v0.0.3
