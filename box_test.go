@@ -1,207 +1,133 @@
 package packr
 
 import (
+	"bytes"
+	"io/ioutil"
+	"os"
+	"runtime"
+	"sort"
+	"strings"
 	"testing"
 
-	"github.com/gobuffalo/packr/file"
-	"github.com/gobuffalo/packr/file/resolver"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_NewBox(t *testing.T) {
-	r := require.New(t)
-
-	b := NewBox("./_fixtures/list_test")
-	r.Len(b.List(), 4)
-
-}
-func Test_Box_AddString(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("./templates")
-	s, err := box.MustString("foo.txt")
-	r.Error(err)
-	r.Equal("", s)
-
-	r.NoError(box.AddString("foo.txt", "foo!!"))
-	s, err = box.MustString("foo.txt")
-	r.NoError(err)
-	r.Equal("foo!!", s)
-}
-
-func Test_Box_AddBytes(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("Test_Box_AddBytes")
-	s, err := box.MustString("foo.txt")
-	r.Error(err)
-	r.Equal("", s)
-
-	r.NoError(box.AddBytes("foo.txt", []byte("foo!!")))
-	s, err = box.MustString("foo.txt")
-	r.NoError(err)
-	r.Equal("foo!!", s)
-}
-
 func Test_Box_String(t *testing.T) {
 	r := require.New(t)
-
-	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box.SetResolver("foo.txt", d)
-
-	s := box.String("foo.txt")
-	r.Equal("foo!", s)
-
-	s = box.String("idontexist")
-	r.Equal("", s)
-}
-
-func Test_Box_String_Miss(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("./_fixtures/templates")
-
-	s := box.String("foo.txt")
-	r.Equal("FOO!!!\n", s)
-
-	s = box.String("idontexist")
-	r.Equal("", s)
+	s := testBox.String("hello.txt")
+	r.Equal("hello world!", strings.TrimSpace(s))
 }
 
 func Test_Box_MustString(t *testing.T) {
 	r := require.New(t)
-
-	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box.SetResolver("foo.txt", d)
-
-	s, err := box.MustString("foo.txt")
-	r.NoError(err)
-	r.Equal("foo!", s)
-
-	s, err = box.MustString("idontexist")
+	_, err := testBox.MustString("idontexist.txt")
 	r.Error(err)
-	r.Equal("", s)
-}
-
-func Test_Box_MustString_Miss(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("./_fixtures/templates")
-
-	s, err := box.MustString("foo.txt")
-	r.NoError(err)
-	r.Equal("FOO!!!\n", s)
-
-	s, err = box.MustString("idontexist")
-	r.Error(err)
-	r.Equal("", s)
 }
 
 func Test_Box_Bytes(t *testing.T) {
 	r := require.New(t)
-
-	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box.SetResolver("foo.txt", d)
-
-	s := box.Bytes("foo.txt")
-	r.Equal([]byte("foo!"), s)
-
-	s = box.Bytes("idontexist")
-	r.Equal([]byte(""), s)
-}
-
-func Test_Box_Bytes_Miss(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("./_fixtures/templates")
-
-	s := box.Bytes("foo.txt")
-	r.Equal([]byte("FOO!!!\n"), s)
-
-	s = box.Bytes("idontexist")
-	r.Equal([]byte(""), s)
+	s := testBox.Bytes("hello.txt")
+	r.Equal([]byte("hello world!"), bytes.TrimSpace(s))
 }
 
 func Test_Box_MustBytes(t *testing.T) {
 	r := require.New(t)
-
-	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box.SetResolver("foo.txt", d)
-
-	s, err := box.MustBytes("foo.txt")
-	r.NoError(err)
-	r.Equal("foo!", string(s))
-
-	s, err = box.MustBytes("idontexist")
+	_, err := testBox.MustBytes("idontexist.txt")
 	r.Error(err)
-	r.Equal("", string(s))
-}
-
-func Test_Box_MustBytes_Miss(t *testing.T) {
-	r := require.New(t)
-
-	box := NewBox("./_fixtures/templates")
-
-	s, err := box.MustBytes("foo.txt")
-	r.NoError(err)
-	r.Equal("FOO!!!\n", string(s))
-
-	s, err = box.MustBytes("idontexist")
-	r.Error(err)
-	r.Equal("", string(s))
 }
 
 func Test_Box_Has(t *testing.T) {
 	r := require.New(t)
-
-	box := NewBox("./templates")
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box.SetResolver("foo.txt", d)
-
-	r.True(box.Has("foo.txt"))
-	r.False(box.Has("idontexist"))
+	r.True(testBox.Has("hello.txt"))
+	r.False(testBox.Has("idontexist.txt"))
 }
 
-func Test_Box_Open(t *testing.T) {
+func Test_List_Virtual(t *testing.T) {
 	r := require.New(t)
+	mustHave := []string{"a", "b", "c", "d/a"}
+	actual := virtualBox.List()
+	sort.Strings(actual)
+	r.Equal(mustHave, actual)
+}
 
-	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
-	})
-	box := NewBox("./templates")
+func Test_List_Physical(t *testing.T) {
+	r := require.New(t)
+	mustHave := osPaths("foo/a.txt", "foo/bar/b.txt", "goodbye.txt", "hello.txt", "index.html")
+	actual := testBox.List()
+	r.Equal(mustHave, actual)
+}
 
-	box.SetResolver("foo.txt", d)
-
-	f, err := box.Open("foo.txt")
+func Test_Outside_Box(t *testing.T) {
+	r := require.New(t)
+	f, err := ioutil.TempFile("", "")
 	r.NoError(err)
-	r.NotZero(f)
-
-	f, err = box.Open("idontexist")
+	defer os.RemoveAll(f.Name())
+	_, err = testBox.MustString(f.Name())
 	r.Error(err)
-	r.Zero(f)
 }
 
-func Test_Box_List(t *testing.T) {
+func Test_Box_find(t *testing.T) {
+	box := NewBox("./example")
+
+	onWindows := runtime.GOOS == "windows"
+	table := []struct {
+		name  string
+		found bool
+	}{
+		{"assets/app.css", true},
+		{"assets\\app.css", onWindows},
+		{"foo/bar.baz", false},
+		{"bar", true},
+		{"bar/sub", true},
+		{"bar/foo", false},
+		{"bar/sub/sub.html", true},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(st *testing.T) {
+			r := require.New(st)
+			_, err := box.find(tt.name)
+			if tt.found {
+				r.True(box.Has(tt.name))
+				r.NoError(err)
+			} else {
+				r.False(box.Has(tt.name))
+				r.Error(err)
+			}
+		})
+	}
+}
+
+func Test_Virtual_Directory_Not_Found(t *testing.T) {
+	r := require.New(t)
+	_, err := virtualBox.find("d")
+	r.NoError(err)
+	_, err = virtualBox.find("does-not-exist")
+	r.Error(err)
+}
+
+func Test_AddString(t *testing.T) {
 	r := require.New(t)
 
-	box := NewBox("./_fixtures/list_test")
-	r.NoError(box.AddString("d/d.txt", "D"))
+	_, err := virtualBox.find("string")
+	r.Error(err)
 
-	act := box.List()
-	exp := []string{"a.txt", "b/b.txt", "b/b2.txt", "c/c.txt", "d/d.txt"}
-	r.Equal(exp, act)
+	virtualBox.AddString("string", "hello")
+
+	_, err = virtualBox.find("string")
+	r.NoError(err)
+	r.Equal("hello", virtualBox.String("string"))
+}
+
+func Test_AddBytes(t *testing.T) {
+	r := require.New(t)
+
+	_, err := virtualBox.find("bytes")
+	r.Error(err)
+
+	virtualBox.AddBytes("bytes", []byte("hello"))
+
+	_, err = virtualBox.find("bytes")
+	r.NoError(err)
+	r.Equal("hello", virtualBox.String("bytes"))
 }

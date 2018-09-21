@@ -14,14 +14,11 @@ test:
 	packr clean
 	$(GO_BIN) test -tags ${TAGS} ./...
 	packr clean
+	cd ./v2 && make test
+	packr clean
 
 ci-test: deps
-	packr clean
 	$(GO_BIN) test -tags ${TAGS} -race ./...
-	packr clean
-
-lint:
-	gometalinter --vendor ./... --deadline=1m --skip=internal
 
 update:
 	$(GO_BIN) get -u
@@ -29,9 +26,5 @@ update:
 	make test
 	make install
 
-release-test:
-	$(GO_BIN) test -tags ${TAGS} -race ./...
-
 release:
-	$(GO_BIN) get github.com/gobuffalo/release
-	release -y -f version.go
+	cd ./v2 && make release

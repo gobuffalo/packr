@@ -14,30 +14,6 @@ To get an idea of the what and why of packr, please enjoy this short video: [htt
 $ go get -u github.com/gobuffalo/packr/...
 ```
 
-## New File Format FAQs
-
-In version `v2.0.0` the file format changed and is not backward compatible with the `packr-v1.x` library.
-
-#### Can `packr-v1.x` read the new format?
-
-No, it can not. Because of the way the new file format works porting it to `packr-v1.x` would be difficult. PR's are welcome though. :)
-
-#### Can `packr-v2.x` read `packr-v1.x` files?
-
-Yes it can, but that ability will eventually be phased out. Because of that we recommend moving to the new format.
-
-#### Can `packr-v2.x` generate `packr-v1.x` files?
-
-Yes it can, but that ability will eventually be phased out. Because of that we recommend moving to the new format.
-
-The `--legacy` command is available on all commands that generate `-packr.go` files.
-
-```bash
-$ packr --legacy
-$ packr install --legacy
-$ packr build --legacy
-```
-
 ## Usage
 
 ### In Code
@@ -45,8 +21,8 @@ $ packr build --legacy
 The first step in using Packr is to create a new box. A box represents a folder on disk. Once you have a box you can get `string` or `[]byte` representations of the file.
 
 ```go
-// set up a new box by giving it a name and an optional (relative) path to a folder on disk:
-box := packr.New("My Box", "./templates")
+// set up a new box by giving it a (relative) path to a folder on disk:
+box := packr.NewBox("./templates")
 
 // Get the string representation of a file:
 html := box.String("index.html")
@@ -89,7 +65,7 @@ import (
 )
 
 func main() {
-	box := packr.New("myBox", "./templates")
+	box := packr.NewBox("./templates")
 
 	s := box.String("admin/index.html")
 	fmt.Println(s)
@@ -127,7 +103,7 @@ import (
 )
 
 func main() {
-	box := packr.New("someBoxName", "./templates")
+	box := packr.NewBox("./templates")
 
 	http.Handle("/", http.FileServer(box))
 	http.ListenAndServe(":3000", nil)

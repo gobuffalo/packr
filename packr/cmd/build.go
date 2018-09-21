@@ -1,27 +1,37 @@
 package cmd
 
 import (
+	"context"
+	"os"
+	"os/exec"
+
+	"github.com/gobuffalo/packr"
+	"github.com/gobuffalo/packr/builder"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
+// buildCmd represents the build command
 var buildCmd = &cobra.Command{
 	Use:                "build",
 	Short:              "Wraps the go build command with packr",
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var cargs []string
-		for _, a := range args {
-			if a == "--legacy" {
-				globalOptions.Legacy = true
-				continue
-			}
-			cargs = append(cargs, a)
-		}
-		if err := pack(); err != nil {
+		defer builder.Clean(input)
+		b := builder.New(context.Background(), input)
+		err := b.Run()
+		if err != nil {
 			return errors.WithStack(err)
 		}
-		return goCmd("build", cargs...)
+
+		cargs := []string{"build"}
+		cargs = append(cargs, args...)
+		cp := exec.Command(packr.GoBin(), cargs...)
+		cp.Stderr = os.Stderr
+		cp.Stdin = os.Stdin
+		cp.Stdout = os.Stdout
+
+		return cp.Run()
 	},
 }
 

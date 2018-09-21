@@ -1,50 +1,49 @@
 package packr
 
 import (
-	"sort"
+	"os"
+	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/packr/file"
-	"github.com/gobuffalo/packr/file/resolver"
 	"github.com/pkg/errors"
 )
 
-type WalkFunc func(string, file.File) error
+type WalkFunc func(string, File) error
 
 // Walk will traverse the box and call the WalkFunc for each file in the box/folder.
-func (b *Box) Walk(wf WalkFunc) error {
-	m := map[string]file.File{}
-
-	dr := b.DefaultResolver
-	if dr == nil {
-		cd := resolver.OsPath(b.ResolutionDir)
-		dr = &resolver.Disk{Root: string(cd)}
-	}
-	if fm, ok := dr.(file.FileMappable); ok {
-		for n, f := range fm.FileMap() {
-			m[n] = f
-		}
-	}
-
-	b.moot.RLock()
-	for n, r := range b.resolvers {
-		f, err := r.Find("", n)
+func (b Box) Walk(wf WalkFunc) error {
+	if data[b.Path] == nil {
+		base, err := filepath.EvalSymlinks(filepath.Join(b.callingDir, b.Path))
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		m[n] = f
-	}
-	b.moot.RUnlock()
+		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+			cleanName, err := filepath.Rel(base, path)
+			if err != nil {
+				cleanName = strings.TrimPrefix(path, base)
+			}
+			cleanName = filepath.ToSlash(filepath.Clean(cleanName))
+			cleanName = strings.TrimPrefix(cleanName, "/")
+			cleanName = filepath.FromSlash(cleanName)
+			if info == nil || info.IsDir() {
+				return nil
+			}
 
-	var keys = make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
+			file, err := fileFor(path, cleanName)
+			if err != nil {
+				return err
+			}
+			return wf(cleanName, file)
+		})
 	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-		if err := wf(k, m[k]); err != nil {
-			return errors.WithStack(err)
+	for n := range data[b.Path] {
+		f, err := b.find(n)
+		if err != nil {
+			return err
+		}
+		err = wf(n, f)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -52,10 +51,9 @@ func (b *Box) Walk(wf WalkFunc) error {
 
 // WalkPrefix will call box.Walk and call the WalkFunc when it finds paths that have a matching prefix
 func (b Box) WalkPrefix(prefix string, wf WalkFunc) error {
-	ipref := resolver.OsPath(prefix)
+	opre := osPath(prefix)
 	return b.Walk(func(path string, f File) error {
-		ipath := resolver.OsPath(path)
-		if strings.HasPrefix(ipath, ipref) {
+		if strings.HasPrefix(osPath(path), opre) {
 			if err := wf(path, f); err != nil {
 				return errors.WithStack(err)
 			}

@@ -1,36 +1,31 @@
 package packr
 
 import (
-	"fmt"
+	"bytes"
+	"compress/gzip"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
-	"sync"
 
-	"github.com/gobuffalo/packr/file"
-	"github.com/gobuffalo/packr/file/resolver"
-	"github.com/gobuffalo/packr/plog"
 	"github.com/pkg/errors"
+)
+
+var (
+	// ErrResOutsideBox gets returned in case of the requested resources being outside the box
+	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
 )
 
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
 // binary.
 func NewBox(path string) Box {
-	return *New(path, path)
-}
-
-func New(name string, path string) *Box {
-	b := findBox(name)
-	if b != nil {
-		return b
-	}
 	var cd string
 	if !filepath.IsAbs(path) {
-		_, filename, _, _ := runtime.Caller(2)
+		_, filename, _, _ := runtime.Caller(1)
 		cd = filepath.Dir(filename)
 	}
 
@@ -40,47 +35,31 @@ func New(name string, path string) *Box {
 	if !filepath.IsAbs(cd) && cd != "" {
 		cd = filepath.Join(GoPath(), "src", cd)
 	}
-	cd = filepath.Join(cd, path)
-	b = &Box{
-		Path:          path,
-		Name:          name,
-		ResolutionDir: cd,
-		resolvers:     map[string]resolver.Resolver{},
-		moot:          &sync.RWMutex{},
+
+	return Box{
+		Path:       path,
+		callingDir: cd,
+		data:       map[string][]byte{},
 	}
-	return placeBox(b)
 }
 
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path            string
-	Name            string
-	ResolutionDir   string
-	resolvers       map[string]resolver.Resolver
-	DefaultResolver resolver.Resolver
-	moot            *sync.RWMutex
-}
-
-func (b *Box) SetResolver(file string, res resolver.Resolver) {
-	b.moot.Lock()
-	plog.Debug(b, "SetResolver", "file", file, "resolver", fmt.Sprintf("%T", res))
-	b.resolvers[resolver.Key(file)] = res
-	b.moot.Unlock()
+	Path        string
+	callingDir  string
+	data        map[string][]byte
+	directories map[string]bool
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
-func (b *Box) AddString(path string, t string) error {
-	return b.AddBytes(path, []byte(t))
+func (b Box) AddString(path string, t string) {
+	b.AddBytes(path, []byte(t))
 }
 
 // AddBytes sets t in b.data by the given path
-func (b *Box) AddBytes(path string, t []byte) error {
-	m := map[string]file.File{}
-	m[resolver.Key(path)] = file.NewFile(path, t)
-	res := resolver.NewInMemory(m)
-	b.SetResolver(path, res)
-	return nil
+func (b Box) AddBytes(path string, t []byte) {
+	b.data[path] = t
 }
 
 // String of the file asked for or an empty string.
@@ -104,69 +83,122 @@ func (b Box) Bytes(name string) []byte {
 // MustBytes returns either the byte slice of the requested
 // file or an error if it can not be found.
 func (b Box) MustBytes(name string) ([]byte, error) {
-	f, err := b.Resolve(name)
-	if err != nil {
-		return []byte(""), err
+	f, err := b.find(name)
+	if err == nil {
+		bb := &bytes.Buffer{}
+		bb.ReadFrom(f)
+		return bb.Bytes(), err
 	}
-	return ioutil.ReadAll(f)
+	return nil, err
 }
 
 // Has returns true if the resource exists in the box
 func (b Box) Has(name string) bool {
-	_, err := b.MustBytes(name)
+	_, err := b.find(name)
 	if err != nil {
 		return false
 	}
 	return true
 }
 
+func (b Box) decompress(bb []byte) []byte {
+	reader, err := gzip.NewReader(bytes.NewReader(bb))
+	if err != nil {
+		return bb
+	}
+	data, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return bb
+	}
+	return data
+}
+
+func (b Box) find(name string) (File, error) {
+	if bb, ok := b.data[name]; ok {
+		return newVirtualFile(name, bb), nil
+	}
+	if b.directories == nil {
+		b.indexDirectories()
+	}
+
+	cleanName := filepath.ToSlash(filepath.Clean(name))
+	// Ensure name is not outside the box
+	if strings.HasPrefix(cleanName, "../") {
+		return nil, ErrResOutsideBox
+	}
+	// Absolute name is considered as relative to the box root
+	cleanName = strings.TrimPrefix(cleanName, "/")
+
+	// Try to get the resource from the box
+	if _, ok := data[b.Path]; ok {
+		if bb, ok := data[b.Path][cleanName]; ok {
+			bb = b.decompress(bb)
+			return newVirtualFile(cleanName, bb), nil
+		}
+		if _, ok := b.directories[cleanName]; ok {
+			return newVirtualDir(cleanName), nil
+		}
+		if filepath.Ext(cleanName) != "" {
+			// The Handler created by http.FileSystem checks for those errors and
+			// returns http.StatusNotFound instead of http.StatusInternalServerError.
+			return nil, os.ErrNotExist
+		}
+		return nil, os.ErrNotExist
+	}
+
+	// Not found in the box virtual fs, try to get it from the file system
+	cleanName = filepath.FromSlash(cleanName)
+	p := filepath.Join(b.callingDir, b.Path, cleanName)
+	return fileFor(p, cleanName)
+}
+
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
-	return b.Resolve(name)
+	return b.find(name)
 }
 
 // List shows "What's in the box?"
 func (b Box) List() []string {
 	var keys []string
 
-	b.Walk(func(path string, info File) error {
-		finfo, _ := info.FileInfo()
-		if !finfo.IsDir() {
-			keys = append(keys, finfo.Name())
+	if b.data == nil || len(b.data) == 0 {
+		b.Walk(func(path string, info File) error {
+			finfo, _ := info.FileInfo()
+			if !finfo.IsDir() {
+				keys = append(keys, finfo.Name())
+			}
+			return nil
+		})
+	} else {
+		for k := range b.data {
+			keys = append(keys, k)
 		}
-		return nil
-	})
-	sort.Strings(keys)
+	}
 	return keys
 }
 
-func (b *Box) Resolve(key string) (file.File, error) {
-	b.moot.RLock()
-	r, ok := b.resolvers[resolver.Key(key)]
-	b.moot.RUnlock()
-	if !ok {
-		r = b.DefaultResolver
-		if r == nil {
-			r = resolver.DefaultResolver
-			if r == nil {
-				return nil, errors.New("resolver.DefaultResolver is nil")
-			}
+func (b *Box) indexDirectories() {
+	b.directories = map[string]bool{}
+	if _, ok := data[b.Path]; ok {
+		for name := range data[b.Path] {
+			prefix, _ := path.Split(name)
+			// Even on Windows the suffix appears to be a /
+			prefix = strings.TrimSuffix(prefix, "/")
+			b.directories[prefix] = true
 		}
 	}
-	plog.Debug(b, "Resolve", "key", key)
+}
 
-	f, err := r.Find(b.Name, key)
+func fileFor(p string, name string) (File, error) {
+	fi, err := os.Stat(p)
 	if err != nil {
-		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
-		f, err = r.Find(b.Name, z)
-		if err != nil {
-			return f, errors.WithStack(err)
-		}
-		b, err := ioutil.ReadAll(f)
-		if err != nil {
-			return f, errors.WithStack(err)
-		}
-		f = file.NewFile(key, b)
+		return nil, err
 	}
-	return f, nil
+	if fi.IsDir() {
+		return newVirtualDir(p), nil
+	}
+	if bb, err := ioutil.ReadFile(p); err == nil {
+		return newVirtualFile(name, bb), nil
+	}
+	return nil, os.ErrNotExist
 }

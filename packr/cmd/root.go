@@ -1,47 +1,55 @@
 package cmd
 
 import (
+	"context"
+	"fmt"
 	"os"
 
-	"github.com/gobuffalo/packr/plog"
-	"github.com/sirupsen/logrus"
+	"github.com/gobuffalo/packr/builder"
 	"github.com/spf13/cobra"
 )
 
-var globalOptions = struct {
-	Verbose       bool
-	IgnoreImports bool
-	Legacy        bool
-	Silent        bool
-}{}
+var input string
+var compress bool
+var verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "packr",
-	Short: "A brief description of your application",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if globalOptions.Verbose {
-			plog.Default.SetLevel(logrus.DebugLevel)
+	Short: "compiles static files into Go files",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if !verbose {
+			for _, a := range args {
+				if a == "-v" {
+					verbose = true
+					break
+				}
+			}
 		}
-		if globalOptions.Silent {
-			plog.Default.SetLevel(logrus.ErrorLevel)
+
+		if verbose {
+			builder.DebugLog = func(s string, a ...interface{}) {
+				os.Stdout.WriteString(fmt.Sprintf(s, a...))
+			}
 		}
+		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return pack(args...)
+		b := builder.New(context.Background(), input)
+		b.Compress = compress
+		return b.Run()
 	},
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&globalOptions.Verbose, "verbose", "v", false, "enables verbose logging")
-	rootCmd.PersistentFlags().BoolVar(&globalOptions.Legacy, "legacy", false, "uses the legacy resolution and packing system (assumes first arg || pwd for input path)")
-	rootCmd.PersistentFlags().BoolVar(&globalOptions.Silent, "silent", false, "silences all output")
-	rootCmd.PersistentFlags().BoolVar(&globalOptions.IgnoreImports, "ignore-imports", false, "when set to true packr won't resolve imports for boxes")
+	pwd, _ := os.Getwd()
+	rootCmd.Flags().StringVarP(&input, "input", "i", pwd, "path to scan for packr Boxes")
+	rootCmd.Flags().BoolVarP(&compress, "compress", "z", false, "compress box contents")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print verbose logging information")
+}
+
+// Execute the commands
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(-1)
+	}
 }
