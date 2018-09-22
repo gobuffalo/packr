@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/md5"
+	"go/build"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -209,7 +210,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 				p := strings.TrimPrefix(s, box.AbsPath)
 				p = strings.TrimPrefix(p, string(filepath.Separator))
 				files = append(files, file{
-					Resolver:    p,
+					Resolver:    strings.Replace(p, "\\", "/", -1),
 					ForwardPath: makeKey(box, s),
 				})
 			}
@@ -229,10 +230,14 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	fp := filepath.Join(d.DBPath, "packed-packr.go.tmpl")
 	g.File(genny.NewFile(fp, strings.NewReader(diskGlobalTmpl)))
 
-	ip := filepath.Dir(d.DBPath)
-	ip = strings.TrimPrefix(ip, filepath.Join(GoPath(), "src"))
-	ip = strings.TrimPrefix(ip, string(filepath.Separator))
-	ip = path.Join(ip, d.DBPackage)
+	ip := strings.ToLower(filepath.Dir(d.DBPath))
+	for _, x := range build.Default.SrcDirs() {
+		x = strings.ToLower(x)
+		ip = strings.TrimPrefix(ip, x)
+		ip = strings.TrimPrefix(ip, string(filepath.Separator))
+	}
+
+	ip = path.Join(strings.Replace(ip, "\\", "/", -1), d.DBPackage)
 
 	for _, n := range opts.Boxes {
 		b := d.boxes[n.Name]
