@@ -7,6 +7,7 @@ import (
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/jam/store"
+	"github.com/markbates/oncer"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,6 +44,7 @@ func Test_NewFrom_Roots_Imports(t *testing.T) {
 
 func Test_NewFrom_Roots_Disk(t *testing.T) {
 	r := require.New(t)
+	oncer.Reset()
 	store.Clean("./_fixtures")
 	p, err := parser.NewFromRoots([]string{"./_fixtures/new_from_roots"}, &parser.RootsOptions{
 		IgnoreImports: true,

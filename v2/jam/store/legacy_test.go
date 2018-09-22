@@ -6,6 +6,7 @@ import (
 
 	"github.com/gobuffalo/genny/gentest"
 	"github.com/gobuffalo/packr/v2/jam/parser"
+	"github.com/markbates/oncer"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,6 +41,7 @@ func Test_Legacy_Pack(t *testing.T) {
 }
 
 func Test_Legacy_Close(t *testing.T) {
+	oncer.Reset()
 	r := require.New(t)
 
 	d := NewLegacy()

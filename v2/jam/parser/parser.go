@@ -77,10 +77,8 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 	}
 
 	dd := map[string]string{}
+	fd := &finder{}
 	for _, r := range roots {
-		fd := &finder{
-			seen: map[string]string{},
-		}
 		var names []string
 		if opts.IgnoreImports {
 			names, _ = fd.findAllGoFiles(r)
