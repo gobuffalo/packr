@@ -146,9 +146,7 @@ When it comes to building multiple releases you typically want that release to b
 
 For example: `./releases`
 
-Traditionally you would use the `-o` flag to tell `go` where to compile said release.
-
-However, because of how boxes work, we must compile the release in the appropriate absolute path.
+However, because passing a `.go` file requires absolute paths, we must compile the release in the appropriate absolute path.
 
 ```bash
 GOOS=linux GOARCH=amd64 packr build
