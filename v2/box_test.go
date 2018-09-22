@@ -1,6 +1,7 @@
 package packr
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/gobuffalo/packr/v2/file"
@@ -11,8 +12,8 @@ import (
 func Test_NewBox(t *testing.T) {
 	r := require.New(t)
 
-	b := NewBox("./_fixtures/list_test")
-	r.Len(b.List(), 4)
+	box := NewBox(filepath.Join("_fixtures", "list_test"))
+	r.Len(box.List(), 4)
 
 }
 func Test_Box_AddString(t *testing.T) {
@@ -62,7 +63,7 @@ func Test_Box_String(t *testing.T) {
 func Test_Box_String_Miss(t *testing.T) {
 	r := require.New(t)
 
-	box := NewBox("./_fixtures/templates")
+	box := NewBox(filepath.Join("_fixtures", "templates"))
 
 	s := box.String("foo.txt")
 	r.Equal("FOO!!!\n", s)
@@ -92,7 +93,7 @@ func Test_Box_MustString(t *testing.T) {
 func Test_Box_MustString_Miss(t *testing.T) {
 	r := require.New(t)
 
-	box := NewBox("./_fixtures/templates")
+	box := NewBox(filepath.Join("_fixtures", "templates"))
 
 	s, err := box.MustString("foo.txt")
 	r.NoError(err)
@@ -122,7 +123,7 @@ func Test_Box_Bytes(t *testing.T) {
 func Test_Box_Bytes_Miss(t *testing.T) {
 	r := require.New(t)
 
-	box := NewBox("./_fixtures/templates")
+	box := NewBox(filepath.Join("_fixtures", "templates"))
 
 	s := box.Bytes("foo.txt")
 	r.Equal([]byte("FOO!!!\n"), s)
@@ -198,10 +199,10 @@ func Test_Box_Open(t *testing.T) {
 func Test_Box_List(t *testing.T) {
 	r := require.New(t)
 
-	box := NewBox("./_fixtures/list_test")
-	r.NoError(box.AddString("d/d.txt", "D"))
+	box := NewBox(filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString(filepath.Join("d", "d.txt"), "D"))
 
 	act := box.List()
-	exp := []string{"a.txt", "b/b.txt", "b/b2.txt", "c/c.txt", "d/d.txt"}
+	exp := []string{"a.txt", filepath.Join("b", "b.txt"), filepath.Join("b", "b2.txt"), filepath.Join("c", "c.txt"), filepath.Join("d", "d.txt")}
 	r.Equal(exp, act)
 }
