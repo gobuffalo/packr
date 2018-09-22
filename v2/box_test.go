@@ -156,10 +156,9 @@ func Test_Box_MustBytes_Miss(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./_fixtures/templates")
-
 	s, err := box.MustBytes("foo.txt")
 	r.NoError(err)
-	r.Equal("FOO!!!\n", string(s))
+	r.Equal("FOO!!!", strings.TrimSpace(string(s)))
 
 	s, err = box.MustBytes("idontexist")
 	r.Error(err)

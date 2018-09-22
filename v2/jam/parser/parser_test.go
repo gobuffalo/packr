@@ -36,9 +36,6 @@ func Test_NewFrom_Roots_Imports(t *testing.T) {
 
 	boxes, err := p.Run()
 	r.NoError(err)
-	for _, b := range boxes {
-		fmt.Println(b.Name)
-	}
 	r.True(len(boxes) > 3)
 }
 
@@ -53,9 +50,6 @@ func Test_NewFrom_Roots_Disk(t *testing.T) {
 
 	boxes, err := p.Run()
 	r.NoError(err)
-	for _, b := range boxes {
-		fmt.Println(b.Name)
-	}
 	r.Len(boxes, 3)
 }
 

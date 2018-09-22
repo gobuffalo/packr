@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gobuffalo/packr/v2/file/resolver"
 )
 
 var DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea", "_fixtures"}
@@ -34,7 +36,7 @@ func IsProspect(path string, ignore ...string) bool {
 		ignore[i] = strings.TrimSpace(strings.ToLower(x))
 	}
 
-	parts := strings.Split(path, string(filepath.Separator))
+	parts := strings.Split(resolver.OsPath(path), string(filepath.Separator))
 	if len(parts) == 0 {
 		return false
 	}
