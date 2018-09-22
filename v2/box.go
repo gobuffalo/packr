@@ -133,6 +133,9 @@ func (b Box) List() []string {
 	var keys []string
 
 	b.Walk(func(path string, info File) error {
+		if info == nil {
+			return nil
+		}
 		finfo, _ := info.FileInfo()
 		if !finfo.IsDir() {
 			keys = append(keys, finfo.Name())

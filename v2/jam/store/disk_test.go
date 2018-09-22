@@ -2,6 +2,7 @@ package store
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gobuffalo/packr/v2"
@@ -39,11 +40,11 @@ func Test_Disk_Files(t *testing.T) {
 
 	f := files[0]
 	r.Equal("aretha.txt", filepath.Base(f.Name()))
-	r.Equal("RESPECT!\n", f.String())
+	r.Equal("RESPECT!", strings.TrimSpace(f.String()))
 
 	f = files[1]
 	r.Equal("think.txt", filepath.Base(f.Name()))
-	r.Equal("THINK!\n", f.String())
+	r.Equal("THINK!", strings.TrimSpace(f.String()))
 }
 
 func Test_Disk_Pack(t *testing.T) {
@@ -76,11 +77,11 @@ func Test_Disk_Packed_Test(t *testing.T) {
 
 	s, err := b.MustString("parents/homer.txt")
 	r.NoError(err)
-	r.Equal("HOMER Simpson\n", s)
+	r.Equal("HOMER Simpson", strings.TrimSpace(s))
 
 	s, err = b.MustString("parents/marge.txt")
 	r.NoError(err)
-	r.Equal("MARGE Simpson\n", s)
+	r.Equal("MARGE Simpson", strings.TrimSpace(s))
 
 	_, err = b.MustString("idontexist")
 	r.Error(err)
