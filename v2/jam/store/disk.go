@@ -234,8 +234,8 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	for _, x := range build.Default.SrcDirs() {
 		x = strings.ToLower(x)
 		ip = strings.TrimPrefix(ip, x)
-		ip = strings.TrimPrefix(ip, string(filepath.Separator))
 	}
+	ip = strings.TrimPrefix(ip, string(filepath.Separator))
 
 	ip = path.Join(strings.Replace(ip, "\\", "/", -1), d.DBPackage)
 

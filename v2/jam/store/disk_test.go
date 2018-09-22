@@ -8,6 +8,7 @@ import (
 	"github.com/gobuffalo/genny/gentest"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/jam/parser"
+	"github.com/markbates/oncer"
 	"github.com/stretchr/testify/require"
 )
 
@@ -77,6 +78,7 @@ func Test_Disk_Files(t *testing.T) {
 }
 
 func Test_Disk_Pack(t *testing.T) {
+	oncer.Reset()
 	r := require.New(t)
 
 	d := NewDisk("", "")
