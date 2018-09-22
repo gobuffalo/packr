@@ -19,6 +19,16 @@ var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "A brief description of your application",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		for _, a := range args {
+			if a == "--legacy" {
+				globalOptions.Legacy = true
+				continue
+			}
+			if a == "-v" || a == "--verbose" {
+				globalOptions.Verbose = true
+				continue
+			}
+		}
 		if globalOptions.Verbose {
 			plog.Default.SetLevel(logrus.DebugLevel)
 		}

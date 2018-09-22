@@ -5,9 +5,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/packr/v2/jam/parser"
+	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/pkg/errors"
 )
 
@@ -42,7 +44,7 @@ func goCmd(name string, args ...string) error {
 				if b.PackageDir == path {
 					pk := fmt.Sprintf("%s-packr.go", b.Package)
 					for _, x := range []string{pk, "a_" + pk} {
-						y := filepath.Join(path, x)
+						y := x
 						if _, err := os.Stat(y); err != nil {
 							continue
 						}
@@ -58,6 +60,7 @@ func goCmd(name string, args ...string) error {
 		}
 	}
 	cp := exec.Command(genny.GoBin(), cargs...)
+	plog.Default.Debug(strings.Join(cp.Args, " "))
 	cp.Stderr = os.Stderr
 	cp.Stdin = os.Stdin
 	cp.Stdout = os.Stdout
