@@ -43,6 +43,7 @@ func (b *Box) Walk(wf WalkFunc) error {
 	sort.Strings(keys)
 
 	for _, k := range keys {
+		k = resolver.OsPath(k)
 		if err := wf(k, m[k]); err != nil {
 			return errors.WithStack(err)
 		}
