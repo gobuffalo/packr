@@ -1,7 +1,9 @@
 package packr
 
 import (
+	"bytes"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gobuffalo/packr/v2/file"
@@ -66,7 +68,7 @@ func Test_Box_String_Miss(t *testing.T) {
 	box := NewBox(filepath.Join("_fixtures", "templates"))
 
 	s := box.String("foo.txt")
-	r.Equal("FOO!!!\n", s)
+	r.Equal("FOO!!!", strings.TrimSpace(s))
 
 	s = box.String("idontexist")
 	r.Equal("", s)
@@ -97,7 +99,7 @@ func Test_Box_MustString_Miss(t *testing.T) {
 
 	s, err := box.MustString("foo.txt")
 	r.NoError(err)
-	r.Equal("FOO!!!\n", s)
+	r.Equal("FOO!!!", strings.TrimSpace(s))
 
 	s, err = box.MustString("idontexist")
 	r.Error(err)
@@ -126,7 +128,7 @@ func Test_Box_Bytes_Miss(t *testing.T) {
 	box := NewBox(filepath.Join("_fixtures", "templates"))
 
 	s := box.Bytes("foo.txt")
-	r.Equal([]byte("FOO!!!\n"), s)
+	r.Equal([]byte("FOO!!!"), bytes.TrimSpace(s))
 
 	s = box.Bytes("idontexist")
 	r.Equal([]byte(""), s)

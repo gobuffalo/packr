@@ -12,7 +12,7 @@ func Test_Box_Walk(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox(filepath.Join("_fixtures", "list_test"))
-	r.NoError(box.AddString("d/d.txt", "D"))
+	r.NoError(box.AddString(filepath.Join("d", "d.txt"), "D"))
 
 	var act []string
 	r.NoError(box.Walk(func(path string, f file.File) error {
