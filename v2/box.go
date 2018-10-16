@@ -86,27 +86,41 @@ func (b *Box) AddBytes(path string, t []byte) error {
 	return nil
 }
 
-// String of the file asked for or an empty string.
+// String is deprecated. Use FindString instead
 func (b Box) String(name string) string {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.String", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
 	return string(b.Bytes(name))
 }
 
-// MustString returns either the string of the requested
-// file or an error if it can not be found.
+// MustString is deprecated. Use FindString instead
 func (b Box) MustString(name string) (string, error) {
-	bb, err := b.MustBytes(name)
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustString", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
+	return b.FindString(name)
+}
+
+// FindString returns either the string of the requested
+// file or an error if it can not be found.
+func (b Box) FindString(name string) (string, error) {
+	bb, err := b.Find(name)
 	return string(bb), err
 }
 
-// Bytes of the file asked for or an empty byte slice.
+// Bytes is deprecated. Use Find instead
 func (b Box) Bytes(name string) []byte {
-	bb, _ := b.MustBytes(name)
+	bb, _ := b.Find(name)
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.Bytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
 	return bb
 }
 
-// MustBytes returns either the byte slice of the requested
-// file or an error if it can not be found.
+// MustBytes is deprecated. Use Find instead.
 func (b Box) MustBytes(name string) ([]byte, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustBytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
+	return b.Find(name)
+}
+
+// Find returns either the byte slice of the requested
+// file or an error if it can not be found.
+func (b Box) Find(name string) ([]byte, error) {
 	f, err := b.Resolve(name)
 	if err != nil {
 		return []byte(""), err
@@ -116,7 +130,7 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 
 // Has returns true if the resource exists in the box
 func (b Box) Has(name string) bool {
-	_, err := b.MustBytes(name)
+	_, err := b.Find(name)
 	if err != nil {
 		return false
 	}

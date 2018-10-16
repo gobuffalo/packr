@@ -22,12 +22,12 @@ func Test_Box_AddString(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
-	s, err := box.MustString("foo.txt")
+	s, err := box.FindString("foo.txt")
 	r.Error(err)
 	r.Equal("", s)
 
 	r.NoError(box.AddString("foo.txt", "foo!!"))
-	s, err = box.MustString("foo.txt")
+	s, err = box.FindString("foo.txt")
 	r.NoError(err)
 	r.Equal("foo!!", s)
 }
@@ -36,12 +36,12 @@ func Test_Box_AddBytes(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("Test_Box_AddBytes")
-	s, err := box.MustString("foo.txt")
+	s, err := box.FindString("foo.txt")
 	r.Error(err)
 	r.Equal("", s)
 
 	r.NoError(box.AddBytes("foo.txt", []byte("foo!!")))
-	s, err = box.MustString("foo.txt")
+	s, err = box.FindString("foo.txt")
 	r.NoError(err)
 	r.Equal("foo!!", s)
 }
@@ -74,7 +74,7 @@ func Test_Box_String_Miss(t *testing.T) {
 	r.Equal("", s)
 }
 
-func Test_Box_MustString(t *testing.T) {
+func Test_Box_FindString(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
@@ -83,25 +83,25 @@ func Test_Box_MustString(t *testing.T) {
 	})
 	box.SetResolver("foo.txt", d)
 
-	s, err := box.MustString("foo.txt")
+	s, err := box.FindString("foo.txt")
 	r.NoError(err)
 	r.Equal("foo!", s)
 
-	s, err = box.MustString("idontexist")
+	s, err = box.FindString("idontexist")
 	r.Error(err)
 	r.Equal("", s)
 }
 
-func Test_Box_MustString_Miss(t *testing.T) {
+func Test_Box_FindString_Miss(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox(filepath.Join("_fixtures", "templates"))
 
-	s, err := box.MustString("foo.txt")
+	s, err := box.FindString("foo.txt")
 	r.NoError(err)
 	r.Equal("FOO!!!", strings.TrimSpace(s))
 
-	s, err = box.MustString("idontexist")
+	s, err = box.FindString("idontexist")
 	r.Error(err)
 	r.Equal("", s)
 }
@@ -134,7 +134,7 @@ func Test_Box_Bytes_Miss(t *testing.T) {
 	r.Equal([]byte(""), s)
 }
 
-func Test_Box_MustBytes(t *testing.T) {
+func Test_Box_Find(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./templates")
@@ -143,24 +143,24 @@ func Test_Box_MustBytes(t *testing.T) {
 	})
 	box.SetResolver("foo.txt", d)
 
-	s, err := box.MustBytes("foo.txt")
+	s, err := box.Find("foo.txt")
 	r.NoError(err)
 	r.Equal("foo!", string(s))
 
-	s, err = box.MustBytes("idontexist")
+	s, err = box.Find("idontexist")
 	r.Error(err)
 	r.Equal("", string(s))
 }
 
-func Test_Box_MustBytes_Miss(t *testing.T) {
+func Test_Box_Find_Miss(t *testing.T) {
 	r := require.New(t)
 
 	box := NewBox("./_fixtures/templates")
-	s, err := box.MustBytes("foo.txt")
+	s, err := box.Find("foo.txt")
 	r.NoError(err)
 	r.Equal("FOO!!!", strings.TrimSpace(string(s)))
 
-	s, err = box.MustBytes("idontexist")
+	s, err = box.Find("idontexist")
 	r.Error(err)
 	r.Equal("", string(s))
 }

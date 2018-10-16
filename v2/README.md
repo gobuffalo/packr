@@ -52,13 +52,13 @@ box := packr.New("My Box", "./templates")
 html := box.String("index.html")
 
 // Get the string representation of a file, or an error if it doesn't exist:
-html, err := box.MustString("index.html")
+html, err := box.FindString("index.html")
 
 // Get the []byte representation of a file:
 html := box.Bytes("index.html")
 
 // Get the []byte representation of a file, or an error if it doesn't exist:
-html, err := box.MustBytes("index.html")
+html, err := box.Find("index.html")
 ```
 
 ### What is a Box?

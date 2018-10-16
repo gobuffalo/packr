@@ -106,15 +106,15 @@ func Test_Disk_Packed_Test(t *testing.T) {
 
 	b := packr.NewBox("simpsons")
 
-	s, err := b.MustString("parents/homer.txt")
+	s, err := b.FindString("parents/homer.txt")
 	r.NoError(err)
 	r.Equal("HOMER Simpson", strings.TrimSpace(s))
 
-	s, err = b.MustString("parents/marge.txt")
+	s, err = b.FindString("parents/marge.txt")
 	r.NoError(err)
 	r.Equal("MARGE Simpson", strings.TrimSpace(s))
 
-	_, err = b.MustString("idontexist")
+	_, err = b.FindString("idontexist")
 	r.Error(err)
 }
 

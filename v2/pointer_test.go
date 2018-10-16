@@ -18,7 +18,7 @@ func Test_Pointer_Find(t *testing.T) {
 		ForwardPath: "foo.txt",
 	})
 
-	s, err := b2.MustString("bar.txt")
+	s, err := b2.FindString("bar.txt")
 	r.NoError(err)
 	r.Equal("FOO!", s)
 }
