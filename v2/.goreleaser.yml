@@ -9,7 +9,7 @@ builds:
     - windows
   env:
     - CGO_ENABLED=0
-  main: ./packr/main.go
+  main: ./packr2/main.go
   binary: packr2
 
 checksum:
