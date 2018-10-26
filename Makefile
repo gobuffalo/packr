@@ -32,7 +32,7 @@ test:
 	$(GO_BIN) test -tags ${TAGS} ./...
 	packr clean
 
-ci-test:
+ci-test: deps
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 	make tidy
 

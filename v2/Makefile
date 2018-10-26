@@ -29,7 +29,7 @@ test:
 	$(GO_BIN) test -tags ${TAGS} ./...
 	make tidy
 
-ci-test:
+ci-test: deps
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 	make tidy
 
