@@ -35,6 +35,7 @@ test:
 ci-test: deps
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 	make tidy
+	cd ./v2 && make ci-test
 
 lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal
