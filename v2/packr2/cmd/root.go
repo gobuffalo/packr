@@ -3,8 +3,9 @@ package cmd
 import (
 	"os"
 
+	"github.com/gobuffalo/genny"
+	"github.com/gobuffalo/logger"
 	"github.com/gobuffalo/packr/v2/plog"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +20,7 @@ var rootCmd = &cobra.Command{
 	Use:   "packr",
 	Short: "A brief description of your application",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		genny.DefaultLogLvl = logger.ErrorLevel
 		for _, a := range args {
 			if a == "--legacy" {
 				globalOptions.Legacy = true
@@ -30,10 +32,12 @@ var rootCmd = &cobra.Command{
 			}
 		}
 		if globalOptions.Verbose {
-			plog.Default.SetLevel(logrus.DebugLevel)
+			genny.DefaultLogLvl = logger.DebugLevel
+			plog.Default = logger.New(logger.DebugLevel)
 		}
 		if globalOptions.Silent {
-			plog.Default.SetLevel(logrus.ErrorLevel)
+			genny.DefaultLogLvl = logger.FatalLevel
+			plog.Default = logger.New(logger.FatalLevel)
 		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {

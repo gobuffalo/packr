@@ -13,12 +13,6 @@ import (
 
 var modsOn = (strings.TrimSpace(envy.Get("GO111MODULE", "off")) == "on")
 
-func init() {
-	if modsOn {
-		fmt.Println("experimental go modules support has been enabled [GO111MODULE=on]")
-	}
-}
-
 //YesToAll will be used by the command to skip the questions
 var YesToAll bool
 

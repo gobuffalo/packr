@@ -6,12 +6,18 @@ Packr is a simple solution for bundling static assets inside of Go binaries. Mos
 
 ## Intro Video
 
-To get an idea of the what and why of packr, please enjoy this short video: [https://vimeo.com/219863271](https://vimeo.com/219863271).
+To get an idea of the what and why of Packr, please enjoy this short video: [https://vimeo.com/219863271](https://vimeo.com/219863271).
 
-## Installation
+## Library Installation
 
 ```text
 $ go get -u github.com/gobuffalo/packr/v2/...
+```
+
+## Binary Installation
+
+```text
+$ go get -u github.com/gobuffalo/packr/v2/packr2
 ```
 
 ## New File Format FAQs
@@ -33,9 +39,9 @@ Yes it can, but that ability will eventually be phased out. Because of that we r
 The `--legacy` command is available on all commands that generate `-packr.go` files.
 
 ```bash
-$ packr --legacy
-$ packr install --legacy
-$ packr build --legacy
+$ packr2 --legacy
+$ packr2 install --legacy
+$ packr2 build --legacy
 ```
 
 ## Usage
@@ -48,14 +54,8 @@ The first step in using Packr is to create a new box. A box represents a folder 
 // set up a new box by giving it a name and an optional (relative) path to a folder on disk:
 box := packr.New("My Box", "./templates")
 
-// Get the string representation of a file:
-html := box.String("index.html")
-
 // Get the string representation of a file, or an error if it doesn't exist:
 html, err := box.FindString("index.html")
-
-// Get the []byte representation of a file:
-html := box.Bytes("index.html")
 
 // Get the []byte representation of a file, or an error if it doesn't exist:
 html, err := box.Find("index.html")
@@ -63,7 +63,7 @@ html, err := box.Find("index.html")
 
 ### What is a Box?
 
-A box represents a folder, and any sub-folders, on disk that you want to have access to in your binary. When compiling a binary using the `packr` CLI the contents of the folder will be converted into Go files that can be compiled inside of a "standard" go binary. Inside of the compiled binary the files will be read from memory. When working locally the files will be read directly off of disk. This is a seamless switch that doesn't require any special attention on your part.
+A box represents a folder, and any sub-folders, on disk that you want to have access to in your binary. When compiling a binary using the `packr2` CLI the contents of the folder will be converted into Go files that can be compiled inside of a "standard" go binary. Inside of the compiled binary the files will be read from memory. When working locally the files will be read directly off of disk. This is a seamless switch that doesn't require any special attention on your part.
 
 #### Example
 
@@ -138,26 +138,26 @@ func main() {
 
 ## Building a Binary (the easy way)
 
-When it comes time to build, or install, your Go binary, simply use `packr build` or `packr install` just as you would `go build` or `go install`. All flags for the `go` tool are supported and everything works the way you expect, the only difference is your static assets are now bundled in the generated binary. If you want more control over how this happens, looking at the following section on building binaries (the hard way).
+When it comes time to build, or install, your Go binary, simply use `packr2 build` or `packr2 install` just as you would `go build` or `go install`. All flags for the `go` tool are supported and everything works the way you expect, the only difference is your static assets are now bundled in the generated binary. If you want more control over how this happens, looking at the following section on building binaries (the hard way).
 
 ## Building a Binary (the hard way)
 
-Before you build your Go binary, run the `packr` command first. It will look for all the boxes in your code and then generate `.go` files that pack the static files into bytes that can be bundled into the Go binary.
+Before you build your Go binary, run the `packr2` command first. It will look for all the boxes in your code and then generate `.go` files that pack the static files into bytes that can be bundled into the Go binary.
 
 ```
-$ packr
+$ packr2
 ```
 
 Then run your `go build command` like normal.
 
-*NOTE*: It is not recommended to check-in these generated `-packr.go` files. They can be large, and can easily become out of date if not careful. It is recommended that you always run `packr clean` after running the `packr` tool.
+*NOTE*: It is not recommended to check-in these generated `-packr.go` files. They can be large, and can easily become out of date if not careful. It is recommended that you always run `packr2 clean` after running the `packr2` tool.
 
 #### Cleaning Up
 
-When you're done it is recommended that you run the `packr clean` command. This will remove all of the generated files that Packr created for you.
+When you're done it is recommended that you run the `packr2 clean` command. This will remove all of the generated files that Packr created for you.
 
 ```
-$ packr clean
+$ packr2 clean
 ```
 
 Why do you want to do this? Packr first looks to the information stored in these generated files, if the information isn't there it looks to disk. This makes it easy to work with in development.
@@ -166,4 +166,4 @@ Why do you want to do this? Packr first looks to the information stored in these
 
 ## Debugging
 
-The `packr` command passes all arguments down to the underlying `go` command, this includes the `-v` flag to print out `go build` information. Packr looks for the `-v` flag, and will turn on its own verbose logging. This is very useful for trying to understand what the `packr` command is doing when it is run.
+The `packr2` command passes all arguments down to the underlying `go` command, this includes the `-v` flag to print out `go build` information. Packr looks for the `-v` flag, and will turn on its own verbose logging. This is very useful for trying to understand what the `packr` command is doing when it is run.

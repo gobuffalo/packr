@@ -26,6 +26,13 @@ func (f *File) String() string {
 	return string(src)
 }
 
+func (s *File) Write(p []byte) (int, error) {
+	bb := &bytes.Buffer{}
+	i, err := bb.Write(p)
+	s.Reader = bb
+	return i, err
+}
+
 // NewFile takes the name of the file you want to
 // write to and a reader to reader from
 func NewFile(path string, r io.Reader) *File {

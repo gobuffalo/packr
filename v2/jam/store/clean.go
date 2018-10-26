@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,15 +36,17 @@ func Clean(root string) error {
 		if info == nil {
 			return nil
 		}
-		if info.IsDir() && base == "packrd" {
-			os.Remove(path)
-			return filepath.SkipDir
-		}
-
-		if strings.Contains(base, "-packr.go") {
-			err := os.Remove(path)
-			if err != nil {
-				return errors.WithStack(err)
+		for _, suf := range []string{"-packr.go", "packrd"} {
+			if strings.HasSuffix(base, suf) {
+				err := os.RemoveAll(path)
+				if err != nil {
+					fmt.Println(err)
+					return errors.WithStack(err)
+				}
+				if info.IsDir() {
+					return filepath.SkipDir
+				}
+				return nil
 			}
 		}
 		return nil

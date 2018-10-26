@@ -3,29 +3,46 @@ GO_BIN ?= go
 
 install: deps
 	echo "installing packr v1"
-	$(GO_BIN) install -v .
+	packr
+	$(GO_BIN) install -v ./packr
+
+tidy:
+ifeq ($(GO111MODULE),on)
+	$(GO_BIN) mod tidy
+else
+	echo skipping go mod tidy
+endif
 
 deps:
-	$(GO_BIN) get -tags ${TAGS} -t ./...
+	rm -rf packrd
+	rm -rf v2/packrd
+	$(GO_BIN) get github.com/gobuffalo/release
+	$(GO_BIN) get -tags ${TAGS} -t $(go list ./... | grep -v /v2/)
+	$(GO_BIN) install -v ./packr
+	packr clean
+	make tidy
 
 build: deps
+	packr
 	$(GO_BIN) build -v .
+	make tidy
 
 test:
 	packr clean
 	$(GO_BIN) test -tags ${TAGS} ./...
 	packr clean
-	cd ./v2 && make test
-	packr clean
 
-ci-test: deps
+ci-test:
 	$(GO_BIN) test -tags ${TAGS} -race ./...
+	make tidy
+
+lint:
+	gometalinter --vendor ./... --deadline=1m --skip=internal
 
 update:
-	$(GO_BIN) get -u
-	$(GO_BIN) mod tidy
+	$(GO_BIN) get -u -tags ${TAGS}
+	make tidy
+	packr
 	make test
 	make install
-
-release:
-	cd ./v2 && make release
+	make tidy

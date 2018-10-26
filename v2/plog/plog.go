@@ -2,19 +2,12 @@ package plog
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/gobuffalo/logger"
 	"github.com/sirupsen/logrus"
 )
 
-var Default = func() *logrus.Logger {
-	l := logrus.New()
-	l.SetOutput(os.Stdout)
-	// l.SetLevel(logrus.DebugLevel)
-	l.SetLevel(logrus.InfoLevel)
-	// l.Formatter = &logrus.JSONFormatter{}
-	return l
-}()
+var Default = logger.New(logger.ErrorLevel)
 
 func Debug(t interface{}, m string, args ...interface{}) {
 	if len(args)%2 == 1 {
