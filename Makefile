@@ -17,7 +17,7 @@ deps:
 	rm -rf packrd
 	rm -rf v2/packrd
 	$(GO_BIN) get github.com/gobuffalo/release
-	$(GO_BIN) get -tags ${TAGS} -t $(go list ./... | grep -v /v2/)
+	$(GO_BIN) get -tags ${TAGS} -t ./...
 	$(GO_BIN) install -v ./packr
 	packr clean
 	make tidy

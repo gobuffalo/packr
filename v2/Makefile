@@ -37,7 +37,7 @@ lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal
 
 update:
-	$(GO_BIN) get -u -tags ${TAGS}
+	$(GO_BIN) get -u -tags ${TAGS} ./...
 	make tidy
 	make install
 	make test
