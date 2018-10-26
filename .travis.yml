@@ -8,6 +8,10 @@ go:
   - "1.11"
   - tip
 
+env:
+  global:
+    - GO111MODULE=on
+
 matrix:
   allow_failures:
     - go: 'tip'
