@@ -1,3 +1,3 @@
 package packr
 
-const Version = "v2.0.0-beta.4"
+const Version = "v2.0.0-beta.5"
