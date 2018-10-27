@@ -9,6 +9,8 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/logger](https://godoc.org/github.com/gobuffalo/logger)
 
+* [github.com/gobuffalo/packd](https://godoc.org/github.com/gobuffalo/packd)
+
 * [github.com/gobuffalo/packr/v2](https://godoc.org/github.com/gobuffalo/packr/v2)
 
 * [github.com/gobuffalo/packr/v2/file](https://godoc.org/github.com/gobuffalo/packr/v2/file)
