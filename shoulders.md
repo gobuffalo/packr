@@ -5,9 +5,13 @@ github.com/gobuffalo/packr does not try to reinvent the wheel! Instead, it uses 
 Thank you to the following **GIANTS**:
 
 
+* [github.com/gobuffalo/envy](https://godoc.org/github.com/gobuffalo/envy)
+
 * [github.com/gobuffalo/packd](https://godoc.org/github.com/gobuffalo/packd)
 
 * [github.com/gobuffalo/packr](https://godoc.org/github.com/gobuffalo/packr)
+
+* [github.com/joho/godotenv](https://godoc.org/github.com/joho/godotenv)
 
 * [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
 
