@@ -28,9 +28,9 @@ var _ packd.Finder = Box{}
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
 // binary.
-func NewBox(path string) Box {
+func NewBox(path string) *Box {
 	oncer.Deprecate(0, "packr.NewBox", "Use packr.New instead.")
-	return *New(path, path)
+	return New(path, path)
 }
 
 func New(name string, path string) *Box {
