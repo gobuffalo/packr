@@ -33,7 +33,6 @@ var _ packd.LegacyBox = Box{}
 // retrieve files from either disk or the embedded
 // binary.
 func NewBox(path string) Box {
-	oncer.Deprecate(0, "github.com/gobuffalo/packr", "Use github.com/gobuffalo/packr/v2 instead.")
 	var cd string
 	if !filepath.IsAbs(path) {
 		_, filename, _, _ := runtime.Caller(1)
