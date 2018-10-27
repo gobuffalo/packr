@@ -2,10 +2,10 @@ module github.com/gobuffalo/packr/v2
 
 require (
 	github.com/gobuffalo/envy v1.6.7
-	github.com/gobuffalo/genny v0.0.0-20181027163443-06cc44be7f24
-	github.com/gobuffalo/logger v0.0.0-20181027144941-73d08d2bb969
-	github.com/gobuffalo/packd v0.0.0-20181027190505-aafc0d02c411
-	github.com/gobuffalo/packr v1.15.0 // indirect
+	github.com/gobuffalo/genny v0.0.0-20181027195209-3887b7171c4f
+	github.com/gobuffalo/logger v0.0.0-20181027193913-9cf4dd0efe46
+	github.com/gobuffalo/packd v0.0.0-20181027194105-7ae579e6d213
+	github.com/gobuffalo/packr v1.15.1 // indirect
 	github.com/karrick/godirwalk v1.7.5
 	github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4
 	github.com/pkg/errors v0.8.0
