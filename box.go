@@ -27,6 +27,7 @@ var _ packd.Lister = Box{}
 var _ packd.Addable = Box{}
 var _ packd.Walkable = Box{}
 var _ packd.Finder = Box{}
+var _ packd.LegacyBox = Box{}
 
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
