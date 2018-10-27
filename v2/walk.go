@@ -4,12 +4,13 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/pkg/errors"
 )
 
-type WalkFunc func(string, file.File) error
+type WalkFunc = packd.WalkFunc
 
 // Walk will traverse the box and call the WalkFunc for each file in the box/folder.
 func (b *Box) Walk(wf WalkFunc) error {

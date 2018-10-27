@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/gobuffalo/packd"
 	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 )
@@ -19,6 +20,13 @@ var (
 	// ErrResOutsideBox gets returned in case of the requested resources being outside the box
 	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
 )
+
+var _ packd.Box = Box{}
+var _ packd.HTTPBox = Box{}
+var _ packd.Lister = Box{}
+var _ packd.Addable = Box{}
+var _ packd.Walkable = Box{}
+var _ packd.Finder = Box{}
 
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
@@ -55,13 +63,15 @@ type Box struct {
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
-func (b Box) AddString(path string, t string) {
+func (b Box) AddString(path string, t string) error {
 	b.AddBytes(path, []byte(t))
+	return nil
 }
 
 // AddBytes sets t in b.data by the given path
-func (b Box) AddBytes(path string, t []byte) {
+func (b Box) AddBytes(path string, t []byte) error {
 	b.data[path] = t
+	return nil
 }
 
 // String is deprecated. Use Find instead

@@ -12,6 +12,8 @@ github.com/gobuffalo/github_flavored_markdown v1.0.5 h1:YvGVf7yj1akgsb+qc64Q0WX8
 github.com/gobuffalo/github_flavored_markdown v1.0.5/go.mod h1:U0643QShPF+OF2tJvYNiYDLDGDuQmJZXsf/bHOJPsMY=
 github.com/gobuffalo/logger v0.0.0-20181022175615-46cfb361fc27 h1:e+2mR5G4maCC4C/ZF2UuYe7mBxyimbDjUuVmhxesr8s=
 github.com/gobuffalo/logger v0.0.0-20181022175615-46cfb361fc27/go.mod h1:8sQkgyhWipz1mIctHF4jTxmJh1Vxhp7mP8IqbljgJZo=
+github.com/gobuffalo/packd v0.0.0-20181027124242-a2ae7c47ccf0 h1:hftpDVIew4IGuc/3I8RTuZuFHS/Ka2+C3/bkp9It/DM=
+github.com/gobuffalo/packd v0.0.0-20181027124242-a2ae7c47ccf0/go.mod h1:LpEu7OkoplvlhztyAEePkS6JwcGgANdgGL5pB4Knxaw=
 github.com/gobuffalo/packr v1.13.7 h1:2uZgLd6b/W4yRBZV/ScaORxZLNGMHO0VCvqQNkKukNA=
 github.com/gobuffalo/packr v1.13.7/go.mod h1:KkinLIn/n6+3tVXMwg6KkNvWwVsrRAz4ph+jgpk3Z24=
 github.com/gobuffalo/plush v3.7.21+incompatible h1:P22trrg5gJPWD80exgn6JuFdI/FTComjYIfBJDxxaA8=

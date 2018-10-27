@@ -4,6 +4,7 @@ require (
 	github.com/gobuffalo/envy v1.6.5
 	github.com/gobuffalo/genny v0.0.0-20181026155221-2169236ba2b4
 	github.com/gobuffalo/logger v0.0.0-20181022175615-46cfb361fc27
+	github.com/gobuffalo/packd v0.0.0-20181027124242-a2ae7c47ccf0
 	github.com/karrick/godirwalk v1.7.5
 	github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4
 	github.com/pkg/errors v0.8.0

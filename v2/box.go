@@ -11,12 +11,19 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 )
+
+var _ packd.Box = &Box{}
+var _ packd.HTTPBox = Box{}
+var _ packd.Addable = &Box{}
+var _ packd.Walkable = &Box{}
+var _ packd.Finder = Box{}
 
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
