@@ -64,27 +64,42 @@ func (b Box) AddBytes(path string, t []byte) {
 	b.data[path] = t
 }
 
-// String of the file asked for or an empty string.
+// String is deprecated. Use Find instead
 func (b Box) String(name string) string {
-	return string(b.Bytes(name))
-}
-
-// MustString returns either the string of the requested
-// file or an error if it can not be found.
-func (b Box) MustString(name string) (string, error) {
-	bb, err := b.MustBytes(name)
-	return string(bb), err
-}
-
-// Bytes of the file asked for or an empty byte slice.
-func (b Box) Bytes(name string) []byte {
-	bb, _ := b.MustBytes(name)
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.String", "Use github.com/gobuffalo/packr#Box.FindString instead.")
+	bb, _ := b.FindString(name)
 	return bb
 }
 
-// MustBytes returns either the byte slice of the requested
-// file or an error if it can not be found.
+// MustString is deprecated. Use FindString instead
+func (b Box) MustString(name string) (string, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.MustString", "Use github.com/gobuffalo/packr#Box.FindString instead.")
+	return b.FindString(name)
+}
+
+// Bytes is deprecated. Use Find instead
+func (b Box) Bytes(name string) []byte {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.Bytes", "Use github.com/gobuffalo/packr#Box.Find instead.")
+	bb, _ := b.Find(name)
+	return bb
+}
+
+// Bytes is deprecated. Use Find instead
 func (b Box) MustBytes(name string) ([]byte, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.MustBytes", "Use github.com/gobuffalo/packr#Box.Find instead.")
+	return b.Find(name)
+}
+
+// FindString returns either the string of the requested
+// file or an error if it can not be found.
+func (b Box) FindString(name string) (string, error) {
+	bb, err := b.Find(name)
+	return string(bb), err
+}
+
+// Find returns either the byte slice of the requested
+// file or an error if it can not be found.
+func (b Box) Find(name string) ([]byte, error) {
 	f, err := b.find(name)
 	if err == nil {
 		bb := &bytes.Buffer{}
