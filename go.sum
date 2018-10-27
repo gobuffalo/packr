@@ -2,8 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gobuffalo/envy v1.6.7 h1:XMZGuFqTupAXhZTriQ+qO38QvNOSU/0rl3hEPCFci/4=
 github.com/gobuffalo/envy v1.6.7/go.mod h1:N+GkhhZ/93bGZc6ZKhJLP6+m+tCNPKwgSpH9kaifseQ=
-github.com/gobuffalo/packd v0.0.0-20181027190505-aafc0d02c411 h1:WQcoUsj99eguxjQg7LsWVXurBrHLKXiS0cHhmKlb5Do=
-github.com/gobuffalo/packd v0.0.0-20181027190505-aafc0d02c411/go.mod h1:SmdBdhj6uhOsg1Ui4SFAyrhuc7U4VCildosO5IDJ3lc=
+github.com/gobuffalo/packd v0.0.0-20181027194105-7ae579e6d213 h1:aEF3yscKSe+wesROAo0CR05oKCXbATA88gmhM+Dibro=
+github.com/gobuffalo/packd v0.0.0-20181027194105-7ae579e6d213/go.mod h1:SmdBdhj6uhOsg1Ui4SFAyrhuc7U4VCildosO5IDJ3lc=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
