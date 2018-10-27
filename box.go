@@ -142,7 +142,7 @@ func (b Box) decompress(bb []byte) []byte {
 
 func (b Box) find(name string) (File, error) {
 	if bb, ok := b.data[name]; ok {
-		return newVirtualFile(name, bb), nil
+		return packd.NewFile(name, bytes.NewReader(bb))
 	}
 	if b.directories == nil {
 		b.indexDirectories()
@@ -160,10 +160,10 @@ func (b Box) find(name string) (File, error) {
 	if _, ok := data[b.Path]; ok {
 		if bb, ok := data[b.Path][cleanName]; ok {
 			bb = b.decompress(bb)
-			return newVirtualFile(cleanName, bb), nil
+			return packd.NewFile(cleanName, bytes.NewReader(bb))
 		}
 		if _, ok := b.directories[cleanName]; ok {
-			return newVirtualDir(cleanName), nil
+			return packd.NewDir(cleanName)
 		}
 		if filepath.Ext(cleanName) != "" {
 			// The Handler created by http.FileSystem checks for those errors and
@@ -222,10 +222,10 @@ func fileFor(p string, name string) (File, error) {
 		return nil, err
 	}
 	if fi.IsDir() {
-		return newVirtualDir(p), nil
+		return packd.NewDir(p)
 	}
 	if bb, err := ioutil.ReadFile(p); err == nil {
-		return newVirtualFile(name, bb), nil
+		return packd.NewFile(name, bytes.NewReader(bb))
 	}
 	return nil, os.ErrNotExist
 }
