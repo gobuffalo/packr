@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/gobuffalo/packd"
+	"github.com/markbates/oncer"
 	"github.com/pkg/errors"
 )
 
@@ -19,10 +21,19 @@ var (
 	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
 )
 
+var _ packd.Box = Box{}
+var _ packd.HTTPBox = Box{}
+var _ packd.Lister = Box{}
+var _ packd.Addable = Box{}
+var _ packd.Walkable = Box{}
+var _ packd.Finder = Box{}
+var _ packd.LegacyBox = Box{}
+
 // NewBox returns a Box that can be used to
 // retrieve files from either disk or the embedded
 // binary.
 func NewBox(path string) Box {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr", "Use github.com/gobuffalo/packr/v2 instead.")
 	var cd string
 	if !filepath.IsAbs(path) {
 		_, filename, _, _ := runtime.Caller(1)
@@ -53,36 +64,53 @@ type Box struct {
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
-func (b Box) AddString(path string, t string) {
+func (b Box) AddString(path string, t string) error {
 	b.AddBytes(path, []byte(t))
+	return nil
 }
 
 // AddBytes sets t in b.data by the given path
-func (b Box) AddBytes(path string, t []byte) {
+func (b Box) AddBytes(path string, t []byte) error {
 	b.data[path] = t
+	return nil
 }
 
-// String of the file asked for or an empty string.
+// String is deprecated. Use Find instead
 func (b Box) String(name string) string {
-	return string(b.Bytes(name))
-}
-
-// MustString returns either the string of the requested
-// file or an error if it can not be found.
-func (b Box) MustString(name string) (string, error) {
-	bb, err := b.MustBytes(name)
-	return string(bb), err
-}
-
-// Bytes of the file asked for or an empty byte slice.
-func (b Box) Bytes(name string) []byte {
-	bb, _ := b.MustBytes(name)
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.String", "Use github.com/gobuffalo/packr#Box.FindString instead.")
+	bb, _ := b.FindString(name)
 	return bb
 }
 
-// MustBytes returns either the byte slice of the requested
-// file or an error if it can not be found.
+// MustString is deprecated. Use FindString instead
+func (b Box) MustString(name string) (string, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.MustString", "Use github.com/gobuffalo/packr#Box.FindString instead.")
+	return b.FindString(name)
+}
+
+// Bytes is deprecated. Use Find instead
+func (b Box) Bytes(name string) []byte {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.Bytes", "Use github.com/gobuffalo/packr#Box.Find instead.")
+	bb, _ := b.Find(name)
+	return bb
+}
+
+// Bytes is deprecated. Use Find instead
 func (b Box) MustBytes(name string) ([]byte, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr#Box.MustBytes", "Use github.com/gobuffalo/packr#Box.Find instead.")
+	return b.Find(name)
+}
+
+// FindString returns either the string of the requested
+// file or an error if it can not be found.
+func (b Box) FindString(name string) (string, error) {
+	bb, err := b.Find(name)
+	return string(bb), err
+}
+
+// Find returns either the byte slice of the requested
+// file or an error if it can not be found.
+func (b Box) Find(name string) ([]byte, error) {
 	f, err := b.find(name)
 	if err == nil {
 		bb := &bytes.Buffer{}
