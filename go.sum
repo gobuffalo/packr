@@ -1,7 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gobuffalo/packd v0.0.0-20181027124242-a2ae7c47ccf0 h1:hftpDVIew4IGuc/3I8RTuZuFHS/Ka2+C3/bkp9It/DM=
-github.com/gobuffalo/packd v0.0.0-20181027124242-a2ae7c47ccf0/go.mod h1:LpEu7OkoplvlhztyAEePkS6JwcGgANdgGL5pB4Knxaw=
+github.com/gobuffalo/packd v0.0.0-20181027124811-abbea089df6f h1:xj+OMgxXnIWrjS0LpfLZFgMeY+uq+SwdrvJNvFRQpEc=
+github.com/gobuffalo/packd v0.0.0-20181027124811-abbea089df6f/go.mod h1:LpEu7OkoplvlhztyAEePkS6JwcGgANdgGL5pB4Knxaw=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4 h1:Mlji5gkcpzkqTROyE4ZxZ8hN7osunMb2RuGVrbvMvCc=
