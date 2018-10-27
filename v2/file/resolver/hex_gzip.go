@@ -61,7 +61,10 @@ func (hg *HexGzip) Find(box string, name string) (file.File, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	f := file.NewFile(OsPath(name), []byte(unpacked))
+	f, err := file.NewFile(OsPath(name), []byte(unpacked))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	hg.moot.Lock()
 	hg.unpacked[name] = f
 	hg.moot.Unlock()

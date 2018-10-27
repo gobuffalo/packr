@@ -22,7 +22,11 @@ var (
 func PackBytes(box string, name string, bb []byte) {
 	b := NewBox(box)
 	d := resolver.NewInMemory(map[string]file.File{})
-	if err := d.Pack(name, file.NewFile(name, bb)); err != nil {
+	f, err := file.NewFile(name, bb)
+	if err != nil {
+		panic(err)
+	}
+	if err := d.Pack(name, f); err != nil {
 		panic(err)
 	}
 	b.SetResolver(name, d)

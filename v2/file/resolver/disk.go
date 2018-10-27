@@ -30,10 +30,10 @@ func (d *Disk) Find(box string, name string) (file.File, error) {
 		return nil, err
 	}
 	if fi.IsDir() {
-		return file.NewDir(OsPath(name)), nil
+		return file.NewDir(OsPath(name))
 	}
 	if bb, err := ioutil.ReadFile(path); err == nil {
-		return file.NewFile(OsPath(name), bb), nil
+		return file.NewFile(OsPath(name), bb)
 	}
 	return nil, os.ErrNotExist
 }
@@ -60,7 +60,10 @@ func (d *Disk) FileMap() map[string]file.File {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		m[name] = file.NewFile(name, b)
+		m[name], err = file.NewFile(name, b)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 		moot.Unlock()
 		return nil
 	}

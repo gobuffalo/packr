@@ -26,5 +26,5 @@ func (p Pointer) Find(box string, path string) (file.File, error) {
 	if err != nil {
 		return f, errors.WithStack(err)
 	}
-	return file.NewFile(path, x), nil
+	return file.NewFile(path, x)
 }

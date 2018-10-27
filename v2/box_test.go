@@ -51,7 +51,7 @@ func Test_Box_String(t *testing.T) {
 
 	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box.SetResolver("foo.txt", d)
 
@@ -79,7 +79,7 @@ func Test_Box_FindString(t *testing.T) {
 
 	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box.SetResolver("foo.txt", d)
 
@@ -111,7 +111,7 @@ func Test_Box_Bytes(t *testing.T) {
 
 	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box.SetResolver("foo.txt", d)
 
@@ -139,7 +139,7 @@ func Test_Box_Find(t *testing.T) {
 
 	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box.SetResolver("foo.txt", d)
 
@@ -170,7 +170,7 @@ func Test_Box_Has(t *testing.T) {
 
 	box := NewBox("./templates")
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box.SetResolver("foo.txt", d)
 
@@ -182,7 +182,7 @@ func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": file.NewFile("foo.txt", []byte("foo!")),
+		"foo.txt": qfile("foo.txt", "foo!"),
 	})
 	box := NewBox("./templates")
 

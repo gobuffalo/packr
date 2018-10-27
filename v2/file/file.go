@@ -17,23 +17,11 @@ type FileMappable interface {
 }
 
 // NewFile returns a virtual File implementation
-func NewFile(name string, b []byte) File {
-	return virtualFile{
-		Reader: bytes.NewReader(b),
-		name:   name,
-		info: info{
-			Path:     name,
-			Contents: b,
-			size:     int64(len(b)),
-			modTime:  virtualFileModTime,
-		},
-	}
+func NewFile(name string, b []byte) (File, error) {
+	return packd.NewFile(name, bytes.NewReader(b))
 }
 
 // NewDir returns a virtual dir implementation
-func NewDir(name string) File {
-	var b []byte
-	v := NewFile(name, b).(virtualFile)
-	v.info.isDir = true
-	return v
+func NewDir(name string) (File, error) {
+	return packd.NewDir(name)
 }

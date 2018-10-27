@@ -87,7 +87,11 @@ func (b *Box) AddString(path string, t string) error {
 // AddBytes sets t in b.data by the given path
 func (b *Box) AddBytes(path string, t []byte) error {
 	m := map[string]file.File{}
-	m[resolver.Key(path)] = file.NewFile(path, t)
+	f, err := file.NewFile(path, t)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	m[resolver.Key(path)] = f
 	res := resolver.NewInMemory(m)
 	b.SetResolver(path, res)
 	return nil
@@ -193,7 +197,10 @@ func (b *Box) Resolve(key string) (file.File, error) {
 		if err != nil {
 			return f, errors.WithStack(err)
 		}
-		f = file.NewFile(key, b)
+		f, err = file.NewFile(key, b)
+		if err != nil {
+			return f, errors.WithStack(err)
+		}
 	}
 	return f, nil
 }
