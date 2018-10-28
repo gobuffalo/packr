@@ -2,7 +2,7 @@ module github.com/gobuffalo/packr
 
 require (
 	github.com/gobuffalo/envy v1.6.7
-	github.com/gobuffalo/packd v0.0.0-20181027194105-7ae579e6d213
+	github.com/gobuffalo/packd v0.0.0-20181028162033-6d52e0eabf41
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4
 	github.com/pkg/errors v0.8.0
