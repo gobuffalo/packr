@@ -15,7 +15,7 @@ type Pointer struct {
 
 var _ resolver.Resolver = Pointer{}
 
-func (p Pointer) Find(box string, path string) (file.File, error) {
+func (p Pointer) Resolve(box string, path string) (file.File, error) {
 	b := findBox(p.ForwardBox)
 	f, err := b.Resolve(p.ForwardPath)
 	if err != nil {

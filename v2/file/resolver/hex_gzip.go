@@ -35,14 +35,14 @@ func (hg *HexGzip) FileMap() map[string]file.File {
 	hg.moot.RUnlock()
 	m := map[string]file.File{}
 	for _, n := range names {
-		if f, err := hg.Find("", n); err == nil {
+		if f, err := hg.Resolve("", n); err == nil {
 			m[n] = f
 		}
 	}
 	return m
 }
 
-func (hg *HexGzip) Find(box string, name string) (file.File, error) {
+func (hg *HexGzip) Resolve(box string, name string) (file.File, error) {
 	plog.Debug(hg, "Find", "box", box, "name", name)
 
 	hg.moot.RLock()

@@ -186,10 +186,10 @@ func (b *Box) Resolve(key string) (file.File, error) {
 	}
 	plog.Debug(b, "Resolve", "key", key)
 
-	f, err := r.Find(b.Name, key)
+	f, err := r.Resolve(b.Name, key)
 	if err != nil {
 		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
-		f, err = r.Find(b.Name, z)
+		f, err = r.Resolve(b.Name, z)
 		if err != nil {
 			return f, errors.WithStack(err)
 		}

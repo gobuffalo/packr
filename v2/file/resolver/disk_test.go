@@ -15,7 +15,7 @@ func Test_Disk_Find(t *testing.T) {
 		Root: "_fixtures\\templates",
 	}
 
-	f, err := d.Find("", "foo.txt")
+	f, err := d.Resolve("", "foo.txt")
 	r.NoError(err)
 
 	fi, err := f.FileInfo()

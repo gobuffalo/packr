@@ -29,7 +29,7 @@ func (b *Box) Walk(wf WalkFunc) error {
 
 	b.moot.RLock()
 	for n, r := range b.resolvers {
-		f, err := r.Find("", n)
+		f, err := r.Resolve("", n)
 		if err != nil {
 			return errors.WithStack(err)
 		}
