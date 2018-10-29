@@ -11,6 +11,8 @@ require (
 	github.com/sirupsen/logrus v1.1.1
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.2.2
+	golang.org/x/crypto v0.0.0-20181029175232-7e6ffbd03851 // indirect
 	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
-	golang.org/x/tools v0.0.0-20181026183834-f60e5f99f081
+	golang.org/x/sys v0.0.0-20181029174526-d69651ed3497 // indirect
+	golang.org/x/tools v0.0.0-20181029181417-2d2de6298155
 )
