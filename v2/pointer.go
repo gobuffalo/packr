@@ -1,10 +1,9 @@
 package packr
 
 import (
-	"io/ioutil"
-
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
+	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/pkg/errors"
 )
 
@@ -16,15 +15,15 @@ type Pointer struct {
 var _ resolver.Resolver = Pointer{}
 
 func (p Pointer) Resolve(box string, path string) (file.File, error) {
-	b := findBox(p.ForwardBox)
+	plog.Debug(p, "Resolve", "box", box, "path", path)
+	b, err := findBox(p.ForwardBox)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	f, err := b.Resolve(p.ForwardPath)
 	if err != nil {
 		return f, errors.WithStack(err)
 	}
-	f.Seek(0, 0)
-	x, err := ioutil.ReadAll(f)
-	if err != nil {
-		return f, errors.WithStack(err)
-	}
-	return file.NewFile(path, x)
+	plog.Debug(p, "Resolve", "box", box, "path", path, "file", f)
+	return f, nil
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
+	"github.com/markbates/oncer"
 )
 
 // File has been deprecated and file.File should be used instead
@@ -50,4 +51,29 @@ func PackJSONBytes(box string, name string, jbb string) error {
 	}
 	PackBytes(box, name, bb)
 	return nil
+}
+
+// Bytes is deprecated. Use Find instead
+func (b Box) Bytes(name string) []byte {
+	bb, _ := b.Find(name)
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.Bytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
+	return bb
+}
+
+// MustBytes is deprecated. Use Find instead.
+func (b Box) MustBytes(name string) ([]byte, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustBytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
+	return b.Find(name)
+}
+
+// String is deprecated. Use FindString instead
+func (b Box) String(name string) string {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.String", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
+	return string(b.Bytes(name))
+}
+
+// MustString is deprecated. Use FindString instead
+func (b Box) MustString(name string) (string, error) {
+	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustString", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
+	return b.FindString(name)
 }

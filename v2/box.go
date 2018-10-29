@@ -1,7 +1,9 @@
 package packr
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -34,12 +36,14 @@ func NewBox(path string) *Box {
 }
 
 func New(name string, path string) *Box {
-	b := findBox(name)
+	plog.Debug("packr", "New", "name", name, "path", path)
+	b, _ := findBox(name)
 	if b != nil {
 		return b
 	}
-	var cd string
-	if !filepath.IsAbs(path) {
+	cd, _ := filepath.Abs(path)
+
+	if !filepath.IsAbs(cd) {
 		_, filename, _, _ := runtime.Caller(2)
 		cd = filepath.Dir(filename)
 	}
@@ -50,7 +54,7 @@ func New(name string, path string) *Box {
 	if !filepath.IsAbs(cd) && cd != "" {
 		cd = filepath.Join(envy.GoPath(), "src", cd)
 	}
-	cd = filepath.Join(cd, path)
+
 	b = &Box{
 		Path:          path,
 		Name:          name,
@@ -58,17 +62,18 @@ func New(name string, path string) *Box {
 		resolvers:     map[string]resolver.Resolver{},
 		moot:          &sync.RWMutex{},
 	}
+	plog.Debug(b, "New", "Box", b, "ResolutionDir", cd)
 	return placeBox(b)
 }
 
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path            string
-	Name            string
-	ResolutionDir   string
+	Path            string            `json:"path"`
+	Name            string            `json:"name"`
+	ResolutionDir   string            `json:"resolution_dir"`
+	DefaultResolver resolver.Resolver `json:"default_resolver"`
 	resolvers       map[string]resolver.Resolver
-	DefaultResolver resolver.Resolver
 	moot            *sync.RWMutex
 }
 
@@ -97,36 +102,11 @@ func (b *Box) AddBytes(path string, t []byte) error {
 	return nil
 }
 
-// String is deprecated. Use FindString instead
-func (b Box) String(name string) string {
-	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.String", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
-	return string(b.Bytes(name))
-}
-
-// MustString is deprecated. Use FindString instead
-func (b Box) MustString(name string) (string, error) {
-	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustString", "Use github.com/gobuffalo/packr/v2#Box.FindString instead.")
-	return b.FindString(name)
-}
-
 // FindString returns either the string of the requested
 // file or an error if it can not be found.
 func (b Box) FindString(name string) (string, error) {
 	bb, err := b.Find(name)
 	return string(bb), err
-}
-
-// Bytes is deprecated. Use Find instead
-func (b Box) Bytes(name string) []byte {
-	bb, _ := b.Find(name)
-	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.Bytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
-	return bb
-}
-
-// MustBytes is deprecated. Use Find instead.
-func (b Box) MustBytes(name string) ([]byte, error) {
-	oncer.Deprecate(0, "github.com/gobuffalo/packr/v2#Box.MustBytes", "Use github.com/gobuffalo/packr/v2#Box.Find instead.")
-	return b.Find(name)
 }
 
 // Find returns either the byte slice of the requested
@@ -136,7 +116,9 @@ func (b Box) Find(name string) ([]byte, error) {
 	if err != nil {
 		return []byte(""), err
 	}
-	return ioutil.ReadAll(f)
+	bb := &bytes.Buffer{}
+	io.Copy(bb, f)
+	return bb.Bytes(), nil
 }
 
 // Has returns true if the resource exists in the box
@@ -150,10 +132,19 @@ func (b Box) Has(name string) bool {
 
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
+	plog.Debug(b, "Open", "name", name)
 	if len(filepath.Ext(name)) == 0 {
-		return file.NewDir(name)
+		d, err := file.NewDir(name)
+		plog.Debug(b, "Open", "name", name, "dir", d)
+		return d, err
 	}
-	return b.Resolve(name)
+	f, err := b.Resolve(name)
+	if err != nil {
+		return f, err
+	}
+	f, err = file.NewFileR(name, f)
+	plog.Debug(b, "Open", "name", f.Name(), "file", f)
+	return f, err
 }
 
 // List shows "What's in the box?"
@@ -188,13 +179,14 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			}
 		}
 	}
-	plog.Debug(b, "Resolve", "key", key)
+	plog.Debug(b, "Resolve", "name", b.Name, "key", key)
 
 	f, err := r.Resolve(b.Name, key)
 	if err != nil {
 		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
 		f, err = r.Resolve(b.Name, z)
 		if err != nil {
+			plog.Debug(b, "Resolve", "name", b.Name, "key", z, "file", f)
 			return f, err
 		}
 		b, err := ioutil.ReadAll(f)
@@ -206,5 +198,6 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			return f, errors.WithStack(err)
 		}
 	}
+	plog.Debug(b, "Resolve", "name", b.Name, "key", key, "file", f)
 	return f, nil
 }

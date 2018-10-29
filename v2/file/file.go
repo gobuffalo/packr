@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/gobuffalo/packd"
 )
@@ -24,4 +25,8 @@ func NewFile(name string, b []byte) (File, error) {
 // NewDir returns a virtual dir implementation
 func NewDir(name string) (File, error) {
 	return packd.NewDir(name)
+}
+
+func NewFileR(name string, r io.Reader) (File, error) {
+	return packd.NewFile(name, r)
 }

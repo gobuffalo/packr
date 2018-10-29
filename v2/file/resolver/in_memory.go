@@ -15,8 +15,12 @@ type InMemory struct {
 	*packd.MemoryBox
 }
 
+func (d InMemory) String() string {
+	return String(&d)
+}
+
 func (d *InMemory) Resolve(box string, name string) (file.File, error) {
-	plog.Debug(d, "Find", "box", box, "name", name)
+	plog.Debug(d, "Resolve", "box", box, "name", name)
 	b, err := d.MemoryBox.Find(name)
 	if err != nil {
 		return nil, err

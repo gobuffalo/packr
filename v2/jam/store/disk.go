@@ -215,7 +215,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 				})
 			}
 			opts := map[string]interface{}{
-				"Box":   ob,
+				"Box":   box,
 				"Files": files,
 			}
 			t := gotools.TemplateTransformer(opts, nil)

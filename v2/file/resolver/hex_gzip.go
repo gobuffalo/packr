@@ -20,8 +20,12 @@ var _ Resolver = &HexGzip{}
 
 type HexGzip struct {
 	packed   map[string]string
-	unpacked map[string]file.File
+	unpacked map[string]string
 	moot     *sync.RWMutex
+}
+
+func (hg HexGzip) String() string {
+	return String(&hg)
 }
 
 var _ file.FileMappable = &HexGzip{}
@@ -43,14 +47,14 @@ func (hg *HexGzip) FileMap() map[string]file.File {
 }
 
 func (hg *HexGzip) Resolve(box string, name string) (file.File, error) {
-	plog.Debug(hg, "Find", "box", box, "name", name)
+	plog.Debug(hg, "Resolve", "box", box, "name", name)
 
-	hg.moot.RLock()
-	if f, ok := hg.unpacked[name]; ok {
-		hg.moot.RUnlock()
-		return f, nil
+	hg.moot.Lock()
+	defer hg.moot.Unlock()
+
+	if s, ok := hg.unpacked[name]; ok {
+		return file.NewFile(name, []byte(s))
 	}
-	hg.moot.RUnlock()
 	packed, ok := hg.packed[name]
 	if !ok {
 		return nil, os.ErrNotExist
@@ -65,9 +69,7 @@ func (hg *HexGzip) Resolve(box string, name string) (file.File, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	hg.moot.Lock()
-	hg.unpacked[name] = f
-	hg.moot.Unlock()
+	hg.unpacked[name] = f.String()
 	return f, nil
 }
 
@@ -77,7 +79,7 @@ func NewHexGzip(files map[string]string) (*HexGzip, error) {
 	}
 	hg := &HexGzip{
 		packed:   files,
-		unpacked: map[string]file.File{},
+		unpacked: map[string]string{},
 		moot:     &sync.RWMutex{},
 	}
 
