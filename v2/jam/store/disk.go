@@ -227,8 +227,20 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		},
 	})
 	g.Transformer(t)
+
 	fp := filepath.Join(d.DBPath, "packed-packr.go.tmpl")
-	g.File(genny.NewFile(fp, strings.NewReader(diskGlobalTmpl)))
+	global := genny.NewFile(fp, strings.NewReader(diskGlobalTmpl))
+	global, err := t.Transform(global)
+	if err != nil {
+		return g, errors.WithStack(err)
+	}
+
+	ft := gotools.FmtTransformer()
+	global, err = ft.Transform(global)
+	if err != nil {
+		return g, errors.WithStack(err)
+	}
+	g.File(global)
 
 	ip := strings.ToLower(filepath.Dir(d.DBPath))
 	for _, x := range build.Default.SrcDirs() {

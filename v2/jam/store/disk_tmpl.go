@@ -44,7 +44,7 @@ const diskGlobalBoxTmpl = `
 	func() {
 		b := packr.New("{{.Box.Name}}", "{{.Box.Path}}")
 		{{ range $file := .Files -}}
-			b.SetResolver("{{$file.Resolver}}", packr.Pointer{ForwardBox: gk, ForwardPath: "{{$file.ForwardPath}}"})
-	{{ end -}}
-}()
+		b.SetResolver("{{$file.Resolver}}", packr.Pointer{ForwardBox: gk, ForwardPath: "{{$file.ForwardPath}}"})
+		{{ end -}}
+	}()
 `
