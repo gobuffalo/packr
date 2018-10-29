@@ -150,6 +150,9 @@ func (b Box) Has(name string) bool {
 
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
+	if len(filepath.Ext(name)) == 0 {
+		return file.NewDir(name)
+	}
 	return b.Resolve(name)
 }
 
@@ -172,6 +175,7 @@ func (b Box) List() []string {
 }
 
 func (b *Box) Resolve(key string) (file.File, error) {
+	key = strings.TrimPrefix(key, "/")
 	b.moot.RLock()
 	r, ok := b.resolvers[resolver.Key(key)]
 	b.moot.RUnlock()
@@ -191,7 +195,7 @@ func (b *Box) Resolve(key string) (file.File, error) {
 		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
 		f, err = r.Resolve(b.Name, z)
 		if err != nil {
-			return f, errors.WithStack(err)
+			return f, err
 		}
 		b, err := ioutil.ReadAll(f)
 		if err != nil {

@@ -192,7 +192,7 @@ func Test_Box_Open(t *testing.T) {
 	r.NoError(err)
 	r.NotZero(f)
 
-	f, err = box.Open("idontexist")
+	f, err = box.Open("idontexist.txt")
 	r.Error(err)
 	r.Zero(f)
 }
