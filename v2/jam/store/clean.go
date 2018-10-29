@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,7 +39,6 @@ func Clean(root string) error {
 			if strings.HasSuffix(base, suf) {
 				err := os.RemoveAll(path)
 				if err != nil {
-					fmt.Println(err)
 					return errors.WithStack(err)
 				}
 				if info.IsDir() {

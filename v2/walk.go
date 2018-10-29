@@ -7,6 +7,7 @@ import (
 	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
+	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +45,9 @@ func (b *Box) Walk(wf WalkFunc) error {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		if err := wf(resolver.OsPath(k), m[k]); err != nil {
+		osPath := resolver.OsPath(k)
+		plog.Debug(b, "Walk", "path", k, "osPath", osPath)
+		if err := wf(osPath, m[k]); err != nil {
 			return errors.WithStack(err)
 		}
 	}

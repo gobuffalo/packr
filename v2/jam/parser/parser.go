@@ -20,7 +20,7 @@ type Parser struct {
 func (p *Parser) Run() ([]*Box, error) {
 	var boxes []*Box
 	for _, pros := range p.Prospects {
-		// fmt.Println("Parser: parsing", pros.Name())
+		plog.Debug(p, "Run", "parsing", pros.Name(), "prospect", pros)
 		v := NewVisitor(pros)
 		pbr, err := v.Run()
 		if err != nil {

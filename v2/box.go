@@ -157,7 +157,7 @@ func (b Box) List() []string {
 		}
 		finfo, _ := info.FileInfo()
 		if !finfo.IsDir() {
-			keys = append(keys, finfo.Name())
+			keys = append(keys, path)
 		}
 		return nil
 	})
