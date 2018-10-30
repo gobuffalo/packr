@@ -14,7 +14,7 @@ func IsProspect(path string, ignore ...string) bool {
 	fi, err := os.Stat(path)
 	if err == nil && fi.IsDir() {
 		un := filepath.Base(path)
-		for _, pre := range []string{".", "_"} {
+		for _, pre := range append([]string{".", "_"}, DefaultIgnoredFolders...) {
 			if strings.HasPrefix(un, pre) {
 				return false
 			}
