@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -35,34 +36,57 @@ func NewBox(path string) *Box {
 	return New(path, path)
 }
 
+func resolutionDir(og string) string {
+	ng, _ := filepath.Abs(og)
+
+	exists := func(s string) bool {
+		_, err := os.Stat(s)
+		if err != nil {
+			return false
+		}
+		plog.Debug("packr", "resolutionDir", "original", og, "resolved", s)
+		return true
+	}
+
+	if exists(ng) {
+		return ng
+	}
+
+	_, filename, _, _ := runtime.Caller(2)
+
+	ng = filepath.Join(filepath.Dir(filename), og)
+
+	// // this little hack courtesy of the `-cover` flag!!
+	cov := filepath.Join("_test", "_obj_test")
+	ng = strings.Replace(ng, string(filepath.Separator)+cov, "", 1)
+
+	if exists(ng) {
+		return ng
+	}
+
+	ng = filepath.Join(envy.GoPath(), "src", ng)
+	if exists(ng) {
+		return ng
+	}
+
+	return og
+}
+
 func New(name string, path string) *Box {
 	plog.Debug("packr", "New", "name", name, "path", path)
 	b, _ := findBox(name)
 	if b != nil {
 		return b
 	}
-	cd, _ := filepath.Abs(path)
-
-	if !filepath.IsAbs(cd) {
-		_, filename, _, _ := runtime.Caller(2)
-		cd = filepath.Dir(filename)
-	}
-
-	// this little hack courtesy of the `-cover` flag!!
-	cov := filepath.Join("_test", "_obj_test")
-	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
-	if !filepath.IsAbs(cd) && cd != "" {
-		cd = filepath.Join(envy.GoPath(), "src", cd)
-	}
 
 	b = &Box{
 		Path:          path,
 		Name:          name,
-		ResolutionDir: cd,
+		ResolutionDir: resolutionDir(path),
 		resolvers:     map[string]resolver.Resolver{},
 		moot:          &sync.RWMutex{},
 	}
-	plog.Debug(b, "New", "Box", b, "ResolutionDir", cd)
+	plog.Debug(b, "New", "Box", b, "ResolutionDir", b.ResolutionDir)
 	return placeBox(b)
 }
 
@@ -143,7 +167,7 @@ func (b Box) Open(name string) (http.File, error) {
 		return f, err
 	}
 	f, err = file.NewFileR(name, f)
-	plog.Debug(b, "Open", "name", f.Name(), "file", f)
+	plog.Debug(b, "Open", "name", f.Name(), "file", f.Name())
 	return f, err
 }
 
@@ -179,14 +203,14 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			}
 		}
 	}
-	plog.Debug(b, "Resolve", "name", b.Name, "key", key)
+	plog.Debug(r, "Resolve", "box", b.Name, "key", key)
 
 	f, err := r.Resolve(b.Name, key)
 	if err != nil {
 		z := filepath.Join(resolver.OsPath(b.ResolutionDir), resolver.OsPath(key))
 		f, err = r.Resolve(b.Name, z)
 		if err != nil {
-			plog.Debug(b, "Resolve", "name", b.Name, "key", z, "file", f)
+			plog.Debug(r, "Resolve", "box", b.Name, "key", z, "err", err)
 			return f, err
 		}
 		b, err := ioutil.ReadAll(f)
@@ -198,6 +222,6 @@ func (b *Box) Resolve(key string) (file.File, error) {
 			return f, errors.WithStack(err)
 		}
 	}
-	plog.Debug(b, "Resolve", "name", b.Name, "key", key, "file", f)
+	plog.Debug(r, "Resolve", "box", b.Name, "key", key, "file", f.Name())
 	return f, nil
 }

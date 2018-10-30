@@ -11,11 +11,15 @@ import (
 var DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea", "_fixtures"}
 
 func IsProspect(path string, ignore ...string) bool {
-	if fi, err := os.Stat(path); err == nil {
-		if fi.IsDir() {
-			un := filepath.Base(path)
-			return !strings.HasPrefix(un, "_")
+	fi, err := os.Stat(path)
+	if err == nil && fi.IsDir() {
+		un := filepath.Base(path)
+		for _, pre := range []string{".", "_"} {
+			if strings.HasPrefix(un, pre) {
+				return false
+			}
 		}
+		return true
 	}
 	path = strings.ToLower(path)
 

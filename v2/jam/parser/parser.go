@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/karrick/godirwalk"
@@ -27,6 +28,7 @@ func (p *Parser) Run() ([]*Box, error) {
 			return boxes, errors.WithStack(err)
 		}
 		for _, b := range pbr {
+			plog.Debug(p, "Run", "file", pros.Name(), "box", b.Name)
 			boxes = append(boxes, b)
 		}
 	}
@@ -62,6 +64,9 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 		if IsProspect(path, opts.Ignores...) && de.IsDir() {
 			roots = append(roots, path)
 			return nil
+		}
+		if de.IsDir() {
+			return filepath.SkipDir
 		}
 		return nil
 	}

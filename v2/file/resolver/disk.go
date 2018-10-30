@@ -28,7 +28,6 @@ func (d *Disk) Resolve(box string, name string) (file.File, error) {
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(OsPath(d.Root), path)
 	}
-	plog.Debug(d, "Resolve", "box", box, "name", name, "path", path)
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, err
