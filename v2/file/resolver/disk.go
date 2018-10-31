@@ -75,7 +75,7 @@ func (d *Disk) FileMap() map[string]file.File {
 		Callback:            callback,
 	})
 	if err != nil {
-		plog.Default.Errorf("[%s] error walking %v", root, err)
+		plog.Logger.Errorf("[%s] error walking %v", root, err)
 	}
 	return m
 }

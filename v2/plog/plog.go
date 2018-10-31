@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var Default = logger.New(logger.ErrorLevel)
+var Logger = logger.New(logger.ErrorLevel)
 
 func Debug(t interface{}, m string, args ...interface{}) {
 	if len(args)%2 == 1 {
@@ -32,7 +32,7 @@ func Debug(t interface{}, m string, args ...interface{}) {
 		}
 		f[k] = v
 	}
-	e := Default.WithFields(f)
+	e := Logger.WithFields(f)
 	if s, ok := t.(string); ok {
 		e.Debugf("%s#%s", s, m)
 		return

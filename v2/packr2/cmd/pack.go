@@ -36,7 +36,7 @@ func pack(args ...string) error {
 	// boxes, just adding a comment suggesting they're
 	// might be a reason to exclude some
 
-	plog.Default.Debugf("found %d boxes", len(boxes))
+	plog.Logger.Debugf("found %d boxes", len(boxes))
 
 	var st store.Store = store.NewDisk("", "")
 

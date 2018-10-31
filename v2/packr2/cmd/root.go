@@ -33,11 +33,11 @@ var rootCmd = &cobra.Command{
 		}
 		if globalOptions.Verbose {
 			genny.DefaultLogLvl = logger.DebugLevel
-			plog.Default = logger.New(logger.DebugLevel)
+			plog.Logger = logger.New(logger.DebugLevel)
 		}
 		if globalOptions.Silent {
 			genny.DefaultLogLvl = logger.FatalLevel
-			plog.Default = logger.New(logger.FatalLevel)
+			plog.Logger = logger.New(logger.FatalLevel)
 		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {

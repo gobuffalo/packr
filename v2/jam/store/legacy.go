@@ -64,7 +64,7 @@ func (l *Legacy) Pack(box *parser.Box) error {
 	// if err := run.WithNew(l.Generator(box)); err != nil {
 	// 	return errors.WithStack(err)
 	// }
-	// run.Logger = plog.Default
+	// run.Logger = plog.Logger
 	// return run.Run()
 }
 
@@ -108,7 +108,7 @@ func (l *Legacy) Close() error {
 	if err := run.WithNew(l.Generator()); err != nil {
 		return errors.WithStack(err)
 	}
-	run.Logger = plog.Default
+	run.Logger = plog.Logger
 	return run.Run()
 }
 

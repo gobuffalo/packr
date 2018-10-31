@@ -281,7 +281,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 func (d *Disk) Close() error {
 	plog.Debug(d, "Close")
 	run := genny.WetRunner(context.Background())
-	run.Logger = plog.Default
+	run.Logger = plog.Logger
 	if err := run.WithNew(d.Generator()); err != nil {
 		return errors.WithStack(err)
 	}

@@ -60,7 +60,7 @@ func goCmd(name string, args ...string) error {
 		}
 	}
 	cp := exec.Command(genny.GoBin(), cargs...)
-	plog.Default.Debug(strings.Join(cp.Args, " "))
+	plog.Logger.Debug(strings.Join(cp.Args, " "))
 	cp.Stderr = os.Stderr
 	cp.Stdin = os.Stdin
 	cp.Stdout = os.Stdout
