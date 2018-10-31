@@ -32,17 +32,11 @@ The first step in using Packr is to create a new box. A box represents a folder 
 // set up a new box by giving it a (relative) path to a folder on disk:
 box := packr.NewBox("./templates")
 
-// Get the string representation of a file:
-html := box.String("index.html")
-
 // Get the string representation of a file, or an error if it doesn't exist:
-html, err := box.MustString("index.html")
-
-// Get the []byte representation of a file:
-html := box.Bytes("index.html")
+html, err := box.FindString("index.html")
 
 // Get the []byte representation of a file, or an error if it doesn't exist:
-html, err := box.MustBytes("index.html")
+html, err := box.FindBytes("index.html")
 ```
 
 ### What is a Box?
@@ -170,7 +164,7 @@ Linux/macOS/Windows (bash)
 mv ./project_name ./releases
 ```
 
-Windows (cmd): 
+Windows (cmd):
 
 ```cmd
 move ./project_name ./releases

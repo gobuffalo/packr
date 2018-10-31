@@ -3,6 +3,7 @@ package packr
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -141,10 +142,18 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
-	lname := strings.TrimPrefix(strings.ToLower(name), "/")
-	if bb, ok := b.data[lname]; ok {
+	fmt.Println("### name ->", name)
+	if bb, ok := b.data[name]; ok {
 		return packd.NewFile(name, bytes.NewReader(bb))
 	}
+
+	lname := strings.TrimPrefix(strings.ToLower(name), "/")
+	fmt.Println("### lname ->", lname)
+	fmt.Println("### b.data[lname] ->", b.data[lname])
+	if bb, ok := b.data[lname]; ok {
+		return packd.NewFile(lname, bytes.NewReader(bb))
+	}
+
 	if b.directories == nil {
 		b.indexDirectories()
 	}
@@ -156,13 +165,21 @@ func (b Box) find(name string) (File, error) {
 	}
 	// Absolute name is considered as relative to the box root
 	cleanName = strings.TrimPrefix(cleanName, "/")
+	fmt.Println("### cleanName ->", cleanName)
 
 	// Try to get the resource from the box
 	lclean := strings.ToLower(cleanName)
+	fmt.Println("### lclean ->", lclean)
+
+	fmt.Println("### data[b.Path] ->", data[b.Path])
 	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][lclean]; ok {
-			bb = b.decompress(bb)
-			return packd.NewFile(cleanName, bytes.NewReader(bb))
+		for _, n := range []string{cleanName, lclean} {
+			fmt.Println("### n ->", n)
+			fmt.Println("### data[b.Path][n] ->", data[b.Path][n])
+			if bb, ok := data[b.Path][n]; ok {
+				bb = b.decompress(bb)
+				return packd.NewFile(cleanName, bytes.NewReader(bb))
+			}
 		}
 		if _, ok := b.directories[cleanName]; ok {
 			return packd.NewDir(cleanName)

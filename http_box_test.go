@@ -35,7 +35,7 @@ func Test_HTTPBox_CaseInsensitive(t *testing.T) {
 		t.Run(path, func(st *testing.T) {
 			r := require.New(st)
 
-			req, err := http.NewRequest("GET", "/Myfile.txt", nil)
+			req, err := http.NewRequest("GET", path, nil)
 			r.NoError(err)
 
 			res := httptest.NewRecorder()
