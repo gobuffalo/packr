@@ -29,6 +29,7 @@ func Test_HTTPBox(t *testing.T) {
 func Test_HTTPBox_CaseInsensitive(t *testing.T) {
 
 	mux := http.NewServeMux()
+	testBox.AddString("myfile.txt", "this is my file")
 	mux.Handle("/", http.FileServer(testBox))
 
 	for _, path := range []string{"/MyFile.txt", "/myfile.txt", "/Myfile.txt"} {
