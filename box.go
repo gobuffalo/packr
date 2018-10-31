@@ -71,7 +71,7 @@ func (b Box) AddString(path string, t string) error {
 
 // AddBytes sets t in b.data by the given path
 func (b Box) AddBytes(path string, t []byte) error {
-	b.data[path] = t
+	b.data[strings.ToLower(path)] = t
 	return nil
 }
 
@@ -145,6 +145,12 @@ func (b Box) find(name string) (File, error) {
 	if bb, ok := b.data[name]; ok {
 		return packd.NewFile(name, bytes.NewReader(bb))
 	}
+
+	lname := strings.TrimPrefix(strings.ToLower(name), "/")
+	if bb, ok := b.data[lname]; ok {
+		return packd.NewFile(lname, bytes.NewReader(bb))
+	}
+
 	if b.directories == nil {
 		b.indexDirectories()
 	}
@@ -158,10 +164,14 @@ func (b Box) find(name string) (File, error) {
 	cleanName = strings.TrimPrefix(cleanName, "/")
 
 	// Try to get the resource from the box
+	lclean := strings.ToLower(cleanName)
+
 	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][cleanName]; ok {
-			bb = b.decompress(bb)
-			return packd.NewFile(cleanName, bytes.NewReader(bb))
+		for _, n := range []string{cleanName, lclean} {
+			if bb, ok := data[b.Path][n]; ok {
+				bb = b.decompress(bb)
+				return packd.NewFile(cleanName, bytes.NewReader(bb))
+			}
 		}
 		if _, ok := b.directories[cleanName]; ok {
 			return packd.NewDir(cleanName)
