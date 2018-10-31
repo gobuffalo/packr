@@ -26,6 +26,28 @@ func Test_HTTPBox(t *testing.T) {
 	r.Equal("hello world!", strings.TrimSpace(res.Body.String()))
 }
 
+func Test_HTTPBox_CaseInsensitive(t *testing.T) {
+
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(testBox))
+
+	for _, path := range []string{"/MyFile.txt", "/myfile.txt", "/Myfile.txt"} {
+		t.Run(path, func(st *testing.T) {
+			r := require.New(st)
+
+			req, err := http.NewRequest("GET", "/Myfile.txt", nil)
+			r.NoError(err)
+
+			res := httptest.NewRecorder()
+
+			mux.ServeHTTP(res, req)
+
+			r.Equal(200, res.Code)
+			r.Equal("this is my file", strings.TrimSpace(res.Body.String()))
+		})
+	}
+}
+
 func Test_HTTPBox_NotFound(t *testing.T) {
 	r := require.New(t)
 
