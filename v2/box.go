@@ -72,6 +72,16 @@ func resolutionDir(og string) string {
 	return og
 }
 
+func construct(name string, path string) *Box {
+	return &Box{
+		Path:          path,
+		Name:          name,
+		ResolutionDir: resolutionDir(path),
+		resolvers:     map[string]resolver.Resolver{},
+		moot:          &sync.RWMutex{},
+	}
+}
+
 func New(name string, path string) *Box {
 	plog.Debug("packr", "New", "name", name, "path", path)
 	b, _ := findBox(name)
@@ -79,15 +89,14 @@ func New(name string, path string) *Box {
 		return b
 	}
 
-	b = &Box{
-		Path:          path,
-		Name:          name,
-		ResolutionDir: resolutionDir(path),
-		resolvers:     map[string]resolver.Resolver{},
-		moot:          &sync.RWMutex{},
-	}
+	b = construct(name, path)
 	plog.Debug(b, "New", "Box", b, "ResolutionDir", b.ResolutionDir)
-	return placeBox(b)
+	b, err := placeBox(b)
+	if err != nil {
+		panic(err)
+	}
+
+	return b
 }
 
 // Box represent a folder on a disk you want to

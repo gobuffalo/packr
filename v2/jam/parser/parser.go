@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/karrick/godirwalk"
@@ -32,6 +35,12 @@ func (p *Parser) Run() ([]*Box, error) {
 			boxes = append(boxes, b)
 		}
 	}
+
+	pwd, _ := os.Getwd()
+	sort.Slice(boxes, func(a, b int) bool {
+		b1 := boxes[a]
+		return !strings.HasPrefix(b1.AbsPath, pwd)
+	})
 	return boxes, nil
 }
 
@@ -57,6 +66,11 @@ func (r RootsOptions) String() string {
 func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 	if opts == nil {
 		opts = &RootsOptions{}
+	}
+
+	if len(roots) == 0 {
+		pwd, _ := os.Getwd()
+		roots = append(roots, pwd)
 	}
 	p := New()
 	plog.Debug(p, "NewFromRoots", "roots", roots, "options", opts)
