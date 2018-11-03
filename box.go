@@ -157,8 +157,14 @@ func (b Box) find(name string) (File, error) {
 	// Absolute name is considered as relative to the box root
 	cleanName = strings.TrimPrefix(cleanName, "/")
 
-	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][cleanName]; ok {
+	if dbox, ok := data[b.Path]; ok {
+		lmap := map[string][]byte{}
+		for k, v := range dbox {
+			lmap[strings.ToLower(k)] = v
+		}
+
+		lname := strings.ToLower(cleanName)
+		if bb, ok := lmap[lname]; ok {
 			bb = b.decompress(bb)
 			return packd.NewFile(cleanName, bytes.NewReader(bb))
 		}
