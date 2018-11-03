@@ -141,42 +141,57 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
-	if bb, ok := b.data[name]; ok {
-		return packd.NewFile(name, bytes.NewReader(bb))
-	}
 
-	if b.directories == nil {
-		b.indexDirectories()
-	}
-
-	cleanName := filepath.ToSlash(filepath.Clean(name))
-	// Ensure name is not outside the box
-	if strings.HasPrefix(cleanName, "../") {
-		return nil, ErrResOutsideBox
-	}
-	// Absolute name is considered as relative to the box root
-	cleanName = strings.TrimPrefix(cleanName, "/")
-
-	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][cleanName]; ok {
-			bb = b.decompress(bb)
-			return packd.NewFile(cleanName, bytes.NewReader(bb))
+	finder := func(name string) (File, error) {
+		if bb, ok := b.data[name]; ok {
+			return packd.NewFile(name, bytes.NewReader(bb))
 		}
-		if _, ok := b.directories[cleanName]; ok {
-			return packd.NewDir(cleanName)
+
+		if b.directories == nil {
+			b.indexDirectories()
 		}
-		if filepath.Ext(cleanName) != "" {
-			// The Handler created by http.FileSystem checks for those errors and
-			// returns http.StatusNotFound instead of http.StatusInternalServerError.
+
+		cleanName := filepath.ToSlash(filepath.Clean(name))
+		// Ensure name is not outside the box
+		if strings.HasPrefix(cleanName, "../") {
+			return nil, ErrResOutsideBox
+		}
+		// Absolute name is considered as relative to the box root
+		cleanName = strings.TrimPrefix(cleanName, "/")
+
+		if _, ok := data[b.Path]; ok {
+			if bb, ok := data[b.Path][cleanName]; ok {
+				bb = b.decompress(bb)
+				return packd.NewFile(cleanName, bytes.NewReader(bb))
+			}
+			if _, ok := b.directories[cleanName]; ok {
+				return packd.NewDir(cleanName)
+			}
+			if filepath.Ext(cleanName) != "" {
+				// The Handler created by http.FileSystem checks for those errors and
+				// returns http.StatusNotFound instead of http.StatusInternalServerError.
+				return nil, os.ErrNotExist
+			}
 			return nil, os.ErrNotExist
 		}
-		return nil, os.ErrNotExist
+
+		// Not found in the box virtual fs, try to get it from the file system
+		cleanName = filepath.FromSlash(cleanName)
+		p := filepath.Join(b.callingDir, b.Path, cleanName)
+		return fileFor(p, cleanName)
 	}
 
-	// Not found in the box virtual fs, try to get it from the file system
-	cleanName = filepath.FromSlash(cleanName)
-	p := filepath.Join(b.callingDir, b.Path, cleanName)
-	return fileFor(p, cleanName)
+	for _, n := range []string{name, strings.ToLower(name)} {
+		f, err := finder(n)
+		if err != nil {
+			if err == os.ErrNotExist {
+				continue
+			}
+			return f, os.ErrNotExist
+		}
+		return f, nil
+	}
+	return nil, os.ErrNotExist
 }
 
 // Open returns a File using the http.File interface
