@@ -14,7 +14,6 @@ var data = map[string]map[string][]byte{}
 
 // PackBytes packs bytes for a file into a box.
 func PackBytes(box string, name string, bb []byte) {
-	name = strings.ToLower(name)
 	gil.Lock()
 	defer gil.Unlock()
 	if _, ok := data[box]; !ok {
