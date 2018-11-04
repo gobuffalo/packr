@@ -6,15 +6,23 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packr/v2/file/resolver"
+	"github.com/gobuffalo/packr/v2/plog"
 )
 
-var DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea", "_fixtures"}
+var DefaultIgnoredFolders = []string{".", "_", "vendor", "node_modules", "_fixtures"}
 
-func IsProspect(path string, ignore ...string) bool {
+func IsProspect(path string, ignore ...string) (status bool) {
+	ignore = append(ignore, DefaultIgnoredFolders...)
+	// plog.Debug("parser", "IsProspect", "path", path, "ignore", ignore)
+	defer func() {
+		if status {
+			plog.Debug("parser", "IsProspect (TRUE)", "path", path, "status", status)
+		}
+	}()
 	fi, err := os.Stat(path)
 	if err == nil && fi.IsDir() {
 		un := filepath.Base(path)
-		for _, pre := range append([]string{".", "_"}, DefaultIgnoredFolders...) {
+		for _, pre := range ignore {
 			if strings.HasPrefix(un, pre) {
 				return false
 			}
@@ -33,9 +41,6 @@ func IsProspect(path string, ignore ...string) bool {
 
 	ext := filepath.Ext(path)
 
-	if len(ignore) == 0 {
-		ignore = append(ignore, DefaultIgnoredFolders...)
-	}
 	for i, x := range ignore {
 		ignore[i] = strings.TrimSpace(strings.ToLower(x))
 	}

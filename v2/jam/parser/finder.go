@@ -1,9 +1,11 @@
 package parser
 
 import (
+	"fmt"
 	"go/build"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/karrick/godirwalk"
@@ -11,13 +13,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-type finder struct{}
+type finder struct {
+	id time.Time
+}
+
+func (fd *finder) key(m, dir string) string {
+	return fmt.Sprintf("%s-*parser.finder#%s-%s", fd.id, m, dir)
+}
 
 // findAllGoFiles *.go files for a given diretory
 func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
 	var err error
 	var names []string
-	oncer.Do("*parser.finder#findAllGoFiles-"+dir, func() {
+	oncer.Do(fd.key("findAllGoFiles", dir), func() {
 		plog.Debug(fd, "findAllGoFiles", "dir", dir)
 
 		callback := func(path string, do *godirwalk.Dirent) error {
@@ -40,7 +48,7 @@ func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
 func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 	var err error
 	var names []string
-	oncer.Do("*parser.finder#findAllGoFilesImports-"+dir, func() {
+	oncer.Do(fd.key("findAllGoFilesImports", dir), func() {
 		ctx := build.Default
 
 		if len(ctx.SrcDirs()) == 0 {

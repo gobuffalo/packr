@@ -122,7 +122,7 @@ func (d *Disk) Clean(box *parser.Box) error {
 		return errors.New("can't clean an empty box.PackageDir")
 	}
 	plog.Debug(d, "Clean", "box", box.Name, "root", root)
-	return Clean(root)
+	return clean(root)
 }
 
 type options struct {

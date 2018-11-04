@@ -12,6 +12,26 @@ import (
 )
 
 func Clean(root string) error {
+	p, err := parser.NewFromRoots([]string{root}, &parser.RootsOptions{})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	boxes, err := p.Run()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	d := NewDisk("", "")
+	for _, box := range boxes {
+		if err := d.Clean(box); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+	return nil
+}
+
+func clean(root string) error {
 	if len(root) == 0 {
 		pwd, err := os.Getwd()
 		if err != nil {
