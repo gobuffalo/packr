@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +16,7 @@ func Test_Box_FindString(t *testing.T) {
 	r := require.New(t)
 	s, err := testBox.FindString("hello.txt")
 	r.NoError(err)
-	r.Equal("hello world!\n", s)
+	r.Equal("hello world!", strings.TrimSpace(s))
 
 	_, err = testBox.Find("idontexist.txt")
 	r.Error(err)

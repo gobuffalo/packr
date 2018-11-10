@@ -83,16 +83,19 @@ The following program will read the `./templates/admin/index.html` file and prin
 package main
 
 import (
-	"fmt"
+  "fmt"
 
-	"github.com/gobuffalo/packr/v2"
+  "github.com/gobuffalo/packr/v2"
 )
 
 func main() {
-	box := packr.New("myBox", "./templates")
+  box := packr.New("myBox", "./templates")
 
-	s := box.String("admin/index.html")
-	fmt.Println(s)
+  s, err := box.FindString("admin/index.html")
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Println(s)
 }
 ```
 

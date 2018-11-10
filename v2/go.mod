@@ -8,10 +8,12 @@ require (
 	github.com/karrick/godirwalk v1.7.5
 	github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4
 	github.com/markbates/safe v1.0.1
+	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
 	golang.org/x/tools v0.0.0-20181109152631-138c20b93253
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
