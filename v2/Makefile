@@ -29,9 +29,13 @@ test:
 	$(GO_BIN) test -tags ${TAGS} ./...
 	make tidy
 
-ci-test: deps
+ci-deps:
+	$(GO_BIN) get -tags ${TAGS} -t ./...
+	$(GO_BIN) install -v ./packr2
+
+ci-test: ci-deps
+	packr2
 	$(GO_BIN) test -tags ${TAGS} -race ./...
-	make tidy
 
 lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal

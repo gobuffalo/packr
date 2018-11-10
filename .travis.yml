@@ -29,6 +29,6 @@ matrix:
     env:
       - GO111MODULE=on
 
-install: make deps
+install: make ci-deps
 
 script: make ci-test

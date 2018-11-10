@@ -32,7 +32,15 @@ test:
 	$(GO_BIN) test -tags ${TAGS} ./...
 	packr clean
 
-ci-test: deps
+ci-deps:
+	rm -rf packrd
+	rm -rf v2/packrd
+	$(GO_BIN) get -tags ${TAGS} -t ./...
+	$(GO_BIN) install -v ./packr
+	packr clean
+	make tidy
+
+ci-test: 
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 	make tidy
 	cd ./v2 && make ci-test
