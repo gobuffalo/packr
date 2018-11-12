@@ -40,8 +40,8 @@ ci-deps:
 	packr clean
 	make tidy
 
-ci-test: 
-	$(GO_BIN) test -tags ${TAGS} -race ./...
+ci-test:
+	$(GO_BIN) test -v -tags ${TAGS} -race ./...
 	make tidy
 	cd ./v2 && make ci-test
 
