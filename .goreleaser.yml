@@ -30,8 +30,11 @@ builds:
     - windows
   env:
     - CGO_ENABLED=0
-  main: ./packr/main.go
-  binary: packr
+  # main: ./packr/main.go
+  # binary: {{.Binary}}
+  # hooks:
+  #   pre: packr
+  #   post: packr clean
 
 checksum:
   name_template: 'checksums.txt'

@@ -1,6 +1,10 @@
-# packr
+# packr (v1)
 
 [![GoDoc](https://godoc.org/github.com/gobuffalo/packr?status.svg)](https://godoc.org/github.com/gobuffalo/packr)
+
+## Packr has been updated to `v2`! Please read the `./v2/README.md` file for more details.
+
+---
 
 Packr is a simple solution for bundling static assets inside of Go binaries. Most importantly it does it in a way that is friendly to developers while they are developing.
 
@@ -61,16 +65,19 @@ The following program will read the `./templates/admin/index.html` file and prin
 package main
 
 import (
-	"fmt"
+  "fmt"
 
-	"github.com/gobuffalo/packr"
+  "github.com/gobuffalo/packr"
 )
 
 func main() {
-	box := packr.NewBox("./templates")
+  box := packr.NewBox("./templates")
 
-	s := box.String("admin/index.html")
-	fmt.Println(s)
+  s, err := box.FindString("admin/index.html")
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Println(s)
 }
 ```
 
@@ -99,16 +106,16 @@ A box implements the [`http.FileSystem`](https://golang.org/pkg/net/http/#FileSy
 package main
 
 import (
-	"net/http"
+  "net/http"
 
-	"github.com/gobuffalo/packr"
+  "github.com/gobuffalo/packr"
 )
 
 func main() {
-	box := packr.NewBox("./templates")
+  box := packr.NewBox("./templates")
 
-	http.Handle("/", http.FileServer(box))
-	http.ListenAndServe(":3000", nil)
+  http.Handle("/", http.FileServer(box))
+  http.ListenAndServe(":3000", nil)
 }
 ```
 

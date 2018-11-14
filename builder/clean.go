@@ -17,14 +17,17 @@ func Clean(root string) {
 		if base == ".git" || base == "vendor" || base == "node_modules" {
 			return filepath.SkipDir
 		}
-		if info == nil || info.IsDir() {
-			return nil
-		}
-		if strings.Contains(base, "-packr.go") {
-			err := os.Remove(path)
-			if err != nil {
-				fmt.Println(err)
-				return errors.WithStack(err)
+		for _, suf := range []string{"-packr.go", "packrd"} {
+			if strings.HasSuffix(base, suf) {
+				err := os.RemoveAll(path)
+				if err != nil {
+					fmt.Println(err)
+					return errors.WithStack(err)
+				}
+				if info.IsDir() {
+					return filepath.SkipDir
+				}
+				return nil
 			}
 		}
 		return nil
