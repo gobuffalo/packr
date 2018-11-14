@@ -55,3 +55,10 @@ update:
 	make test
 	make install
 	make tidy
+
+release-test:
+	$(GO_BIN) test -tags ${TAGS} -race ./...
+
+release:
+	release -y -f version.go
+	make tidy
