@@ -26,16 +26,8 @@ build: deps
 
 test:
 	packr2
-	$(GO_BIN) test -v -tags ${TAGS} ./...
+	$(GO_BIN) test -tags ${TAGS} ./...
 	make tidy
-
-ci-deps:
-	$(GO_BIN) get -tags ${TAGS} -t ./...
-	$(GO_BIN) install -v ./packr2
-
-ci-test: ci-deps
-	packr2
-	$(GO_BIN) test -tags ${TAGS} -race ./...
 
 lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal
