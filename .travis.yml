@@ -29,6 +29,9 @@ matrix:
     env:
       - GO111MODULE=on
 
-install: make ci-deps
+install: false
 
-script: make ci-test
+script:
+  - ./travis.sh
+  - cd v2 && ./travis.sh
+
