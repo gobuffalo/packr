@@ -12,6 +12,11 @@ import (
 )
 
 func Clean(root string) error {
+	defer func() {
+		packd := filepath.Join(root, "packrd")
+		os.RemoveAll(packd)
+	}()
+
 	p, err := parser.NewFromRoots([]string{root}, &parser.RootsOptions{})
 	if err != nil {
 		return errors.WithStack(err)
@@ -42,35 +47,31 @@ func clean(root string) error {
 	if _, err := os.Stat(root); err != nil {
 		return nil
 	}
+	defer func() {
+		packd := filepath.Join(root, "packrd")
+		os.RemoveAll(packd)
+	}()
+
 	callback := func(path string, info *godirwalk.Dirent) error {
-		if _, err := os.Stat(path); err != nil {
-			return nil
-		}
-		base := filepath.Base(path)
-		for _, d := range parser.DefaultIgnoredFolders {
-			if base == d {
+		if strings.HasSuffix(path, "-packr.go") {
+			err := os.RemoveAll(path)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			if info.IsDir() {
 				return filepath.SkipDir
 			}
-		}
-		if info == nil {
 			return nil
-		}
-		for _, suf := range []string{"-packr.go", "packrd"} {
-			if strings.HasSuffix(base, suf) {
-				err := os.RemoveAll(path)
-				if err != nil {
-					return errors.WithStack(err)
-				}
-				if info.IsDir() {
-					return filepath.SkipDir
-				}
-				return nil
-			}
 		}
 		return nil
 	}
-	return godirwalk.Walk(root, &godirwalk.Options{
+	err := godirwalk.Walk(root, &godirwalk.Options{
 		FollowSymbolicLinks: true,
 		Callback:            callback,
 	})
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }

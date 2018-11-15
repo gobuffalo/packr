@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -31,7 +32,7 @@ func (v *Visitor) Run() (Boxes, error) {
 	var boxes Boxes
 	pf, err := gotools.ParseFile(v.File)
 	if err != nil {
-		return boxes, errors.WithStack(err)
+		return boxes, errors.Wrap(err, v.File.Name())
 	}
 
 	v.Package = pf.Ast.Name.Name
@@ -50,7 +51,7 @@ func (v *Visitor) Run() (Boxes, error) {
 		for i, e := range v.errors {
 			s[i] = e.Error()
 		}
-		return boxes, errors.New(strings.Join(s, "\n"))
+		return boxes, errors.Wrap(errors.New(strings.Join(s, "\n")), v.File.Name())
 	}
 	return boxes, nil
 }
@@ -287,7 +288,7 @@ func (v *Visitor) fromVariable(as *ast.AssignStmt) (string, error) {
 			return bs.Value, nil
 		}
 	}
-	return "", errors.New("unable to find value from variable")
+	return "", errors.Wrap(errors.New("unable to find value from variable"), fmt.Sprint(as))
 }
 
 func (v *Visitor) addVariable(bn string, as *ast.AssignStmt) error {
@@ -308,7 +309,7 @@ func (v *Visitor) fromConstant(vs *ast.ValueSpec) (string, error) {
 			return bs.Value, nil
 		}
 	}
-	return "", errors.New("unable to find value from constant")
+	return "", errors.Wrap(errors.New("unable to find value from constant"), fmt.Sprint(vs))
 }
 
 func (v *Visitor) addConstant(bn string, vs *ast.ValueSpec) error {
