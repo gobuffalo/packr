@@ -14,11 +14,12 @@ var globalOptions = struct {
 	IgnoreImports bool
 	Legacy        bool
 	Silent        bool
+	StoreCmd      string
 }{}
 
 var rootCmd = &cobra.Command{
-	Use:   "packr",
-	Short: "A brief description of your application",
+	Use:   "packr2",
+	Short: "Packr is a simple solution for bundling static assets inside of Go binaries.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		genny.DefaultLogLvl = logger.ErrorLevel
 		for _, a := range args {
@@ -58,4 +59,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.Legacy, "legacy", false, "uses the legacy resolution and packing system (assumes first arg || pwd for input path)")
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.Silent, "silent", false, "silences all output")
 	rootCmd.PersistentFlags().BoolVar(&globalOptions.IgnoreImports, "ignore-imports", false, "when set to true packr won't resolve imports for boxes")
+	rootCmd.PersistentFlags().StringVar(&globalOptions.StoreCmd, "store-cmd", "", "sub command to use for packing")
 }

@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"context"
+	"encoding/json"
 	"io"
 	"os"
+	"os/exec"
+	"time"
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/jam/store"
@@ -38,6 +42,10 @@ func pack(args ...string) error {
 
 	plog.Logger.Debugf("found %d boxes", len(boxes))
 
+	if len(globalOptions.StoreCmd) != 0 {
+		return shellPack(boxes)
+	}
+
 	var st store.Store = store.NewDisk("", "")
 
 	if globalOptions.Legacy {
@@ -56,4 +64,17 @@ func pack(args ...string) error {
 		return cl.Close()
 	}
 	return nil
+}
+
+func shellPack(boxes parser.Boxes) error {
+	b, err := json.Marshal(boxes)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	c := exec.CommandContext(ctx, globalOptions.StoreCmd, string(b))
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
 }
