@@ -27,8 +27,8 @@ func NewVisitor(f *File) *Visitor {
 	}
 }
 
-func (v *Visitor) Run() ([]*Box, error) {
-	var boxes []*Box
+func (v *Visitor) Run() (Boxes, error) {
+	var boxes Boxes
 	pf, err := gotools.ParseFile(v.File)
 	if err != nil {
 		return boxes, errors.WithStack(err)

@@ -16,8 +16,8 @@ type Parser struct {
 }
 
 // Run the parser and run any boxes found
-func (p *Parser) Run() ([]*Box, error) {
-	var boxes []*Box
+func (p *Parser) Run() (Boxes, error) {
+	var boxes Boxes
 	for _, pros := range p.Prospects {
 		plog.Debug(p, "Run", "parsing", pros.Name())
 		v := NewVisitor(pros)

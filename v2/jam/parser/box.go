@@ -16,6 +16,8 @@ type Box struct {
 	PackageDir string // the absolute path of the package where the box was found
 }
 
+type Boxes []*Box
+
 // String - json returned
 func (b Box) String() string {
 	x, _ := json.Marshal(b)
