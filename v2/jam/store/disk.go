@@ -246,7 +246,11 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 
 	var ip string
 	if envy.Mods() {
-		moddata, err := ioutil.ReadFile("go.mod")
+		mp := filepath.Join(filepath.Dir(d.DBPath), "go.mod")
+		if _, err := os.Stat(mp); err != nil {
+			mp = filepath.Join(d.DBPath, "go.mod")
+		}
+		moddata, err := ioutil.ReadFile(mp)
 		if err != nil {
 			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
 		}
