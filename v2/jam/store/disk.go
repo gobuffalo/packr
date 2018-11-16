@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/md5"
-	"fmt"
 	"go/build"
 	"html/template"
 	"io"
@@ -52,7 +51,6 @@ func NewDisk(path string, pkg string) *Disk {
 	if !filepath.IsAbs(path) {
 		path, _ = filepath.Abs(path)
 	}
-	fmt.Println("### path ->", path)
 	return &Disk{
 		DBPath:    path,
 		DBPackage: pkg,
