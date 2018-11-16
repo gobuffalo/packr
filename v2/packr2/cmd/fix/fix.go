@@ -25,7 +25,7 @@ var ic = ImportConverter{
 }
 
 var checks = []Check{
-	packrClean,
+	// packrClean,
 	ic.Process,
 }
 

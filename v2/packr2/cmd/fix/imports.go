@@ -65,7 +65,6 @@ func (c ImportConverter) processFile(p string, info os.FileInfo, err error) erro
 }
 
 func (c ImportConverter) rewriteFile(name string) error {
-
 	// create an empty fileset.
 	fset := token.NewFileSet()
 
@@ -83,6 +82,48 @@ func (c ImportConverter) rewriteFile(name string) error {
 	}
 
 	changed := false
+	funcs := []*ast.FuncDecl{}
+	for _, d := range f.Decls {
+		if fn, isFn := d.(*ast.FuncDecl); isFn {
+			funcs = append(funcs, fn)
+		}
+	}
+
+	for _, fun := range funcs {
+		ast.Inspect(fun, func(node ast.Node) bool {
+			switch n := node.(type) {
+			case *ast.CallExpr:
+				fn, ok := n.Fun.(*ast.SelectorExpr)
+				if !ok || fn.Sel == nil {
+					return true
+				}
+
+				sel := fn.Sel
+				i, ok := fn.X.(*ast.Ident)
+				if !ok {
+					return true
+				}
+				if i.Name != "packr" {
+					return true
+				}
+				if sel.Name == "NewBox" {
+					sel.Name = "New"
+					n.Args = append(n.Args, n.Args[0])
+					changed = true
+				}
+				if sel.Name == "MustBytes" {
+					sel.Name = "Find"
+					changed = true
+				}
+				if sel.Name == "MustBytes" {
+					sel.Name = "Find"
+					changed = true
+				}
+			}
+			return true
+		})
+	}
+
 	for key, value := range c.Data {
 		if !astutil.DeleteImport(fset, f, key) {
 			continue
@@ -169,14 +210,15 @@ func onlyRelevantFiles(p string, fi os.FileInfo, err error, fn func(p string) er
 		return err
 	}
 
-	if fi.IsDir() {
-		return nil
-	}
-
-	for _, n := range []string{"vendor", "node_modules", ".git"} {
-		if strings.HasPrefix(p, n+string(filepath.Separator)) {
-			return nil
+	if fi.IsDir() && p != "." {
+		for _, n := range []string{"_", ".", "vendor", "node_modules", ".git"} {
+			base := filepath.Base(p)
+			if strings.HasPrefix(base, n) {
+				return filepath.SkipDir
+			}
 		}
+
+		return nil
 	}
 
 	ext := filepath.Ext(p)

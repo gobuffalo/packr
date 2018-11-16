@@ -12,24 +12,32 @@ import (
 var DefaultIgnoredFolders = []string{".", "_", "vendor", "node_modules", "_fixtures"}
 
 func IsProspect(path string, ignore ...string) (status bool) {
-	ignore = append(ignore, DefaultIgnoredFolders...)
 	// plog.Debug("parser", "IsProspect", "path", path, "ignore", ignore)
 	defer func() {
 		if status {
 			plog.Debug("parser", "IsProspect (TRUE)", "path", path, "status", status)
 		}
 	}()
-	fi, err := os.Stat(path)
-	if err == nil && fi.IsDir() {
-		un := filepath.Base(path)
-		for _, pre := range ignore {
-			if strings.HasPrefix(un, pre) {
-				return false
-			}
-		}
+	if path == "." {
 		return true
 	}
+
+	ext := filepath.Ext(path)
+	dir := filepath.Dir(path)
+
+	fi, _ := os.Stat(path)
+	if fi != nil {
+		if fi.IsDir() {
+			dir = filepath.Base(path)
+		} else {
+			if len(ext) > 0 {
+				dir = filepath.Base(filepath.Dir(path))
+			}
+		}
+	}
+
 	path = strings.ToLower(path)
+	dir = strings.ToLower(dir)
 
 	if strings.HasSuffix(path, "-packr.go") {
 		return false
@@ -39,8 +47,7 @@ func IsProspect(path string, ignore ...string) (status bool) {
 		return false
 	}
 
-	ext := filepath.Ext(path)
-
+	ignore = append(ignore, DefaultIgnoredFolders...)
 	for i, x := range ignore {
 		ignore[i] = strings.TrimSpace(strings.ToLower(x))
 	}
@@ -49,9 +56,10 @@ func IsProspect(path string, ignore ...string) (status bool) {
 	if len(parts) == 0 {
 		return false
 	}
+
 	for _, i := range ignore {
 		for _, p := range parts {
-			if p == i {
+			if strings.HasPrefix(p, i) {
 				return false
 			}
 		}
