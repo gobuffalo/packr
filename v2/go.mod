@@ -9,10 +9,11 @@ require (
 	github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4
 	github.com/markbates/safe v1.0.1
 	github.com/pkg/errors v0.8.0
+	github.com/rogpeppe/go-internal v1.0.0
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
 	golang.org/x/sys v0.0.0-20181106135930-3a76605856fd // indirect
-	golang.org/x/tools v0.0.0-20181115194243-f87c222f1487
+	golang.org/x/tools v0.0.0-20181116193547-e77c06808af6
 )

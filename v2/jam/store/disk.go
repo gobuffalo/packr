@@ -16,10 +16,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/genny/movinglater/gotools"
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 	"github.com/gobuffalo/packr/v2/plog"
+	"github.com/rogpeppe/go-internal/modfile"
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/karrick/godirwalk"
@@ -242,14 +244,31 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	}
 	g.File(global)
 
-	ip := strings.ToLower(filepath.Dir(d.DBPath))
-	for _, x := range build.Default.SrcDirs() {
-		x = strings.ToLower(x)
-		ip = strings.TrimPrefix(ip, x)
-	}
-	ip = strings.TrimPrefix(ip, string(filepath.Separator))
+	var ip string
+	if envy.Mods() {
+		mp := filepath.Join(filepath.Dir(d.DBPath), "go.mod")
+		if _, err := os.Stat(mp); err != nil {
+			mp = filepath.Join(d.DBPath, "go.mod")
+		}
+		moddata, err := ioutil.ReadFile(mp)
+		if err != nil {
+			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
+		}
+		ip = modfile.ModulePath(moddata)
+		if ip == "" {
+			return g, errors.New("go.mod is malformed.")
+		}
+	} else {
+		ip = strings.ToLower(filepath.Dir(d.DBPath))
+		for _, x := range build.Default.SrcDirs() {
+			x = strings.ToLower(x)
+			ip = strings.TrimPrefix(ip, x)
+		}
+		ip = strings.TrimPrefix(ip, string(filepath.Separator))
 
-	ip = path.Join(strings.Replace(ip, "\\", "/", -1), d.DBPackage)
+		ip = strings.Replace(ip, "\\", "/", -1)
+	}
+	ip = path.Join(ip, d.DBPackage)
 
 	for _, n := range opts.Boxes {
 		b := d.boxes[n.Name]
