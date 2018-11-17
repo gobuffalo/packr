@@ -51,10 +51,8 @@ func Test_Builder_Run_Compress(t *testing.T) {
 	defer Clean(root)
 
 	exPackr := filepath.Join(root, "a_example-packr.go")
-	r.False(fileExists(exPackr))
 
 	fooPackr := filepath.Join(root, "foo", "a_foo-packr.go")
-	r.False(fileExists(fooPackr))
 
 	b := New(context.Background(), root)
 	b.Compress = true
