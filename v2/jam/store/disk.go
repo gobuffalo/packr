@@ -259,9 +259,8 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 			return g, errors.New("go.mod is malformed.")
 		}
 	} else {
-		ip = strings.ToLower(filepath.Dir(d.DBPath))
+		ip = filepath.Dir(d.DBPath)
 		for _, x := range build.Default.SrcDirs() {
-			x = strings.ToLower(x)
 			ip = strings.TrimPrefix(ip, x)
 		}
 		ip = strings.TrimPrefix(ip, string(filepath.Separator))
