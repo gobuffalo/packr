@@ -34,7 +34,15 @@ func (b *Box) Walk(wf WalkFunc) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		m[n] = f
+		keep := true
+		for k := range m {
+			if strings.ToLower(k) == strings.ToLower(n) {
+				keep = false
+			}
+		}
+		if keep {
+			m[n] = f
+		}
 	}
 	b.moot.RUnlock()
 
