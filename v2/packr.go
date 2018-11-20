@@ -1,8 +1,6 @@
 package packr
 
 import (
-	"sync"
-
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/plog"
@@ -10,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var boxes = &sync.Map{}
+var boxes = &boxMap{}
 
 var _ = safe.Run(func() {
 	p, err := parser.NewFromRoots([]string{}, nil)
@@ -38,15 +36,10 @@ func findBox(name string) (*Box, error) {
 	key := resolver.Key(name)
 	plog.Debug("packr", "findBox", "name", name, "key", key)
 
-	i, ok := boxes.Load(key)
+	b, ok := boxes.Load(key)
 	if !ok {
 		plog.Debug("packr", "findBox", "name", name, "key", key, "found", ok)
 		return nil, errors.Errorf("could not find box %s", name)
-	}
-
-	b, ok := i.(*Box)
-	if !ok {
-		return nil, errors.Errorf("expected *Box got %T", i)
 	}
 
 	plog.Debug(b, "found", "box", b)
@@ -55,12 +48,7 @@ func findBox(name string) (*Box, error) {
 
 func placeBox(b *Box) (*Box, error) {
 	key := resolver.Key(b.Name)
-	i, ok := boxes.LoadOrStore(key, b)
-
-	eb, ok := i.(*Box)
-	if !ok {
-		return nil, errors.Errorf("expected *Box got %T", i)
-	}
+	eb, _ := boxes.LoadOrStore(key, b)
 
 	plog.Debug("packr", "placeBox", "name", eb.Name, "path", eb.Path, "resolution directory", eb.ResolutionDir)
 	return eb, nil
