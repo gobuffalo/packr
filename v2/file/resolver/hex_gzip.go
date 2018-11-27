@@ -3,6 +3,7 @@ package resolver
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
+	"github.com/gobuffalo/packr/v2/plog"
 
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/pkg/errors"
@@ -46,9 +48,12 @@ func (hg *HexGzip) FileMap() map[string]file.File {
 }
 
 func (hg *HexGzip) Resolve(box string, name string) (file.File, error) {
-
+	plog.Debug(hg, "Resolve", "box", box, "name", name)
 	hg.moot.Lock()
 	defer hg.moot.Unlock()
+
+	fmt.Println("### hg.unpacked ->", hg.unpacked)
+	fmt.Println("### hg.packed ->", hg.packed)
 
 	if s, ok := hg.unpacked[name]; ok {
 		return file.NewFile(name, []byte(s))
