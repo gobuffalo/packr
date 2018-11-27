@@ -47,6 +47,8 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packr/v2/plog](https://godoc.org/github.com/gobuffalo/packr/v2/plog)
 
+* [github.com/gobuffalo/syncx](https://godoc.org/github.com/gobuffalo/syncx)
+
 * [github.com/joho/godotenv](https://godoc.org/github.com/joho/godotenv)
 
 * [github.com/karrick/godirwalk](https://godoc.org/github.com/karrick/godirwalk)

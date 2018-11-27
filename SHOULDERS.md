@@ -11,6 +11,8 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packr](https://godoc.org/github.com/gobuffalo/packr)
 
+* [github.com/gobuffalo/syncx](https://godoc.org/github.com/gobuffalo/syncx)
+
 * [github.com/joho/godotenv](https://godoc.org/github.com/joho/godotenv)
 
 * [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
