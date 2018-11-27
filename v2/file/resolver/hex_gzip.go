@@ -3,7 +3,6 @@ package resolver
 import (
 	"bytes"
 	"compress/gzip"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -52,9 +51,6 @@ func (hg *HexGzip) Resolve(box string, name string) (file.File, error) {
 	hg.moot.Lock()
 	defer hg.moot.Unlock()
 
-	fmt.Println("### hg.unpacked ->", hg.unpacked)
-	fmt.Println("### hg.packed ->", hg.packed)
-
 	if s, ok := hg.unpacked[name]; ok {
 		return file.NewFile(name, []byte(s))
 	}
@@ -80,6 +76,7 @@ func NewHexGzip(files map[string]string) (*HexGzip, error) {
 	if files == nil {
 		files = map[string]string{}
 	}
+
 	hg := &HexGzip{
 		packed:   files,
 		unpacked: map[string]string{},
