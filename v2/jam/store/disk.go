@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/md5"
+	"fmt"
 	"go/build"
 	"html/template"
 	"io"
@@ -142,10 +143,11 @@ type optsBox struct {
 func (d *Disk) Generator() (*genny.Generator, error) {
 	g := genny.New()
 
+	xb := &parser.Box{Name: DISK_GLOBAL_KEY}
 	opts := options{
 		Package:     d.DBPackage,
 		GlobalFiles: map[string]string{},
-		GK:          DISK_GLOBAL_KEY,
+		GK:          makeKey(xb, d.DBPath),
 	}
 
 	wg := errgroup.Group{}
@@ -165,7 +167,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 					return errors.WithStack(err)
 				}
 				d.moot.Lock()
-				opts.GlobalFiles[v] = bb.String()
+				opts.GlobalFiles[makeKey(xb, k)] = bb.String()
 				d.moot.Unlock()
 				return nil
 			})
@@ -314,10 +316,8 @@ func (d *Disk) Close() error {
 // write -packr.go files in each package (1 per package) that init the global db
 
 func makeKey(box *parser.Box, path string) string {
-	// return path
-	// s := strings.TrimPrefix(path, box.AbsPath)
-	// return strings.TrimPrefix(s, string(filepath.Separator))
-	hasher := md5.New()
-	hasher.Write([]byte(path))
-	return hex.EncodeToString(hasher.Sum(nil))
+	w := md5.New()
+	fmt.Fprint(w, path)
+	h := hex.EncodeToString(w.Sum(nil))
+	return h
 }

@@ -15,14 +15,14 @@ type Pointer struct {
 var _ resolver.Resolver = Pointer{}
 
 func (p Pointer) Resolve(box string, path string) (file.File, error) {
-	plog.Debug(p, "Resolve", "box", box, "path", path)
+	plog.Debug(p, "Resolve", "box", box, "path", path, "forward-box", p.ForwardBox, "forward-path", p.ForwardPath)
 	b, err := findBox(p.ForwardBox)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	f, err := b.Resolve(p.ForwardPath)
 	if err != nil {
-		return f, errors.WithStack(err)
+		return f, errors.WithStack(errors.Wrap(err, path))
 	}
 	plog.Debug(p, "Resolve", "box", box, "path", path, "file", f)
 	return f, nil
