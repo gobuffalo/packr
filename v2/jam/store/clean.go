@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gobuffalo/packd"
+	packr "github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/pkg/errors"
-
-	"github.com/karrick/godirwalk"
 )
 
 func Clean(root string) error {
@@ -52,26 +52,29 @@ func clean(root string) error {
 		os.RemoveAll(packd)
 	}()
 
-	callback := func(path string, info *godirwalk.Dirent) error {
+	box := packr.New(root, root)
+	err := box.Walk(func(path string, f packd.File) error {
+		info, err := f.FileInfo()
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		if info.IsDir() {
+			if filepath.Base(path) == "packrd" {
+				os.RemoveAll(path)
+				return filepath.SkipDir
+			}
+		}
 		if strings.HasSuffix(path, "-packr.go") {
 			err := os.RemoveAll(path)
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			if info.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
 		}
 		return nil
-	}
-	err := godirwalk.Walk(root, &godirwalk.Options{
-		FollowSymbolicLinks: true,
-		Callback:            callback,
 	})
-
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	return nil
 }
