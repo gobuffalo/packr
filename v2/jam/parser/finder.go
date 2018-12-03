@@ -56,7 +56,7 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 			return
 		}
 
-		pkg, err := ctx.ImportDir(dir, 0)
+		pkg, err := ctx.ImportDir(dir, build.IgnoreVendor)
 		if strings.HasPrefix(pkg.ImportPath, "github.com/gobuffalo/packr") {
 			return
 		}
