@@ -5,8 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/packd"
-	packr "github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/pkg/errors"
 )
@@ -52,9 +50,7 @@ func clean(root string) error {
 		os.RemoveAll(packd)
 	}()
 
-	box := packr.New(root, root)
-	err := box.Walk(func(path string, f packd.File) error {
-		info, err := f.FileInfo()
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
