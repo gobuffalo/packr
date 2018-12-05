@@ -18,3 +18,9 @@ Thank you to the following **GIANTS**:
 * [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
 
 * [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
+
+* [github.com/rogpeppe/go-internal/modfile](https://godoc.org/github.com/rogpeppe/go-internal/modfile)
+
+* [github.com/rogpeppe/go-internal/module](https://godoc.org/github.com/rogpeppe/go-internal/module)
+
+* [github.com/rogpeppe/go-internal/semver](https://godoc.org/github.com/rogpeppe/go-internal/semver)
