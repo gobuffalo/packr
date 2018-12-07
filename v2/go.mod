@@ -1,10 +1,11 @@
 module github.com/gobuffalo/packr/v2
 
 require (
-	github.com/gobuffalo/envy v1.6.10
+	github.com/gobuffalo/envy v1.6.11
 	github.com/gobuffalo/genny v0.0.0-20181207164119-84844398a37d
 	github.com/gobuffalo/logger v0.0.0-20181127160119-5b956e21995c
 	github.com/gobuffalo/packd v0.0.0-20181207120301-c49825f8f6f4
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/karrick/godirwalk v1.7.7
 	github.com/markbates/oncer v0.0.0-20181203154359-bf2de49a0be2
 	github.com/markbates/safe v1.0.1
