@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -55,6 +56,11 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 	}
 	for _, root := range roots {
 		plog.Debug(p, "NewFromRoots", "walking", root)
+		sample := filepath.Join(root, "sample.go")
+		if !IsProspect(sample) {
+			fmt.Fprintf(os.Stderr, "Directory not a prospect due to ignored component(s): %s\n", root)
+			continue
+		}
 		err := godirwalk.Walk(root, wopts)
 		if err != nil {
 			return p, errors.WithStack(err)
