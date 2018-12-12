@@ -1,6 +1,7 @@
 module github.com/gobuffalo/packr/v2
 
 require (
+	github.com/gobuffalo/buffalo-plugins v1.8.3 // indirect
 	github.com/gobuffalo/envy v1.6.11
 	github.com/gobuffalo/genny v0.0.0-20181211165820-e26c8466f14d
 	github.com/gobuffalo/logger v0.0.0-20181127160119-5b956e21995c
