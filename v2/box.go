@@ -217,9 +217,20 @@ func (b Box) List() []string {
 func (b *Box) Resolve(key string) (file.File, error) {
 	key = strings.TrimPrefix(key, "/")
 	b.moot.RLock()
-	r, ok := b.resolvers[resolver.Key(key)]
+
+	var r resolver.Resolver
+
+	for k, vr := range b.resolvers {
+		lk := strings.ToLower(resolver.Key(k))
+		lkey := strings.ToLower(resolver.Key(key))
+		if lk == lkey {
+			r = vr
+			break
+		}
+	}
 	b.moot.RUnlock()
-	if !ok {
+
+	if r == nil {
 		r = b.DefaultResolver
 		if r == nil {
 			r = resolver.DefaultResolver

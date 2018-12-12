@@ -8,7 +8,7 @@ import (
 
 func Key(s string) string {
 	s = strings.Replace(s, "\\", "/", -1)
-	return strings.ToLower(s)
+	return s
 }
 
 func OsPath(s string) string {
