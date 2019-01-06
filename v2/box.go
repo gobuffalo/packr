@@ -167,7 +167,9 @@ func (b Box) Has(name string) bool {
 func (b Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
 	f, err := b.Resolve(name)
-	if err != nil {
+	// Some resolvers don't resolve empty directories,
+	// but net/http/fs.go expects it
+	if err != nil && name[len(name)-1] != '/' {
 		return f, err
 	}
 	if len(filepath.Ext(name)) == 0 {
