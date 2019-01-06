@@ -195,6 +195,10 @@ func Test_Box_Open(t *testing.T) {
 	f, err = box.Open("idontexist.txt")
 	r.Error(err)
 	r.Zero(f)
+
+	f, err = box.Open("dirdoesntexit")
+	r.Error(err)
+	r.Zero(f)
 }
 
 func Test_Box_List(t *testing.T) {

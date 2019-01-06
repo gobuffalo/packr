@@ -166,14 +166,14 @@ func (b Box) Has(name string) bool {
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
+	f, err := b.Resolve(name)
+	if err != nil {
+		return f, err
+	}
 	if len(filepath.Ext(name)) == 0 {
 		d, err := file.NewDir(name)
 		plog.Debug(b, "Open", "name", name, "dir", d)
 		return d, err
-	}
-	f, err := b.Resolve(name)
-	if err != nil {
-		return f, err
 	}
 	f, err = file.NewFileR(name, f)
 	plog.Debug(b, "Open", "name", f.Name(), "file", f.Name())
