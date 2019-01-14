@@ -76,6 +76,7 @@ func Pack(opts PackOptions) error {
 	return nil
 }
 
+// ShellPack ...
 func ShellPack(opts PackOptions, boxes parser.Boxes) error {
 	b, err := json.Marshal(boxes)
 	if err != nil {
