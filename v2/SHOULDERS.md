@@ -77,8 +77,20 @@ Thank you to the following **GIANTS**:
 
 * [golang.org/x/tools/go/ast/astutil](https://godoc.org/golang.org/x/tools/go/ast/astutil)
 
+* [golang.org/x/tools/go/gcexportdata](https://godoc.org/golang.org/x/tools/go/gcexportdata)
+
+* [golang.org/x/tools/go/internal/cgo](https://godoc.org/golang.org/x/tools/go/internal/cgo)
+
+* [golang.org/x/tools/go/internal/gcimporter](https://godoc.org/golang.org/x/tools/go/internal/gcimporter)
+
+* [golang.org/x/tools/go/internal/packagesdriver](https://godoc.org/golang.org/x/tools/go/internal/packagesdriver)
+
+* [golang.org/x/tools/go/packages](https://godoc.org/golang.org/x/tools/go/packages)
+
 * [golang.org/x/tools/imports](https://godoc.org/golang.org/x/tools/imports)
 
 * [golang.org/x/tools/internal/fastwalk](https://godoc.org/golang.org/x/tools/internal/fastwalk)
 
 * [golang.org/x/tools/internal/gopathwalk](https://godoc.org/golang.org/x/tools/internal/gopathwalk)
+
+* [golang.org/x/tools/internal/semver](https://godoc.org/golang.org/x/tools/internal/semver)

@@ -11,6 +11,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/rogpeppe/go-internal v1.0.0
 	github.com/sirupsen/logrus v1.3.0
+	github.com/spf13/afero v1.2.0 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc // indirect
