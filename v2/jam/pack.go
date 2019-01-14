@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// PackOptions ...
 type PackOptions struct {
 	IgnoreImports bool
 	Legacy        bool
