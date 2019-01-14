@@ -91,6 +91,7 @@ func ShellPack(opts PackOptions, boxes parser.Boxes) error {
 
 }
 
+// Clean ...
 func Clean(args ...string) error {
 	pwd, err := os.Getwd()
 	if err != nil {
