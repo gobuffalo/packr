@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +19,7 @@ var installCmd = &cobra.Command{
 			}
 			cargs = append(cargs, a)
 		}
-		if err := pack(); err != nil {
+		if err := jam.Pack(globalOptions.PackOptions); err != nil {
 			return errors.WithStack(err)
 		}
 		return goCmd("install", cargs...)

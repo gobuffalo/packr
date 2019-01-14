@@ -5,17 +5,18 @@ import (
 
 	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/logger"
+	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/spf13/cobra"
 )
 
 var globalOptions = struct {
-	Verbose       bool
-	IgnoreImports bool
-	Legacy        bool
-	Silent        bool
-	StoreCmd      string
-}{}
+	jam.PackOptions
+	Verbose bool
+	Silent  bool
+}{
+	PackOptions: jam.PackOptions{},
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "packr2",
@@ -42,7 +43,11 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return pack(args...)
+		opts := globalOptions.PackOptions
+		roots := opts.Roots
+		roots = append(roots, args...)
+		opts.Roots = roots
+		return jam.Pack(opts)
 	},
 }
 
