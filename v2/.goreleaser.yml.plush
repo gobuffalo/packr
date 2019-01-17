@@ -4,8 +4,15 @@ builds:
     - darwin
     - linux
     - windows
+  goarch:
+    - ppc64le
   env:
     - CGO_ENABLED=0
+  ignore:
+    - goos: darwin
+      goarch: ppc64le
+    - goos: windows
+      goarch: ppc64le
   main: ./packr2/main.go
   binary: packr2
 
