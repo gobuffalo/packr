@@ -6,6 +6,8 @@ builds:
     - windows
   goarch:
     - ppc64le
+    - 386
+    - amd64
   env:
     - CGO_ENABLED=0
   ignore:
