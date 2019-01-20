@@ -8,6 +8,8 @@ require (
 	github.com/gobuffalo/meta v0.0.0-20190120163247-50bbb1fa260d // indirect
 	github.com/gobuffalo/packd v0.0.0-20181212173646-eca3b8fd6687
 	github.com/karrick/godirwalk v1.7.8
+	github.com/kr/pty v1.1.3 // indirect
+	github.com/markbates/deplist v1.0.5 // indirect
 	github.com/markbates/oncer v0.0.0-20181203154359-bf2de49a0be2
 	github.com/markbates/safe v1.0.1
 	github.com/pkg/errors v0.8.1
