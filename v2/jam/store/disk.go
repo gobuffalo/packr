@@ -262,9 +262,14 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		}
 	} else {
 		ip = filepath.Dir(d.DBPath)
-		for _, x := range build.Default.SrcDirs() {
+		srcs := build.Default.SrcDirs()
+		srcs = append(srcs, envy.GoPaths()...)
+		for _, x := range srcs {
+			ip = strings.TrimPrefix(ip, "/private")
 			ip = strings.TrimPrefix(ip, x)
 		}
+		ip = strings.TrimPrefix(ip, string(filepath.Separator))
+		ip = strings.TrimPrefix(ip, "src")
 		ip = strings.TrimPrefix(ip, string(filepath.Separator))
 
 		ip = strings.Replace(ip, "\\", "/", -1)
