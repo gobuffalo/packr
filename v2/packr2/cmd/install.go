@@ -11,14 +11,7 @@ var installCmd = &cobra.Command{
 	Short:              "Wraps the go install command with packr",
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var cargs []string
-		for _, a := range args {
-			if a == "--legacy" {
-				globalOptions.Legacy = true
-				continue
-			}
-			cargs = append(cargs, a)
-		}
+		cargs := parseArgs(args)
 		if err := jam.Pack(globalOptions.PackOptions); err != nil {
 			return errors.WithStack(err)
 		}
