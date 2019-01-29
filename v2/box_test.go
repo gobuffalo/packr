@@ -207,3 +207,14 @@ func Test_Box_List(t *testing.T) {
 	exp := []string{"a.txt", filepath.Join("b", "b.txt"), filepath.Join("b", "b2.txt"), filepath.Join("c", "c.txt"), filepath.Join("d", "d.txt")}
 	r.Equal(exp, act)
 }
+
+func Test_Box_HasDir(t *testing.T) {
+	r := require.New(t)
+
+	box := NewBox(filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString("d/e/f.txt", "D"))
+
+	r.True(box.HasDir("d/e"))
+	r.True(box.HasDir("c"))
+	r.False(box.HasDir("a"))
+}
