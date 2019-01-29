@@ -95,6 +95,7 @@ func construct(name string, path string) *Box {
 		ResolutionDir: resolutionDir(path),
 		resolvers:     map[string]resolver.Resolver{},
 		moot:          &sync.RWMutex{},
+		dirs:          map[string]bool{},
 	}
 }
 
@@ -124,10 +125,12 @@ type Box struct {
 	DefaultResolver resolver.Resolver `json:"default_resolver"`
 	resolvers       map[string]resolver.Resolver
 	moot            *sync.RWMutex
+	dirs            map[string]bool
 }
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
 	b.moot.Lock()
+	b.dirs[filepath.Dir(file)] = true
 	plog.Debug(b, "SetResolver", "file", file, "resolver", fmt.Sprintf("%T", res))
 	b.resolvers[resolver.Key(file)] = res
 	b.moot.Unlock()
@@ -179,10 +182,28 @@ func (b Box) Has(name string) bool {
 	return true
 }
 
+func (b *Box) HasDir(name string) bool {
+	oncer.Do("packr2/box/HasDir", func() {
+		for _, f := range b.List() {
+			d := filepath.Dir(f)
+			b.dirs[d] = true
+			b.dirs[strings.TrimPrefix(name, "/")] = true
+		}
+	})
+	if name == "/" {
+		return b.Has("index.html")
+	}
+	_, ok := b.dirs[name]
+	return ok
+}
+
 // Open returns a File using the http.File interface
 func (b Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
 	if len(filepath.Ext(name)) == 0 {
+		if !b.HasDir(name) {
+			return nil, os.ErrNotExist
+		}
 		d, err := file.NewDir(name)
 		plog.Debug(b, "Open", "name", name, "dir", d)
 		return d, err
