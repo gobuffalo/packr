@@ -130,7 +130,9 @@ type Box struct {
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
 	b.moot.Lock()
-	b.dirs[filepath.Dir(file)] = true
+	d := filepath.Dir(file)
+	b.dirs[d] = true
+	b.dirs[strings.TrimPrefix(d, "/")] = true
 	plog.Debug(b, "SetResolver", "file", file, "resolver", fmt.Sprintf("%T", res))
 	b.resolvers[resolver.Key(file)] = res
 	b.moot.Unlock()
