@@ -22,7 +22,7 @@ import (
 )
 
 var _ packd.Box = &Box{}
-var _ packd.HTTPBox = Box{}
+var _ packd.HTTPBox = &Box{}
 var _ packd.Addable = &Box{}
 var _ packd.Walkable = &Box{}
 var _ packd.Finder = Box{}
@@ -195,7 +195,7 @@ func (b *Box) HasDir(name string) bool {
 }
 
 // Open returns a File using the http.File interface
-func (b Box) Open(name string) (http.File, error) {
+func (b *Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
 	if len(filepath.Ext(name)) == 0 {
 		if !b.HasDir(name) {
@@ -215,7 +215,7 @@ func (b Box) Open(name string) (http.File, error) {
 }
 
 // List shows "What's in the box?"
-func (b Box) List() []string {
+func (b *Box) List() []string {
 	var keys []string
 
 	b.Walk(func(path string, info File) error {

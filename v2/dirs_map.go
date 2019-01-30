@@ -5,6 +5,7 @@ package packr
 
 import (
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -17,7 +18,7 @@ type dirsMap struct {
 
 // Delete the key from the map
 func (m *dirsMap) Delete(key string) {
-	m.data.Delete(key)
+	m.data.Delete(m.normalizeKey(key))
 }
 
 // Load the key from the map.
@@ -25,7 +26,7 @@ func (m *dirsMap) Delete(key string) {
 // A false return indicates either the key was not found
 // or the value is not of type bool
 func (m *dirsMap) Load(key string) (bool, bool) {
-	i, ok := m.data.Load(key)
+	i, ok := m.data.Load(m.normalizeKey(key))
 	if !ok {
 		return false, false
 	}
@@ -36,7 +37,7 @@ func (m *dirsMap) Load(key string) (bool, bool) {
 // LoadOrStore will return an existing key or
 // store the value if not already in the map
 func (m *dirsMap) LoadOrStore(key string, value bool) (bool, bool) {
-	i, _ := m.data.LoadOrStore(key, value)
+	i, _ := m.data.LoadOrStore(m.normalizeKey(key), value)
 	s, ok := i.(bool)
 	return s, ok
 }
@@ -58,7 +59,7 @@ func (m *dirsMap) Range(f func(key string, value bool) bool) {
 
 // Store a bool in the map
 func (m *dirsMap) Store(key string, value bool) {
-	m.data.Store(key, value)
+	m.data.Store(m.normalizeKey(key), value)
 }
 
 // Keys returns a list of keys in the map
@@ -70,4 +71,10 @@ func (m *dirsMap) Keys() []string {
 	})
 	sort.Strings(keys)
 	return keys
+}
+
+func (m *dirsMap) normalizeKey(key string) string {
+	key = strings.Replace(key, "\\", "/", -1)
+
+	return key
 }
