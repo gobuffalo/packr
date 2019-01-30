@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// WalkFunc is used to walk a box
 type WalkFunc = packd.WalkFunc
 
 // Walk will traverse the box and call the WalkFunc for each file in the box/folder.
@@ -20,7 +21,7 @@ func (b *Box) Walk(wf WalkFunc) error {
 	dr := b.DefaultResolver
 	if dr == nil {
 		cd := resolver.OsPath(b.ResolutionDir)
-		dr = &resolver.Disk{Root: string(cd)}
+		dr = &resolver.Disk{Root: cd}
 	}
 	if fm, ok := dr.(file.FileMappable); ok {
 		for n, f := range fm.FileMap() {
@@ -36,7 +37,7 @@ func (b *Box) Walk(wf WalkFunc) error {
 		}
 		keep := true
 		for k := range m {
-			if strings.ToLower(k) == strings.ToLower(n) {
+			if strings.EqualFold(k, n) {
 				keep = false
 			}
 		}

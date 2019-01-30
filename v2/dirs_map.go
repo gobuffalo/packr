@@ -59,7 +59,9 @@ func (m *dirsMap) Range(f func(key string, value bool) bool) {
 
 // Store a bool in the map
 func (m *dirsMap) Store(key string, value bool) {
-	m.data.Store(m.normalizeKey(key), value)
+	d := m.normalizeKey(key)
+	m.data.Store(d, value)
+	m.data.Store(strings.TrimPrefix(d, "/"), value)
 }
 
 // Keys returns a list of keys in the map
