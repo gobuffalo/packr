@@ -11,7 +11,6 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"sync"
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packd"
@@ -23,7 +22,7 @@ import (
 )
 
 var _ packd.Box = &Box{}
-var _ packd.HTTPBox = Box{}
+var _ packd.HTTPBox = &Box{}
 var _ packd.Addable = &Box{}
 var _ packd.Walkable = &Box{}
 var _ packd.Finder = Box{}
@@ -93,8 +92,8 @@ func construct(name string, path string) *Box {
 		Path:          path,
 		Name:          name,
 		ResolutionDir: resolutionDir(path),
-		resolvers:     map[string]resolver.Resolver{},
-		moot:          &sync.RWMutex{},
+		resolvers:     resolversMap{},
+		dirs:          dirsMap{},
 	}
 }
 
@@ -122,15 +121,16 @@ type Box struct {
 	Name            string            `json:"name"`
 	ResolutionDir   string            `json:"resolution_dir"`
 	DefaultResolver resolver.Resolver `json:"default_resolver"`
-	resolvers       map[string]resolver.Resolver
-	moot            *sync.RWMutex
+	resolvers       resolversMap
+	dirs            dirsMap
 }
 
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
-	b.moot.Lock()
+	d := filepath.Dir(file)
+	b.dirs.Store(d, true)
+	b.dirs.Store(strings.TrimPrefix(d, "/"), true)
 	plog.Debug(b, "SetResolver", "file", file, "resolver", fmt.Sprintf("%T", res))
-	b.resolvers[resolver.Key(file)] = res
-	b.moot.Unlock()
+	b.resolvers.Store(resolver.Key(file), res)
 }
 
 // AddString converts t to a byteslice and delegates to AddBytes to add to b.data
@@ -179,10 +179,28 @@ func (b Box) Has(name string) bool {
 	return true
 }
 
+func (b *Box) HasDir(name string) bool {
+	oncer.Do("packr2/box/HasDir", func() {
+		for _, f := range b.List() {
+			d := filepath.Dir(f)
+			b.dirs.Store(d, true)
+			b.dirs.Store(strings.TrimPrefix(d, "/"), true)
+		}
+	})
+	if name == "/" {
+		return b.Has("index.html")
+	}
+	_, ok := b.dirs.Load(name)
+	return ok
+}
+
 // Open returns a File using the http.File interface
-func (b Box) Open(name string) (http.File, error) {
+func (b *Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
 	if len(filepath.Ext(name)) == 0 {
+		if !b.HasDir(name) {
+			return nil, os.ErrNotExist
+		}
 		d, err := file.NewDir(name)
 		plog.Debug(b, "Open", "name", name, "dir", d)
 		return d, err
@@ -197,7 +215,7 @@ func (b Box) Open(name string) (http.File, error) {
 }
 
 // List shows "What's in the box?"
-func (b Box) List() []string {
+func (b *Box) List() []string {
 	var keys []string
 
 	b.Walk(func(path string, info File) error {
@@ -216,19 +234,18 @@ func (b Box) List() []string {
 
 func (b *Box) Resolve(key string) (file.File, error) {
 	key = strings.TrimPrefix(key, "/")
-	b.moot.RLock()
 
 	var r resolver.Resolver
 
-	for k, vr := range b.resolvers {
+	b.resolvers.Range(func(k string, vr resolver.Resolver) bool {
 		lk := strings.ToLower(resolver.Key(k))
 		lkey := strings.ToLower(resolver.Key(key))
 		if lk == lkey {
 			r = vr
-			break
+			return false
 		}
-	}
-	b.moot.RUnlock()
+		return true
+	})
 
 	if r == nil {
 		r = b.DefaultResolver
