@@ -7,6 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Pointer is a resolvr which resolves
+// a file from a different box.
 type Pointer struct {
 	ForwardBox  string
 	ForwardPath string
@@ -14,6 +16,8 @@ type Pointer struct {
 
 var _ resolver.Resolver = Pointer{}
 
+// Resolve attempts to find the file in the specific box
+// with the specified key
 func (p Pointer) Resolve(box string, path string) (file.File, error) {
 	plog.Debug(p, "Resolve", "box", box, "path", path, "forward-box", p.ForwardBox, "forward-path", p.ForwardPath)
 	b, err := findBox(p.ForwardBox)
