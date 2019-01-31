@@ -93,4 +93,6 @@ Thank you to the following **GIANTS**:
 
 * [golang.org/x/tools/internal/gopathwalk](https://godoc.org/golang.org/x/tools/internal/gopathwalk)
 
+* [golang.org/x/tools/internal/module](https://godoc.org/golang.org/x/tools/internal/module)
+
 * [golang.org/x/tools/internal/semver](https://godoc.org/golang.org/x/tools/internal/semver)
