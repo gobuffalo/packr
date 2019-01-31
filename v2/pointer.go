@@ -29,5 +29,5 @@ func (p Pointer) Resolve(box string, path string) (file.File, error) {
 		return f, errors.WithStack(errors.Wrap(err, path))
 	}
 	plog.Debug(p, "Resolve", "box", box, "path", path, "file", f)
-	return f, nil
+	return file.NewFileR(path, f)
 }
