@@ -142,6 +142,9 @@ type optsBox struct {
 
 func (d *Disk) Generator() (*genny.Generator, error) {
 	g := genny.New()
+	if len(d.boxes) == 0 {
+		return g, nil
+	}
 
 	xb := &parser.Box{Name: DISK_GLOBAL_KEY}
 	opts := options{
