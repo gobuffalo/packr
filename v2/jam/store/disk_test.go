@@ -140,3 +140,22 @@ func Test_Disk_Close(t *testing.T) {
 		return nil
 	})
 }
+
+func Test_Disk_Generator_NoFiles(t *testing.T) {
+	gomods.Disable(func() error {
+
+		r := require.New(t)
+
+		d := NewDisk(".", "")
+		r.Len(d.boxes, 0)
+
+		run := gentest.NewRunner()
+		run.WithNew(d.Generator())
+		r.NoError(run.Run())
+
+		res := run.Results()
+		r.Len(res.Files, 0)
+
+		return nil
+	})
+}
