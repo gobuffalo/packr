@@ -15,5 +15,5 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4
-	golang.org/x/tools v0.0.0-20190206175659-4892ae6946ab
+	golang.org/x/tools v0.0.0-20190206221403-44bcb96178d3
 )
