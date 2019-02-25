@@ -3,6 +3,7 @@ module github.com/gobuffalo/packr/v2
 require (
 	github.com/gobuffalo/envy v1.6.15
 	github.com/gobuffalo/genny v0.0.0-20190219203444-c95082806342
+	github.com/gobuffalo/gogen v0.0.0-20190224213239-1c6076128bbc
 	github.com/gobuffalo/logger v0.0.0-20190224201004-be78ebfea0fa
 	github.com/gobuffalo/packd v0.0.0-20190224160250-d04dd98aca5b
 	github.com/karrick/godirwalk v1.7.8

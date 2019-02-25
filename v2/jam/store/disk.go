@@ -19,7 +19,7 @@ import (
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/genny"
-	"github.com/gobuffalo/genny/movinglater/gotools"
+	"github.com/gobuffalo/gogen"
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/rogpeppe/go-internal/modfile"
@@ -192,7 +192,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		return opts.Boxes[a].Name < opts.Boxes[b].Name
 	})
 
-	t := gotools.TemplateTransformer(opts, template.FuncMap{
+	t := gogen.TemplateTransformer(opts, template.FuncMap{
 		"printBox": func(ob optsBox) (template.HTML, error) {
 			box := d.boxes[ob.Name]
 			if box == nil {
@@ -225,7 +225,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 				"Box":   box,
 				"Files": files,
 			}
-			t := gotools.TemplateTransformer(opts, nil)
+			t := gogen.TemplateTransformer(opts, nil)
 			gf, err = t.Transform(gf)
 			if err != nil {
 				return "", errors.WithStack(err)
@@ -242,7 +242,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		return g, errors.WithStack(err)
 	}
 
-	ft := gotools.FmtTransformer()
+	ft := gogen.FmtTransformer()
 	global, err = ft.Transform(global)
 	if err != nil {
 		return g, errors.WithStack(err)
@@ -295,7 +295,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 			Import:  ip,
 		}
 
-		t := gotools.TemplateTransformer(o, template.FuncMap{})
+		t := gogen.TemplateTransformer(o, template.FuncMap{})
 		f, err := t.Transform(f)
 		if err != nil {
 			return g, nil

@@ -126,8 +126,9 @@ github.com/gobuffalo/gitgen v0.0.0-20190219185555-91c2c5f0aad5/go.mod h1:ZzGIrxB
 github.com/gobuffalo/github_flavored_markdown v1.0.4/go.mod h1:uRowCdK+q8d/RF0Kt3/DSalaIXbb0De/dmTqMQdkQ4I=
 github.com/gobuffalo/github_flavored_markdown v1.0.5/go.mod h1:U0643QShPF+OF2tJvYNiYDLDGDuQmJZXsf/bHOJPsMY=
 github.com/gobuffalo/github_flavored_markdown v1.0.7/go.mod h1:w93Pd9Lz6LvyQXEG6DktTPHkOtCbr+arAD5mkwMzXLI=
-github.com/gobuffalo/gogen v0.0.0-20190219194924-d32a17ad9761 h1:KJFgsBn2pl82SyCJrVO1ksoJq7u5a+f1MeBvmjHtGTk=
 github.com/gobuffalo/gogen v0.0.0-20190219194924-d32a17ad9761/go.mod h1:v47C8sid+ZM2qK+YpQ2MGJKssKAqyTsH1wl/pTCPdz8=
+github.com/gobuffalo/gogen v0.0.0-20190224213239-1c6076128bbc h1:GjmMs2PLx+rH9In421AR1RkHV5AG9lLnRpIPhWauvoI=
+github.com/gobuffalo/gogen v0.0.0-20190224213239-1c6076128bbc/go.mod h1:tQqPADZKflmJCR4FHRHYNPP79cXPICyxUiUHyhuXtqg=
 github.com/gobuffalo/httptest v1.0.2/go.mod h1:7T1IbSrg60ankme0aDLVnEY0h056g9M1/ZvpVThtB7E=
 github.com/gobuffalo/licenser v0.0.0-20180924033006-eae28e638a42/go.mod h1:Ubo90Np8gpsSZqNScZZkVXXAo5DGhTb+WYFIjlnog8w=
 github.com/gobuffalo/licenser v0.0.0-20181025145548-437d89de4f75/go.mod h1:x3lEpYxkRG/XtGCUNkio+6RZ/dlOvLzTI9M1auIwFcw=
