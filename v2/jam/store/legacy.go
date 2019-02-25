@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/genny"
-	"github.com/gobuffalo/genny/movinglater/gotools"
+	"github.com/gobuffalo/gogen"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/plog"
 )
@@ -93,7 +93,7 @@ func (l *Legacy) Generator() (*genny.Generator, error) {
 			"Boxes":   b,
 		}
 		f := genny.NewFile(filepath.Join(bx.PackageDir, "a_"+bx.Package+"-packr.go.tmpl"), strings.NewReader(legacyTmpl))
-		t := gotools.TemplateTransformer(opts, nil)
+		t := gogen.TemplateTransformer(opts, nil)
 		f, err := t.Transform(f)
 		if err != nil {
 			return g, errors.WithStack(err)

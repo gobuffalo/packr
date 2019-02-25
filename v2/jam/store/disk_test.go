@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gobuffalo/genny/gentest"
-	"github.com/gobuffalo/genny/movinglater/gotools/gomods"
+	"github.com/gobuffalo/gogen/gomods"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/markbates/oncer"
