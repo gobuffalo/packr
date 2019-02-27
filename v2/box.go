@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -118,7 +119,7 @@ func (b *Box) Has(name string) bool {
 
 // HasDir returns true if the directory exists in the box
 func (b *Box) HasDir(name string) bool {
-	oncer.Do("packr2/box/HasDir", func() {
+	oncer.Do("packr2/box/HasDir"+b.Name, func() {
 		for _, f := range b.List() {
 			d := filepath.Dir(f)
 			b.dirs.Store(d, true)
@@ -134,21 +135,29 @@ func (b *Box) HasDir(name string) bool {
 // Open returns a File using the http.File interface
 func (b *Box) Open(name string) (http.File, error) {
 	plog.Debug(b, "Open", "name", name)
-	if len(filepath.Ext(name)) == 0 {
-		if !b.HasDir(name) {
-			return nil, os.ErrNotExist
-		}
-		d, err := file.NewDir(name)
-		plog.Debug(b, "Open", "name", name, "dir", d)
-		return d, err
-	}
 	f, err := b.Resolve(name)
 	if err != nil {
+		if len(filepath.Ext(name)) == 0 {
+			return b.openWoExt(name)
+		}
 		return f, err
 	}
 	f, err = file.NewFileR(name, f)
 	plog.Debug(b, "Open", "name", f.Name(), "file", f.Name())
 	return f, err
+}
+
+func (b *Box) openWoExt(name string) (http.File, error) {
+	if !b.HasDir(name) {
+		id := path.Join(name, "index.html")
+		if b.Has(id) {
+			return b.Open(id)
+		}
+		return nil, os.ErrNotExist
+	}
+	d, err := file.NewDir(name)
+	plog.Debug(b, "Open", "name", name, "dir", d)
+	return d, err
 }
 
 // List shows "What's in the box?"

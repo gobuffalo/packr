@@ -69,6 +69,27 @@ func Test_HTTPBox_NotFound(t *testing.T) {
 	r.Equal(404, res.Code)
 }
 
+func Test_HTTPBox_Handles_IndexHTML_Nested(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_HTTPBox_Handles_IndexHTML_Nested", "!")
+	box.AddString("foo/index.html", "foo")
+
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(box))
+
+	req, err := http.NewRequest("GET", "/foo", nil)
+	r.NoError(err)
+
+	res := httptest.NewRecorder()
+
+	mux.ServeHTTP(res, req)
+
+	r.Equal(200, res.Code)
+
+	r.Equal("foo", strings.TrimSpace(res.Body.String()))
+}
+
 func Test_HTTPBox_Handles_IndexHTML(t *testing.T) {
 	r := require.New(t)
 
