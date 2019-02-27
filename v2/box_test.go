@@ -182,17 +182,21 @@ func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt": qfile("foo.txt", "foo!"),
+		"foo.txt":        qfile("foo.txt", "foo!"),
+		"bar":            qfile("bar", "bar!"),
+		"baz/index.html": qfile("baz", "baz!"),
 	})
 	box := New("Test_Box_Open", "./templates")
 
-	box.SetResolver("foo.txt", d)
+	box.DefaultResolver = d
 
-	f, err := box.Open("foo.txt")
-	r.NoError(err)
-	r.NotZero(f)
+	for _, x := range []string{"foo.txt", "/foo.txt", "bar", "/bar", "baz", "/baz"} {
+		f, err := box.Open(x)
+		r.NoError(err)
+		r.NotZero(f)
+	}
 
-	f, err = box.Open("idontexist.txt")
+	f, err := box.Open("idontexist.txt")
 	r.Error(err)
 	r.Zero(f)
 }
