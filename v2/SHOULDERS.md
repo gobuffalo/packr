@@ -15,6 +15,8 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packd](https://godoc.org/github.com/gobuffalo/packd)
 
+* [github.com/inconshreveable/mousetrap](https://godoc.org/github.com/inconshreveable/mousetrap)
+
 * [github.com/karrick/godirwalk](https://godoc.org/github.com/karrick/godirwalk)
 
 * [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
