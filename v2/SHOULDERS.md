@@ -15,8 +15,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packd](https://godoc.org/github.com/gobuffalo/packd)
 
-* [github.com/inconshreveable/mousetrap](https://godoc.org/github.com/inconshreveable/mousetrap)
-
 * [github.com/karrick/godirwalk](https://godoc.org/github.com/karrick/godirwalk)
 
 * [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
@@ -34,5 +32,7 @@ Thank you to the following **GIANTS**:
 * [github.com/stretchr/testify](https://godoc.org/github.com/stretchr/testify)
 
 * [golang.org/x/sync](https://godoc.org/golang.org/x/sync)
+
+* [golang.org/x/sys](https://godoc.org/golang.org/x/sys)
 
 * [golang.org/x/tools](https://godoc.org/golang.org/x/tools)
