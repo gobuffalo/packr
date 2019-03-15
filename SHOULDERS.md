@@ -11,8 +11,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packr/v2](https://godoc.org/github.com/gobuffalo/packr/v2)
 
-* [github.com/inconshreveable/mousetrap](https://godoc.org/github.com/inconshreveable/mousetrap)
-
 * [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
 
 * [github.com/spf13/cobra](https://godoc.org/github.com/spf13/cobra)
@@ -20,5 +18,3 @@ Thank you to the following **GIANTS**:
 * [github.com/stretchr/testify](https://godoc.org/github.com/stretchr/testify)
 
 * [golang.org/x/sync](https://godoc.org/golang.org/x/sync)
-
-* [golang.org/x/sys](https://godoc.org/golang.org/x/sys)
