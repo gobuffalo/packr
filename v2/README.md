@@ -26,7 +26,7 @@ In version `v2.0.0` the file format changed and is not backward compatible with 
 
 #### Can `packr-v1.x` read the new format?
 
-No, it can not. Because of the way the new file format works porting it to `packr-v1.x` would be difficult. PR's are welcome though. :)
+No, it can not. Because of the way the new file format works porting it to `packr-v1.x` would be difficult. PRs are welcome though. :)
 
 #### Can `packr-v2.x` read `packr-v1.x` files?
 
@@ -112,13 +112,13 @@ Packr uses the following resolution rules when looking for a file:
 
 Because Packr knows how to fall through to the file system, developers don't need to worry about constantly compiling their static files into a binary. They can work unimpeded.
 
-Packr takes file resolution a step further. When declaring a new box you use a relative path, `./templates`. When Packr recieves this call it calculates out the absolute path to that directory. By doing this it means you can be guaranteed that Packr can find your files correctly, even if you're not running in the directory that the box was created in. This helps with the problem of testing, where Go changes the `pwd` for each package, making relative paths difficult to work with. This is not a problem when using Packr.
+Packr takes file resolution a step further. When declaring a new box you use a relative path, `./templates`. When Packr receives this call it calculates out the absolute path to that directory. By doing this it means you can be guaranteed that Packr can find your files correctly, even if you're not running in the directory that the box was created in. This helps with the problem of testing, where Go changes the `pwd` for each package, making relative paths difficult to work with. This is not a problem when using Packr.
 
 ---
 
 ## Usage with HTTP
 
-A box implements the [`http.FileSystem`](https://golang.org/pkg/net/http/#FileSystemhttps://golang.org/pkg/net/http/#FileSystem) interface, meaning it can be used to serve static files.
+A box implements the [`http.FileSystem`](https://golang.org/pkg/net/http/#FileSystem) interface, meaning it can be used to serve static files.
 
 ```go
 package main
