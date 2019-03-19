@@ -258,7 +258,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		cmd := exec.Command("go", "env", "GOMOD")
 		out, err := cmd.Output()
 		if err != nil {
-			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
+			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled")
 		}
 		mp := strings.TrimSpace(string(out))
 		if mp == "" {
