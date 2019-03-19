@@ -11,6 +11,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"sort"
@@ -251,10 +252,24 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 
 	var ip string
 	if envy.Mods() {
-		mp := filepath.Join(filepath.Dir(d.DBPath), "go.mod")
-		if _, err := os.Stat(mp); err != nil {
-			mp = filepath.Join(d.DBPath, "go.mod")
+		// Starting in 1.12, we can rely on Go's method for
+		// resolving where go.mod resides. Prior versions will
+		// simply return an empty string.
+		cmd := exec.Command("go", "env", "GOMOD")
+		out, err := cmd.Output()
+		if err != nil {
+			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled")
 		}
+		mp := strings.TrimSpace(string(out))
+		if mp == "" {
+			// We are on a prior version of Go; try and do
+			// the resolution ourselves.
+			mp = filepath.Join(filepath.Dir(d.DBPath), "go.mod")
+			if _, err := os.Stat(mp); err != nil {
+				mp = filepath.Join(d.DBPath, "go.mod")
+			}
+		}
+
 		moddata, err := ioutil.ReadFile(mp)
 		if err != nil {
 			return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
