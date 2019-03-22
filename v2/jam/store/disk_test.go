@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/genny/gentest"
 	"github.com/gobuffalo/gogen/gomods"
 	"github.com/gobuffalo/packr/v2"
@@ -47,6 +48,38 @@ func Test_Disk_Generator(t *testing.T) {
 		r.Contains(f.String(), `import _ "github.com/gobuffalo/packr/v2/jam/packrd"`)
 		return nil
 	})
+}
+
+func Test_Disk_Generator_GoMod(t *testing.T) {
+	oe := envy.Get(gomods.ENV, "off")
+	_ = envy.MustSet(gomods.ENV, "on")
+	defer envy.MustSet(gomods.ENV, oe)
+
+	r := require.New(t)
+
+	p, err := parser.NewFromRoots([]string{"./_fixtures/disk-pack"}, &parser.RootsOptions{
+		IgnoreImports: true,
+	})
+	r.NoError(err)
+
+	boxes, err := p.Run()
+	r.NoError(err)
+
+	d := NewDisk(".", "")
+	for _, b := range boxes {
+		r.NoError(d.Pack(b))
+	}
+
+	run := gentest.NewRunner()
+	run.WithNew(d.Generator())
+	r.NoError(run.Run())
+
+	res := run.Results()
+	r.Len(res.Files, 3)
+
+	f := res.Files[0]
+	r.Equal("a-packr.go", filepath.Base(f.Name()))
+	r.Contains(f.String(), `import _ "github.com/gobuffalo/packr/v2/jam/packrd"`)
 }
 
 func Test_Disk_FileNames(t *testing.T) {
