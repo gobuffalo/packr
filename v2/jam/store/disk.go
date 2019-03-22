@@ -278,6 +278,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 		if ip == "" {
 			return g, errors.New("go.mod is malformed.")
 		}
+		ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
 	} else {
 		ip = filepath.Dir(d.DBPath)
 		srcs := envy.GoPaths()
