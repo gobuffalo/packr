@@ -65,6 +65,13 @@ func New(name string, path string) *Box {
 	return b
 }
 
+// Folder returns a Box that will NOT be packed.
+// This is useful for writing tests or tools that
+// need to work with a folder at runtime.
+func Folder(path string) *Box {
+	return New(path, path)
+}
+
 // SetResolver allows for the use of a custom resolver for
 // the specified file
 func (b *Box) SetResolver(file string, res resolver.Resolver) {
