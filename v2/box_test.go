@@ -219,6 +219,7 @@ func Test_Box_HasDir(t *testing.T) {
 	r.NoError(box.AddString("d/e/f.txt", "D"))
 
 	r.True(box.HasDir("d/e"))
+	r.True(box.HasDir("d"))
 	r.True(box.HasDir("c"))
 	r.False(box.HasDir("a"))
 }
