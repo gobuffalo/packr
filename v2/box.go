@@ -128,8 +128,9 @@ func (b *Box) Has(name string) bool {
 func (b *Box) HasDir(name string) bool {
 	oncer.Do("packr2/box/HasDir"+b.Name, func() {
 		for _, f := range b.List() {
-			d := filepath.Dir(f)
-			b.dirs.Store(d, true)
+			for d := filepath.Dir(f); d != "."; d = filepath.Dir(d) {
+				b.dirs.Store(d, true)
+			}
 		}
 	})
 	if name == "/" {
