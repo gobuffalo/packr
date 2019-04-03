@@ -170,3 +170,58 @@ Why do you want to do this? Packr first looks to the information stored in these
 ## Debugging
 
 The `packr2` command passes all arguments down to the underlying `go` command, this includes the `-v` flag to print out `go build` information. Packr looks for the `-v` flag, and will turn on its own verbose logging. This is very useful for trying to understand what the `packr` command is doing when it is run.
+
+---
+
+## FAQ
+
+### Compilation Errors with Go Templates
+
+Q: I have a program with Go template files, those files are named `foo.go` and look like the following:
+
+```
+// Copyright {{.Year}} {{.Author}}. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package {{.Project}}
+```
+
+When I run `packr2` I get errors like:
+
+```
+expected 'IDENT', found '{'
+``
+
+A: Packr works by searching your `.go` files for `packr.New` or `packr.NewBox` calls. Because those files aren't "proper" Go files, Packr can't parse them to find the box declarations. To fix this you need to tell Packr to ignore those files when searching for boxes. A couple solutions to this problem are:
+
+* Name the files something else. The `.tmpl` extension is the idiomatic way of naming these types of files.
+* Rename the folder containing these files to start with an `_`, for example `_templates`. Packr, like Go, will ignore folders starting with the `_` character when searching for boxes.
+
+### Dynamic Box Paths
+
+Q: I need to set the path of a box using a variable, but `packr.New("foo", myVar)` doesn't work correctly.
+
+A: Packr attempts to "automagically" set it's resolution directory when using `packr.New`, however, for dynamic paths you need to set it manually:
+
+```go
+box := packr.New("foo", "|")
+box.ResolutionDir = myVar
+```
+
+### I don't want to pack files, but still use the Packr interface.
+
+Q: I want to write code that using the Packr tools, but doesn't actually pack the files into my binary. How can I do that?
+
+A: Using `packr.Folder` gives you back a `*packr.Box` that can be used as normal, but is excluded by the Packr tool when compiling.
+
+### Packr Finds No Boxes
+
+Q: I run `packr2 -v` but it doesn't find my boxes:
+
+```
+DEBU[2019-03-18T18:48:52+01:00] *parser.Parser#NewFromRoots found prospects=0
+DEBU[2019-03-18T18:48:52+01:00] found 0 boxes
+```
+
+A: Packr works by parsing `.go` files to find `packr.New` and `packr.NewBox` declarations. If there aren't any `.go` in the folder that `packr2` is run in it can not find those declarations. To fix this problem run the `packr2` command in the directory containing your `.go` files.
