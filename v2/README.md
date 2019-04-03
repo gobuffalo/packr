@@ -191,7 +191,7 @@ When I run `packr2` I get errors like:
 
 ```
 expected 'IDENT', found '{'
-``
+```
 
 A: Packr works by searching your `.go` files for `packr.New` or `packr.NewBox` calls. Because those files aren't "proper" Go files, Packr can't parse them to find the box declarations. To fix this you need to tell Packr to ignore those files when searching for boxes. A couple solutions to this problem are:
 
