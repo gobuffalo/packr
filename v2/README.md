@@ -233,7 +233,9 @@ Q: I want to be able to easily test my applications by passing in mock boxes. Ho
 A: Packr boxes and files conform to the interfaces found at [`github.com/gobuffalo/packd`](https://godoc.org/github.com/gobuffalo/packd). Change your application to use those interfaces instead of the concrete Packr types.
 
 ```go
-func myFunc(box *packr.Box)
+// using concrete type
+func myFunc(box *packr.Box) {}
 
-func myFunc(box packd.Box)
+// using interfaces
+func myFunc(box packd.Box) {}
 ```
