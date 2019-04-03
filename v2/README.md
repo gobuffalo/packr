@@ -225,3 +225,15 @@ DEBU[2019-03-18T18:48:52+01:00] found 0 boxes
 ```
 
 A: Packr works by parsing `.go` files to find [`github.com/gobuffalo/packr/v2#Box`](https://godoc.org/github.com/gobuffalo/packr/v2#Box) and [`github.com/gobuffalo/packr/v2#NewBox`](https://godoc.org/github.com/gobuffalo/packr/v2#NewBox) declarations. If there aren't any `.go` in the folder that `packr2` is run in it can not find those declarations. To fix this problem run the `packr2` command in the directory containing your `.go` files.
+
+### Box Interfaces
+
+Q: I want to be able to easily test my applications by passing in mock boxes. How do I do that?
+
+A: Packr boxes and files conform to the interfaces found at [`github.com/gobuffalo/packd`](https://godoc.org/github.com/gobuffalo/packd). Change your application to use those interfaces instead of the concrete Packr types.
+
+```go
+func myFunc(box *packr.Box)
+
+func myFunc(box packd.Box)
+```
