@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"github.com/gobuffalo/envy"
 
@@ -39,6 +40,22 @@ var rootCmd = &cobra.Command{
 				continue
 			}
 		}
+
+		// if the last argument is a .go file or directory we should
+		// find boxes from there, not from the current directory.
+		//	packr2 -v cmd/main.go
+		if len(args) > 0 {
+			i := len(args) - 1
+			dir := args[i]
+			if _, err := os.Stat(dir); err == nil {
+				if filepath.Ext(dir) == ".go" {
+					dir = filepath.Dir(dir)
+				}
+				os.Chdir(dir)
+				args[i] = filepath.Base(args[i])
+			}
+		}
+
 		if globalOptions.Verbose {
 			genny.DefaultLogLvl = logger.DebugLevel
 			plog.Logger = logger.New(logger.DebugLevel)
