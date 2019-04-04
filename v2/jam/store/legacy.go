@@ -9,8 +9,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/gogen"
 	"github.com/gobuffalo/packr/v2/jam/parser"
@@ -34,7 +32,7 @@ func NewLegacy() *Legacy {
 func (l *Legacy) Pack(box *parser.Box) error {
 	files, err := l.Files(box)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	var fcs []legacyFile
@@ -43,7 +41,7 @@ func (l *Legacy) Pack(box *parser.Box) error {
 		n := strings.TrimPrefix(f.Name(), box.AbsPath+string(filepath.Separator))
 		c, err := l.prepFile(f)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		fcs = append(fcs, legacyFile{Name: n, Contents: c})
 	}
@@ -62,7 +60,7 @@ func (l *Legacy) Pack(box *parser.Box) error {
 
 	// run := genny.WetRunner(context.Background())
 	// if err := run.WithNew(l.Generator(box)); err != nil {
-	// 	return errors.WithStack(err)
+	// 	return err
 	// }
 	// run.Logger = plog.Logger
 	// return run.Run()
@@ -71,11 +69,11 @@ func (l *Legacy) Pack(box *parser.Box) error {
 func (l *Legacy) prepFile(r io.Reader) (string, error) {
 	bb := &bytes.Buffer{}
 	if _, err := io.Copy(bb, r); err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 	b, err := json.Marshal(bb.Bytes())
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 	return strings.Replace(string(b), "\"", "\\\"", -1), nil
 }
@@ -96,7 +94,7 @@ func (l *Legacy) Generator() (*genny.Generator, error) {
 		t := gogen.TemplateTransformer(opts, nil)
 		f, err := t.Transform(f)
 		if err != nil {
-			return g, errors.WithStack(err)
+			return g, err
 		}
 		g.File(f)
 	}
@@ -106,7 +104,7 @@ func (l *Legacy) Generator() (*genny.Generator, error) {
 func (l *Legacy) Close() error {
 	run := genny.WetRunner(context.Background())
 	if err := run.WithNew(l.Generator()); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	run.Logger = plog.Logger
 	return run.Run()

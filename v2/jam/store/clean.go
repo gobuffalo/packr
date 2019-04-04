@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
-	"github.com/pkg/errors"
 )
 
 func Clean(root string) error {
@@ -17,18 +16,18 @@ func Clean(root string) error {
 
 	p, err := parser.NewFromRoots([]string{root}, &parser.RootsOptions{})
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	boxes, err := p.Run()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	d := NewDisk("", "")
 	for _, box := range boxes {
 		if err := d.Clean(box); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 	return nil
@@ -38,7 +37,7 @@ func clean(root string) error {
 	if len(root) == 0 {
 		pwd, err := os.Getwd()
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		root = pwd
 	}
@@ -52,7 +51,7 @@ func clean(root string) error {
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		if info.IsDir() {
 			if filepath.Base(path) == "packrd" {
@@ -63,13 +62,13 @@ func clean(root string) error {
 		if strings.HasSuffix(path, "-packr.go") {
 			err := os.RemoveAll(path)
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil

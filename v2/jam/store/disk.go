@@ -25,9 +25,10 @@ import (
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/rogpeppe/go-internal/modfile"
 
+	"github.com/pkg/errors"
+
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/karrick/godirwalk"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -88,12 +89,12 @@ func (d *Disk) Files(box *parser.Box) ([]*parser.File, error) {
 	var files []*parser.File
 	names, err := d.FileNames(box)
 	if err != nil {
-		return files, errors.WithStack(err)
+		return files, err
 	}
 	for _, n := range names {
 		b, err := ioutil.ReadFile(n)
 		if err != nil {
-			return files, errors.WithStack(err)
+			return files, err
 		}
 		f := parser.NewFile(n, bytes.NewReader(b))
 		files = append(files, f)
@@ -106,7 +107,7 @@ func (d *Disk) Pack(box *parser.Box) error {
 	d.boxes[box.Name] = box
 	names, err := d.FileNames(box)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	for _, n := range names {
 		_, ok := d.global[n]
@@ -163,12 +164,12 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 				zw := gzip.NewWriter(enc)
 				f, err := os.Open(k)
 				if err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 				defer f.Close()
 				io.Copy(zw, f)
 				if err := zw.Close(); err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 				d.moot.Lock()
 				opts.GlobalFiles[makeKey(xb, k)] = bb.String()
@@ -179,7 +180,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	}
 
 	if err := wg.Wait(); err != nil {
-		return g, errors.WithStack(err)
+		return g, err
 	}
 
 	for _, b := range d.boxes {
@@ -201,7 +202,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 			}
 			fn, err := d.FileNames(box)
 			if err != nil {
-				return "", errors.WithStack(err)
+				return "", err
 			}
 			if len(fn) == 0 {
 				return "", nil
@@ -229,7 +230,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 			t := gogen.TemplateTransformer(opts, nil)
 			gf, err = t.Transform(gf)
 			if err != nil {
-				return "", errors.WithStack(err)
+				return "", err
 			}
 			return template.HTML(gf.String()), nil
 		},
@@ -240,13 +241,13 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 	global := genny.NewFile(fp, strings.NewReader(diskGlobalTmpl))
 	global, err := t.Transform(global)
 	if err != nil {
-		return g, errors.WithStack(err)
+		return g, err
 	}
 
 	ft := gogen.FmtTransformer()
 	global, err = ft.Transform(global)
 	if err != nil {
-		return g, errors.WithStack(err)
+		return g, err
 	}
 	g.File(global)
 
@@ -279,6 +280,7 @@ func (d *Disk) Generator() (*genny.Generator, error) {
 			return g, errors.New("go.mod is malformed.")
 		}
 		ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
+		ip = strings.Replace(ip, "\\", "/", -1)
 	} else {
 		ip = filepath.Dir(d.DBPath)
 		srcs := envy.GoPaths()
@@ -327,7 +329,7 @@ func (d *Disk) Close() error {
 	run := genny.WetRunner(context.Background())
 	run.Logger = plog.Logger
 	if err := run.WithNew(d.Generator()); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	return run.Run()
 }

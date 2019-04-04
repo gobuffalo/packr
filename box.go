@@ -11,8 +11,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/gobuffalo/packd"
 	"github.com/pkg/errors"
+
+	"github.com/gobuffalo/packd"
 )
 
 var (

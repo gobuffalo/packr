@@ -76,7 +76,7 @@ func (v *Visitor) eval(node ast.Node) error {
 	case *ast.GenDecl:
 		for _, n := range t.Specs {
 			if err := v.eval(n); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	case *ast.FuncDecl:
@@ -85,14 +85,14 @@ func (v *Visitor) eval(node ast.Node) error {
 		}
 		for _, b := range t.Body.List {
 			if err := v.evalStmt(b); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 		return nil
 	case *ast.ValueSpec:
 		for _, e := range t.Values {
 			if err := v.evalExpr(e); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func (v *Visitor) evalStmt(stmt ast.Stmt) error {
 	case *ast.AssignStmt:
 		for _, e := range t.Rhs {
 			if err := v.evalArgs(e); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	}
@@ -127,12 +127,12 @@ func (v *Visitor) evalExpr(expr ast.Expr) error {
 				}
 
 				if err := v.evalArgs(at); err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 			case *ast.CompositeLit:
 				for _, e := range at.Elts {
 					if err := v.evalExpr(e); err != nil {
-						return errors.WithStack(err)
+						return err
 					}
 				}
 			}
@@ -151,7 +151,7 @@ func (v *Visitor) evalArgs(expr ast.Expr) error {
 	case *ast.CompositeLit:
 		for _, e := range at.Elts {
 			if err := v.evalExpr(e); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	case *ast.CallExpr:
@@ -161,14 +161,14 @@ func (v *Visitor) evalArgs(expr ast.Expr) error {
 		switch st := at.Fun.(type) {
 		case *ast.SelectorExpr:
 			if err := v.evalSelector(at, st); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		case *ast.Ident:
 			return v.evalIdent(st)
 		}
 		for _, a := range at.Args {
 			if err := v.evalArgs(a); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	}
@@ -211,11 +211,11 @@ func (v *Visitor) evalSelector(expr *ast.CallExpr, sel *ast.SelectorExpr) error 
 
 			k1, err := zz(expr.Args[0])
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 			k2, err := zz(expr.Args[1])
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 			v.addBox(k1, k2)
 

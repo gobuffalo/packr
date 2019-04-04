@@ -25,7 +25,7 @@ Thank you to the following **GIANTS**:
 
 * [github.com/markbates/safe](https://godoc.org/github.com/markbates/safe)
 
-* [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
+* [errors](https://godoc.org/errors)
 
 * [github.com/rogpeppe/go-internal](https://godoc.org/github.com/rogpeppe/go-internal)
 
