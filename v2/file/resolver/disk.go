@@ -10,7 +10,6 @@ import (
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/karrick/godirwalk"
-	"github.com/pkg/errors"
 )
 
 var _ Resolver = &Disk{}
@@ -61,11 +60,11 @@ func (d *Disk) FileMap() map[string]file.File {
 		name := strings.TrimPrefix(path, root+string(filepath.Separator))
 		b, err := ioutil.ReadFile(path)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		m[name], err = file.NewFile(name, b)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		moot.Unlock()
 		return nil

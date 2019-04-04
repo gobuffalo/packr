@@ -3,7 +3,7 @@ package parser
 import (
 	"encoding/json"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // FromArgs is useful when writing packr store-cmd binaries.

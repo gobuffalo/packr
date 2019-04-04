@@ -21,7 +21,7 @@ type box struct {
 func (b *box) Walk(root string) error {
 	root, err := filepath.EvalSymlinks(root)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	if _, err := os.Stat(root); err != nil {
 		// return nil
@@ -41,17 +41,17 @@ func (b *box) Walk(root string) error {
 
 		bb, err := ioutil.ReadFile(path)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		if b.compress {
 			bb, err = compressFile(bb)
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 		bb, err = json.Marshal(bb)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		f.Contents = strings.Replace(string(bb), "\"", "\\\"", -1)
 
@@ -66,11 +66,11 @@ func compressFile(bb []byte) ([]byte, error) {
 	writer := gzip.NewWriter(&buf)
 	_, err := writer.Write(bb)
 	if err != nil {
-		return bb, errors.WithStack(err)
+		return bb, err
 	}
 	err = writer.Close()
 	if err != nil {
-		return bb, errors.WithStack(err)
+		return bb, err
 	}
 	return buf.Bytes(), nil
 }

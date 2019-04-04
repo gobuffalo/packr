@@ -64,7 +64,7 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 		if err != nil {
 			if !strings.Contains(err.Error(), "cannot find package") {
 				if _, ok := errors.Cause(err).(*build.NoGoError); !ok {
-					err = errors.WithStack(err)
+					err = err
 					return
 				}
 			}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/jam/store"
-	"github.com/pkg/errors"
 )
 
 // Clean up an *-packr.go files
@@ -20,18 +19,18 @@ func Clean(root string) error {
 		IgnoreImports: true,
 	})
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	boxes, err := p.Run()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	d := store.NewDisk("", "")
 	for _, box := range boxes {
 		if err := d.Clean(box); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 	return nil

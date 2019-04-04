@@ -11,7 +11,7 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/packr/v2](https://godoc.org/github.com/gobuffalo/packr/v2)
 
-* [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
+* [errors](https://godoc.org/errors)
 
 * [github.com/spf13/cobra](https://godoc.org/github.com/spf13/cobra)
 

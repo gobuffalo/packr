@@ -22,7 +22,7 @@ func (p Pointer) Resolve(box string, path string) (file.File, error) {
 	plog.Debug(p, "Resolve", "box", box, "path", path, "forward-box", p.ForwardBox, "forward-path", p.ForwardPath)
 	b, err := findBox(p.ForwardBox)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	f, err := b.Resolve(p.ForwardPath)
 	if err != nil {

@@ -8,7 +8,6 @@ import (
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr/v2/jam/store"
-	"github.com/pkg/errors"
 )
 
 var modsOn = (strings.TrimSpace(envy.Get("GO111MODULE", "off")) == "on")
@@ -32,7 +31,7 @@ var checks = []Check{
 func packrClean(r *Runner) error {
 	pwd, err := os.Getwd()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	store.Clean(pwd)
 	return nil
