@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 
 		// if the last argument is a .go file or directory we should
 		// find boxes from there, not from the current directory.
-		//	packr2 -v cmd/main.go
+		//	packr2 build -v cmd/main.go
 		if len(args) > 0 {
 			i := len(args) - 1
 			dir := args[i]
