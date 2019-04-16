@@ -1,4 +1,4 @@
 package packr
 
 // Version of Packr
-const Version = "v2.1.0"
+const Version = "v2.2.0"
