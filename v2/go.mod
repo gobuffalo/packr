@@ -1,7 +1,5 @@
 module github.com/gobuffalo/packr/v2
 
-go 1.12
-
 require (
 	github.com/gobuffalo/envy v1.7.0
 	github.com/gobuffalo/genny v0.0.0-20190403191548-3ca520ef0d9e

@@ -13,8 +13,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/inconshreveable/mousetrap](https://godoc.org/github.com/inconshreveable/mousetrap)
 
-* [github.com/konsorten/go-windows-terminal-sequences](https://godoc.org/github.com/konsorten/go-windows-terminal-sequences)
-
 * [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
 
 * [github.com/spf13/cobra](https://godoc.org/github.com/spf13/cobra)
@@ -22,7 +20,5 @@ Thank you to the following **GIANTS**:
 * [github.com/spf13/pflag](https://godoc.org/github.com/spf13/pflag)
 
 * [github.com/stretchr/testify](https://godoc.org/github.com/stretchr/testify)
-
-* [golang.org/x/crypto](https://godoc.org/golang.org/x/crypto)
 
 * [golang.org/x/sync](https://godoc.org/golang.org/x/sync)
