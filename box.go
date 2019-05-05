@@ -129,6 +129,8 @@ func (b Box) decompress(bb []byte) []byte {
 	if err != nil {
 		return bb
 	}
+	defer reader.Close()
+
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return bb
