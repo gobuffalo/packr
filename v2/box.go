@@ -150,7 +150,13 @@ func (b *Box) Open(name string) (http.File, error) {
 		}
 		return f, err
 	}
-	f, err = file.NewFileR(name, f)
+	info, err := f.FileInfo()
+	if err != nil {
+		return f, err
+	}
+	if !info.IsDir() {
+		f, err = file.NewFileR(name, f)
+	}
 	plog.Debug(b, "Open", "name", f.Name(), "file", f.Name())
 	return f, err
 }
