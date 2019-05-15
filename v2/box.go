@@ -2,6 +2,7 @@ package packr
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,7 +18,6 @@ import (
 	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/markbates/oncer"
-	"errors"
 )
 
 var _ packd.Box = &Box{}
@@ -126,6 +126,9 @@ func (b *Box) Has(name string) bool {
 
 // HasDir returns true if the directory exists in the box
 func (b *Box) HasDir(name string) bool {
+	if name == "/" {
+		return b.Has("index.html")
+	}
 	oncer.Do("packr2/box/HasDir"+b.Name, func() {
 		for _, f := range b.List() {
 			for d := filepath.Dir(f); d != "."; d = filepath.Dir(d) {
@@ -133,9 +136,6 @@ func (b *Box) HasDir(name string) bool {
 			}
 		}
 	})
-	if name == "/" {
-		return b.Has("index.html")
-	}
 	_, ok := b.dirs.Load(name)
 	return ok
 }
