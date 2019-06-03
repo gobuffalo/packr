@@ -19,6 +19,7 @@ type PackOptions struct {
 	Legacy        bool
 	StoreCmd      string
 	Roots         []string
+	RootsOptions  *parser.RootsOptions
 }
 
 // Pack the roots given + PWD
@@ -33,9 +34,15 @@ func Pack(opts PackOptions) error {
 		return err
 	}
 
-	p, err := parser.NewFromRoots(opts.Roots, &parser.RootsOptions{
-		IgnoreImports: opts.IgnoreImports,
-	})
+	if opts.RootsOptions == nil {
+		opts.RootsOptions = &parser.RootsOptions{}
+	}
+
+	if opts.IgnoreImports {
+		opts.RootsOptions.IgnoreImports = true
+	}
+
+	p, err := parser.NewFromRoots(opts.Roots, opts.RootsOptions)
 	if err != nil {
 		return err
 	}
