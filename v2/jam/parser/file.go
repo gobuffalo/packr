@@ -14,6 +14,7 @@ type File struct {
 	AbsPath string
 }
 
+// Close ...
 func (f File) Close() error {
 	if c, ok := f.Reader.(io.Closer); ok {
 		return c.Close()
