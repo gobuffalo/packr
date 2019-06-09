@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ParsedFile ...
 type ParsedFile struct {
 	File    packd.SimpleFile
 	FileSet *token.FileSet
