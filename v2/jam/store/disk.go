@@ -276,7 +276,7 @@ func (d *Disk) Close() error {
 
 		moddata, err := ioutil.ReadFile(mp)
 		if err != nil {
-			return errors.New("go.mod cannot be read or does not exist while go module is enabled.")
+			return errors.New("go.mod cannot be read or does not exist while go module is enabled")
 		}
 		ip = modfile.ModulePath(moddata)
 		if ip == "" {
