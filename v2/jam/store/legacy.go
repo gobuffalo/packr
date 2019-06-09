@@ -69,6 +69,7 @@ func (l *Legacy) prepFile(r io.Reader) (string, error) {
 	return strings.Replace(string(b), "\"", "\\\"", -1), nil
 }
 
+// Close ...
 func (l *Legacy) Close() error {
 	for _, b := range l.boxes {
 		if len(b) == 0 {
