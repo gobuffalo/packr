@@ -280,7 +280,7 @@ func (d *Disk) Close() error {
 		}
 		ip = modfile.ModulePath(moddata)
 		if ip == "" {
-			return errors.New("go.mod is malformed.")
+			return errors.New("go.mod is malformed")
 		}
 		ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
 		ip = strings.Replace(ip, "\\", "/", -1)
