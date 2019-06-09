@@ -139,6 +139,7 @@ type optsBox struct {
 	Path string
 }
 
+// Close ...
 func (d *Disk) Close() error {
 	if len(d.boxes) == 0 {
 		return nil
