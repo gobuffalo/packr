@@ -36,6 +36,7 @@ func ParseFileMode(gf packd.SimpleFile, mode parser.Mode) (ParsedFile, error) {
 	return pf, nil
 }
 
+// ParseFile ...
 func ParseFile(gf packd.SimpleFile) (ParsedFile, error) {
 	return ParseFileMode(gf, 0)
 }
