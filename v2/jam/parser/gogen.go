@@ -19,6 +19,7 @@ type ParsedFile struct {
 	Lines   []string
 }
 
+// ParseFileMode ...
 func ParseFileMode(gf packd.SimpleFile, mode parser.Mode) (ParsedFile, error) {
 	pf := ParsedFile{
 		FileSet: token.NewFileSet(),
