@@ -14,6 +14,13 @@ type File struct {
 	AbsPath string
 }
 
+func (f File) Close() error {
+	if c, ok := f.Reader.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
+
 // Name of the file "app.go"
 func (f File) Name() string {
 	return f.Path

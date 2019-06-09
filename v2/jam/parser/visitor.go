@@ -8,13 +8,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/gobuffalo/genny"
-	"github.com/gobuffalo/gogen"
+	"github.com/gobuffalo/packd"
 	"github.com/pkg/errors"
 )
 
 type Visitor struct {
-	File    genny.File
+	File    packd.SimpleFile
 	Package string
 	boxes   map[string]*Box
 	errors  []error
@@ -30,7 +29,7 @@ func NewVisitor(f *File) *Visitor {
 
 func (v *Visitor) Run() (Boxes, error) {
 	var boxes Boxes
-	pf, err := gogen.ParseFile(v.File)
+	pf, err := ParseFile(v.File)
 	if err != nil {
 		return boxes, errors.Wrap(err, v.File.Name())
 	}
