@@ -7,10 +7,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/envy](https://godoc.org/github.com/gobuffalo/envy)
 
-* [github.com/gobuffalo/genny](https://godoc.org/github.com/gobuffalo/genny)
-
-* [github.com/gobuffalo/gogen](https://godoc.org/github.com/gobuffalo/gogen)
-
 * [github.com/gobuffalo/logger](https://godoc.org/github.com/gobuffalo/logger)
 
 * [github.com/gobuffalo/packd](https://godoc.org/github.com/gobuffalo/packd)
