@@ -307,7 +307,6 @@ func (d *Disk) Close() error {
 			continue
 		}
 		p := filepath.Join(b.PackageDir, b.Package+"-packr.go")
-		// f := genny.NewFile(p, strings.NewReader(diskImportTmpl))
 		f, err := os.Create(p)
 		if err != nil {
 			return err
@@ -330,12 +329,6 @@ func (d *Disk) Close() error {
 			return err
 		}
 
-		// t := gogen.TemplateTransformer(o, template.FuncMap{})
-		// f, err := t.Transform(f)
-		// if err != nil {
-		// 	return nil
-		// }
-		// g.File(f)
 	}
 
 	return nil
