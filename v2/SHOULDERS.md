@@ -13,12 +13,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/karrick/godirwalk](https://godoc.org/github.com/karrick/godirwalk)
 
-* [github.com/markbates/oncer](https://godoc.org/github.com/markbates/oncer)
-
-* [github.com/markbates/safe](https://godoc.org/github.com/markbates/safe)
-
-* [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
-
 * [github.com/rogpeppe/go-internal](https://godoc.org/github.com/rogpeppe/go-internal)
 
 * [github.com/sirupsen/logrus](https://godoc.org/github.com/sirupsen/logrus)
