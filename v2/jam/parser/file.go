@@ -10,8 +10,8 @@ import (
 // File that is to be parsed
 type File struct {
 	io.Reader
-	Path    string
-	AbsPath string
+	Path	string
+	AbsPath	string
 }
 
 // Name of the file "app.go"
@@ -47,8 +47,8 @@ func NewFile(path string, r io.Reader) *File {
 		abs, _ = filepath.Abs(path)
 	}
 	return &File{
-		Reader:  r,
-		Path:    path,
-		AbsPath: abs,
+		Reader:		r,
+		Path:		path,
+		AbsPath:	abs,
 	}
 }

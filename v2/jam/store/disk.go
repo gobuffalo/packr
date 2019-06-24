@@ -22,8 +22,6 @@ import (
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/rogpeppe/go-internal/modfile"
 
-	"github.com/pkg/errors"
-
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/karrick/godirwalk"
 	"golang.org/x/sync/errgroup"
@@ -34,11 +32,11 @@ var _ Store = &Disk{}
 const DISK_GLOBAL_KEY = "__packr_global__"
 
 type Disk struct {
-	DBPath    string
-	DBPackage string
-	global    map[string]string
-	boxes     map[string]*parser.Box
-	moot      *sync.RWMutex
+	DBPath		string
+	DBPackage	string
+	global		map[string]string
+	boxes		map[string]*parser.Box
+	moot		*sync.RWMutex
 }
 
 func NewDisk(path string, pkg string) *Disk {
@@ -52,11 +50,11 @@ func NewDisk(path string, pkg string) *Disk {
 		path, _ = filepath.Abs(path)
 	}
 	return &Disk{
-		DBPath:    path,
-		DBPackage: pkg,
-		global:    map[string]string{},
-		boxes:     map[string]*parser.Box{},
-		moot:      &sync.RWMutex{},
+		DBPath:		path,
+		DBPackage:	pkg,
+		global:		map[string]string{},
+		boxes:		map[string]*parser.Box{},
+		moot:		&sync.RWMutex{},
 	}
 }
 
@@ -70,7 +68,7 @@ func (d *Disk) FileNames(box *parser.Box) ([]string, error) {
 		return names, nil
 	}
 	err := godirwalk.Walk(path, &godirwalk.Options{
-		FollowSymbolicLinks: true,
+		FollowSymbolicLinks:	true,
 		Callback: func(path string, de *godirwalk.Dirent) error {
 			if !de.IsRegular() {
 				return nil
@@ -121,22 +119,22 @@ func (d *Disk) Pack(box *parser.Box) error {
 func (d *Disk) Clean(box *parser.Box) error {
 	root := box.PackageDir
 	if len(root) == 0 {
-		return errors.New("can't clean an empty box.PackageDir")
+		return fmt.Errorf("can't clean an empty box.PackageDir")
 	}
 	plog.Debug(d, "Clean", "box", box.Name, "root", root)
 	return clean(root)
 }
 
 type options struct {
-	Package     string
-	GlobalFiles map[string]string
-	Boxes       []optsBox
-	GK          string
+	Package		string
+	GlobalFiles	map[string]string
+	Boxes		[]optsBox
+	GK		string
 }
 
 type optsBox struct {
-	Name string
-	Path string
+	Name	string
+	Path	string
 }
 
 // Close ...
@@ -147,9 +145,9 @@ func (d *Disk) Close() error {
 
 	xb := &parser.Box{Name: DISK_GLOBAL_KEY}
 	opts := options{
-		Package:     d.DBPackage,
-		GlobalFiles: map[string]string{},
-		GK:          makeKey(xb, d.DBPath),
+		Package:	d.DBPackage,
+		GlobalFiles:	map[string]string{},
+		GK:		makeKey(xb, d.DBPath),
 	}
 
 	wg := errgroup.Group{}
@@ -195,7 +193,7 @@ func (d *Disk) Close() error {
 		"printBox": func(ob optsBox) (template.HTML, error) {
 			box := d.boxes[ob.Name]
 			if box == nil {
-				return "", errors.Errorf("could not find box %s", ob.Name)
+				return "", fmt.Errorf("could not find box %s", ob.Name)
 			}
 			fn, err := d.FileNames(box)
 			if err != nil {
@@ -206,8 +204,8 @@ func (d *Disk) Close() error {
 			}
 
 			type file struct {
-				Resolver    string
-				ForwardPath string
+				Resolver	string
+				ForwardPath	string
 			}
 
 			tmpl, err := template.New("box.go").Parse(diskGlobalBoxTmpl)
@@ -220,13 +218,13 @@ func (d *Disk) Close() error {
 				p := strings.TrimPrefix(s, box.AbsPath)
 				p = strings.TrimPrefix(p, string(filepath.Separator))
 				files = append(files, file{
-					Resolver:    strings.Replace(p, "\\", "/", -1),
-					ForwardPath: makeKey(box, s),
+					Resolver:	strings.Replace(p, "\\", "/", -1),
+					ForwardPath:	makeKey(box, s),
 				})
 			}
 			opts := map[string]interface{}{
-				"Box":   box,
-				"Files": files,
+				"Box":		box,
+				"Files":	files,
 			}
 
 			bb := &bytes.Buffer{}
@@ -263,7 +261,7 @@ func (d *Disk) Close() error {
 		cmd := exec.Command("go", "env", "GOMOD")
 		out, err := cmd.Output()
 		if err != nil {
-			return errors.New("go.mod cannot be read or does not exist while go module is enabled")
+			return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
 		}
 		mp := strings.TrimSpace(string(out))
 		if mp == "" {
@@ -277,11 +275,11 @@ func (d *Disk) Close() error {
 
 		moddata, err := ioutil.ReadFile(mp)
 		if err != nil {
-			return errors.New("go.mod cannot be read or does not exist while go module is enabled")
+			return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
 		}
 		ip = modfile.ModulePath(moddata)
 		if ip == "" {
-			return errors.New("go.mod is malformed")
+			return fmt.Errorf("go.mod is malformed")
 		}
 		ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
 		ip = strings.Replace(ip, "\\", "/", -1)
@@ -314,11 +312,11 @@ func (d *Disk) Close() error {
 		defer f.Close()
 
 		o := struct {
-			Package string
-			Import  string
+			Package	string
+			Import	string
 		}{
-			Package: b.Package,
-			Import:  ip,
+			Package:	b.Package,
+			Import:		ip,
 		}
 
 		tmpl, err := template.New(p).Parse(diskImportTmpl)

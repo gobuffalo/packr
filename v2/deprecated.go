@@ -2,11 +2,11 @@ package packr
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
-	"github.com/markbates/oncer"
+	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
 )
 
 // File has been deprecated and file.File should be used instead
@@ -15,7 +15,7 @@ type File = file.File
 var (
 	// ErrResOutsideBox gets returned in case of the requested resources being outside the box
 	// Deprecated
-	ErrResOutsideBox = errors.New("can't find a resource outside the box")
+	ErrResOutsideBox = fmt.Errorf("can't find a resource outside the box")
 )
 
 // PackBytes packs bytes for a file into a box.

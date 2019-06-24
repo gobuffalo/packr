@@ -9,8 +9,8 @@ import (
 
 func Test_Ident_OsPath(t *testing.T) {
 	table := map[string]string{
-		"foo/bar/baz":   "foo/bar/baz",
-		"foo\\bar\\baz": "foo/bar/baz",
+		"foo/bar/baz":		"foo/bar/baz",
+		"foo\\bar\\baz":	"foo/bar/baz",
 	}
 
 	if runtime.GOOS == "windows" {
@@ -27,7 +27,7 @@ func Test_Ident_OsPath(t *testing.T) {
 
 func ident_OsPath_Windows_Table() map[string]string {
 	return map[string]string{
-		"foo/bar/baz":   "foo\\bar\\baz",
-		"foo\\bar\\baz": "foo\\bar\\baz",
+		"foo/bar/baz":		"foo\\bar\\baz",
+		"foo\\bar\\baz":	"foo\\bar\\baz",
 	}
 }
