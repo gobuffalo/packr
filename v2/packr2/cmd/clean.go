@@ -6,8 +6,8 @@ import (
 )
 
 var cleanCmd = &cobra.Command{
-	Use:   "clean",
-	Short: "removes any *-packr.go files",
+	Use:	"clean",
+	Short:	"removes any *-packr.go files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return jam.Clean(args...)
 	},

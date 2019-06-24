@@ -7,7 +7,6 @@ package hex
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 )
@@ -16,7 +15,7 @@ const hextable = "0123456789abcdef"
 
 // EncodedLen returns the length of an encoding of n source bytes.
 // Specifically, it returns n * 2.
-func EncodedLen(n int) int { return n * 2 }
+func EncodedLen(n int) int	{ return n * 2 }
 
 // Encode encodes src into EncodedLen(len(src))
 // bytes of dst. As a convenience, it returns the number
@@ -34,7 +33,7 @@ func Encode(dst, src []byte) int {
 // ErrLength reports an attempt to decode an odd-length input
 // using Decode or DecodeString.
 // The stream-based Decoder returns io.ErrUnexpectedEOF instead of ErrLength.
-var ErrLength = errors.New("encoding/hex: odd length hex string")
+var ErrLength = fmt.Errorf("encoding/hex: odd length hex string")
 
 // InvalidByteError values describe errors resulting from an invalid byte in a hex string.
 type InvalidByteError byte
@@ -45,7 +44,7 @@ func (e InvalidByteError) Error() string {
 
 // DecodedLen returns the length of a decoding of x source bytes.
 // Specifically, it returns x / 2.
-func DecodedLen(x int) int { return x / 2 }
+func DecodedLen(x int) int	{ return x / 2 }
 
 // Decode decodes src into DecodedLen(len(src)) bytes,
 // returning the actual number of bytes written to dst.
@@ -127,9 +126,9 @@ func Dump(data []byte) string {
 const bufferSize = 1024
 
 type encoder struct {
-	w   io.Writer
-	err error
-	out [bufferSize]byte // output buffer
+	w	io.Writer
+	err	error
+	out	[bufferSize]byte	// output buffer
 }
 
 // NewEncoder returns an io.Writer that writes lowercase hexadecimal characters to w.
@@ -154,10 +153,10 @@ func (e *encoder) Write(p []byte) (n int, err error) {
 }
 
 type decoder struct {
-	r   io.Reader
-	err error
-	in  []byte           // input buffer (encoded form)
-	arr [bufferSize]byte // backing array for in
+	r	io.Reader
+	err	error
+	in	[]byte			// input buffer (encoded form)
+	arr	[bufferSize]byte	// backing array for in
 }
 
 // NewDecoder returns an io.Reader that decodes hexadecimal characters from r.
@@ -170,7 +169,7 @@ func (d *decoder) Read(p []byte) (n int, err error) {
 	// Fill internal buffer with sufficient bytes to decode
 	if len(d.in) < 2 && d.err == nil {
 		var numCopy, numRead int
-		numCopy = copy(d.arr[:], d.in) // Copies either 0 or 1 bytes
+		numCopy = copy(d.arr[:], d.in)	// Copies either 0 or 1 bytes
 		numRead, d.err = d.r.Read(d.arr[numCopy:])
 		d.in = d.arr[:numCopy+numRead]
 		if d.err == io.EOF && len(d.in)%2 != 0 {
@@ -189,11 +188,11 @@ func (d *decoder) Read(p []byte) (n int, err error) {
 	numDec, err := Decode(p, d.in[:len(p)*2])
 	d.in = d.in[2*numDec:]
 	if err != nil {
-		d.in, d.err = nil, err // Decode error; discard input remainder
+		d.in, d.err = nil, err	// Decode error; discard input remainder
 	}
 
 	if len(d.in) < 2 {
-		return numDec, d.err // Only expose errors when buffer fully consumed
+		return numDec, d.err	// Only expose errors when buffer fully consumed
 	}
 	return numDec, nil
 }
@@ -206,12 +205,12 @@ func Dumper(w io.Writer) io.WriteCloser {
 }
 
 type dumper struct {
-	w          io.Writer
-	rightChars [18]byte
-	buf        [14]byte
-	used       int  // number of bytes in the current line
-	n          uint // number of bytes, total
-	closed     bool
+	w		io.Writer
+	rightChars	[18]byte
+	buf		[14]byte
+	used		int	// number of bytes in the current line
+	n		uint	// number of bytes, total
+	closed		bool
 }
 
 func toChar(b byte) byte {
@@ -223,7 +222,7 @@ func toChar(b byte) byte {
 
 func (h *dumper) Write(data []byte) (n int, err error) {
 	if h.closed {
-		return 0, errors.New("encoding/hex: dumper closed")
+		return 0, fmt.Errorf("encoding/hex: dumper closed")
 	}
 
 	// Output lines look like:

@@ -6,11 +6,11 @@ import (
 )
 
 type info struct {
-	Path     string
-	Contents []byte
-	size     int64
-	modTime  time.Time
-	isDir    bool
+	Path		string
+	Contents	[]byte
+	size		int64
+	modTime		time.Time
+	isDir		bool
 }
 
 func (f info) Name() string {

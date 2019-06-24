@@ -8,12 +8,12 @@ import (
 
 // Box found while parsing a file
 type Box struct {
-	Name       string // name of the box
-	Path       string // relative path of folder NewBox("./templates")
-	AbsPath    string // absolute path of Path
-	Package    string // the package name the box was found in
-	PWD        string // the PWD when the parser was run
-	PackageDir string // the absolute path of the package where the box was found
+	Name		string	// name of the box
+	Path		string	// relative path of folder NewBox("./templates")
+	AbsPath		string	// absolute path of Path
+	Package		string	// the package name the box was found in
+	PWD		string	// the PWD when the parser was run
+	PackageDir	string	// the absolute path of the package where the box was found
 }
 
 type Boxes []*Box
@@ -32,9 +32,9 @@ func NewBox(name string, path string) *Box {
 	name = strings.Replace(name, "\"", "", -1)
 	pwd, _ := os.Getwd()
 	box := &Box{
-		Name: name,
-		Path: path,
-		PWD:  pwd,
+		Name:	name,
+		Path:	path,
+		PWD:	pwd,
 	}
 	return box
 }

@@ -25,8 +25,8 @@ var httpBox = func() packd.Box {
 	}
 
 	hg, err := resolver.NewHexGzip(map[string]string{
-		"index.html": ind,
-		"hello.txt":  hello,
+		"index.html":	ind,
+		"hello.txt":	hello,
 	})
 	if err != nil {
 		panic(err)
