@@ -3,14 +3,15 @@ package parser
 import (
 	"fmt"
 	"go/build"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/packr/v2/plog"
-	"github.com/karrick/godirwalk"
 	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/errx"
 	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
+	"github.com/gobuffalo/packr/v2/plog"
+	"github.com/karrick/godirwalk"
 )
 
 type finder struct {
@@ -33,12 +34,22 @@ func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
 			if ext != ".go" {
 				return nil
 			}
+			//check if path is a dir
+			fi, err := os.Stat(path)
+			if err != nil {
+				return nil
+			}
+
+			if fi.IsDir() {
+				return nil
+			}
+
 			names = append(names, path)
 			return nil
 		}
 		err = godirwalk.Walk(dir, &godirwalk.Options{
-			FollowSymbolicLinks:	true,
-			Callback:		callback,
+			FollowSymbolicLinks: true,
+			Callback:            callback,
 		})
 	})
 
