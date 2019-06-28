@@ -31,7 +31,7 @@ changelog:
       - '^docs:'
       - '^test:'
 <%= if (brew) { %>
-brew:
+brews:
   github:
     owner: gobuffalo
     name: homebrew-tap
