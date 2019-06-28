@@ -3,14 +3,15 @@ package parser
 import (
 	"fmt"
 	"go/build"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/karrick/godirwalk"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/errx"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
+	"github.com/markbates/oncer"
+	"github.com/pkg/errors"
 )
 
 type finder struct {
@@ -33,12 +34,23 @@ func (fd *finder) findAllGoFiles(dir string) ([]string, error) {
 			if ext != ".go" {
 				return nil
 			}
+
+			//checkif path is a dir
+			fi, err := os.Stat(path)
+			if err != nil {
+				return nil
+			}
+
+			if fi.IsDir() {
+				return nil
+			}
+
 			names = append(names, path)
 			return nil
 		}
 		err = godirwalk.Walk(dir, &godirwalk.Options{
-			FollowSymbolicLinks:	true,
-			Callback:		callback,
+			FollowSymbolicLinks: true,
+			Callback:            callback,
 		})
 	})
 
@@ -52,7 +64,7 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 		ctx := build.Default
 
 		if len(ctx.SrcDirs()) == 0 {
-			err = fmt.Errorf("no src directories found")
+			err = errors.New("no src directories found")
 			return
 		}
 
@@ -63,7 +75,7 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 
 		if err != nil {
 			if !strings.Contains(err.Error(), "cannot find package") {
-				if _, ok := errx.Unwrap(err).(*build.NoGoError); !ok {
+				if _, ok := errors.Cause(err).(*build.NoGoError); !ok {
 					err = err
 					return
 				}
