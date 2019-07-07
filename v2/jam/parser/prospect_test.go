@@ -8,8 +8,8 @@ import (
 
 func Test_IsProspect(t *testing.T) {
 	table := []struct {
-		path string
-		pass bool
+		path	string
+		pass	bool
 	}{
 		{"foo/.git/config", false},
 		{"foo/.git/baz.go", false},

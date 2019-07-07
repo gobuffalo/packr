@@ -10,8 +10,8 @@ import (
 
 // Parser to find boxes
 type Parser struct {
-	Prospects     []*File // a list of files to check for boxes
-	IgnoreImports bool
+	Prospects	[]*File	// a list of files to check for boxes
+	IgnoreImports	bool
 }
 
 // Run the parser and run any boxes found

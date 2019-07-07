@@ -7,7 +7,7 @@ import (
 
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/gobuffalo/packr/v2/jam/store"
-	"github.com/markbates/oncer"
+	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
 	"github.com/stretchr/testify/require"
 )
 

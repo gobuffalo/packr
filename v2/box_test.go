@@ -182,9 +182,9 @@ func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt":        qfile("foo.txt", "foo!"),
-		"bar":            qfile("bar", "bar!"),
-		"baz/index.html": qfile("baz", "baz!"),
+		"foo.txt":		qfile("foo.txt", "foo!"),
+		"bar":			qfile("bar", "bar!"),
+		"baz/index.html":	qfile("baz", "baz!"),
 	})
 	box := New("Test_Box_Open", "./templates")
 

@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gobuffalo/genny"
 	"github.com/gobuffalo/logger"
 	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/gobuffalo/packr/v2/plog"
@@ -13,17 +12,16 @@ import (
 
 var globalOptions = struct {
 	jam.PackOptions
-	Verbose bool
-	Silent  bool
+	Verbose	bool
+	Silent	bool
 }{
 	PackOptions: jam.PackOptions{},
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "packr2",
-	Short: "Packr is a simple solution for bundling static assets inside of Go binaries.",
+	Use:	"packr2",
+	Short:	"Packr is a simple solution for bundling static assets inside of Go binaries.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		genny.DefaultLogLvl = logger.ErrorLevel
 		for _, a := range args {
 			if a == "--legacy" {
 				globalOptions.Legacy = true
@@ -51,11 +49,9 @@ var rootCmd = &cobra.Command{
 		}
 
 		if globalOptions.Verbose {
-			genny.DefaultLogLvl = logger.DebugLevel
 			plog.Logger = logger.New(logger.DebugLevel)
 		}
 		if globalOptions.Silent {
-			genny.DefaultLogLvl = logger.FatalLevel
 			plog.Logger = logger.New(logger.FatalLevel)
 		}
 		return nil

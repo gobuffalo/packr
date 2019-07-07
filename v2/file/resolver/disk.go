@@ -70,8 +70,8 @@ func (d *Disk) FileMap() map[string]file.File {
 		return nil
 	}
 	err := godirwalk.Walk(root, &godirwalk.Options{
-		FollowSymbolicLinks: true,
-		Callback:            callback,
+		FollowSymbolicLinks:	true,
+		Callback:		callback,
 	})
 	if err != nil {
 		plog.Logger.Errorf("[%s] error walking %v", root, err)

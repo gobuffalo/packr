@@ -13,8 +13,8 @@ import (
 )
 
 type RootsOptions struct {
-	IgnoreImports bool
-	Ignores       []string
+	IgnoreImports	bool
+	Ignores		[]string
 }
 
 func (r RootsOptions) String() string {
@@ -49,8 +49,8 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 		return nil
 	}
 	wopts := &godirwalk.Options{
-		FollowSymbolicLinks: true,
-		Callback:            callback,
+		FollowSymbolicLinks:	true,
+		Callback:		callback,
 	}
 	for _, root := range roots {
 		plog.Debug(p, "NewFromRoots", "walking", root)

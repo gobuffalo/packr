@@ -18,9 +18,9 @@ import (
 var _ Resolver = &HexGzip{}
 
 type HexGzip struct {
-	packed   map[string]string
-	unpacked map[string]string
-	moot     *sync.RWMutex
+	packed		map[string]string
+	unpacked	map[string]string
+	moot		*sync.RWMutex
 }
 
 func (hg HexGzip) String() string {
@@ -77,9 +77,9 @@ func NewHexGzip(files map[string]string) (*HexGzip, error) {
 	}
 
 	hg := &HexGzip{
-		packed:   files,
-		unpacked: map[string]string{},
-		moot:     &sync.RWMutex{},
+		packed:		files,
+		unpacked:	map[string]string{},
+		moot:		&sync.RWMutex{},
 	}
 
 	return hg, nil

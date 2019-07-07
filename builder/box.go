@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type box struct {
@@ -25,7 +24,7 @@ func (b *box) Walk(root string) error {
 	}
 	if _, err := os.Stat(root); err != nil {
 		// return nil
-		return errors.Errorf("could not find folder for box: %s", root)
+		return fmt.Errorf("could not find folder for box: %s", root)
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info == nil || info.IsDir() || strings.HasSuffix(info.Name(), "-packr.go") {

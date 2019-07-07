@@ -12,11 +12,11 @@ import (
 
 func construct(name string, path string) *Box {
 	return &Box{
-		Path:          path,
-		Name:          name,
-		ResolutionDir: resolutionDir(path),
-		resolvers:     resolversMap{},
-		dirs:          dirsMap{},
+		Path:		path,
+		Name:		name,
+		ResolutionDir:	resolutionDir(path),
+		resolvers:	resolversMap{},
+		dirs:		dirsMap{},
 	}
 }
 

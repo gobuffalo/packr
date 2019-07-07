@@ -15,8 +15,8 @@ func Test_Pointer_Find(t *testing.T) {
 
 	b2 := New("b2", "")
 	b2.SetResolver("bar.txt", &Pointer{
-		ForwardBox:  "b1",
-		ForwardPath: "foo.txt",
+		ForwardBox:	"b1",
+		ForwardPath:	"foo.txt",
 	})
 
 	s, err := b2.FindString("bar.txt")
