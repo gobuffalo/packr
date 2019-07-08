@@ -190,30 +190,10 @@ func Test_Box_Open(t *testing.T) {
 
 	box.DefaultResolver = d
 
-	type pathTest struct {
-		path  string
-		isDir bool
-	}
-
-	pathTests := []pathTest{
-		{"foo.txt", false},
-		{"/foo.txt", false},
-		{"bar", false},
-		{"/bar", false},
-		{"baz", true},
-		{"/baz", true},
-		{"baz/index.html", false},
-		{"/baz/index.html", false},
-	}
-
-	for _, x := range pathTests {
-		f, err := box.Open(x.path)
-		r.NoError(err, "for path %#v", x.path)
-		r.NotZero(f, "for path %#v", x.path)
-
-		stat, err := f.Stat()
-		r.NoError(err, "for path %#v", x.path)
-		r.Equal(x.isDir, stat.IsDir(), "stat.IsDir() != %t for path %#v", true, x.path)
+	for _, x := range []string{"foo.txt", "/foo.txt", "bar", "/bar", "baz", "/baz"} {
+		f, err := box.Open(x)
+		r.NoError(err)
+		r.NotZero(f)
 	}
 
 	f, err := box.Open("idontexist.txt")
