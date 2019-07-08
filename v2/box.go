@@ -15,8 +15,8 @@ import (
 	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
-	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
+	"github.com/gobuffalo/packr/v2/plog"
 )
 
 var _ packd.Box = &Box{}
@@ -28,12 +28,12 @@ var _ packd.Finder = &Box{}
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path		string			`json:"path"`
-	Name		string			`json:"name"`
-	ResolutionDir	string			`json:"resolution_dir"`
-	DefaultResolver	resolver.Resolver	`json:"default_resolver"`
-	resolvers	resolversMap
-	dirs		dirsMap
+	Path            string            `json:"path"`
+	Name            string            `json:"name"`
+	ResolutionDir   string            `json:"resolution_dir"`
+	DefaultResolver resolver.Resolver `json:"default_resolver"`
+	resolvers       resolversMap
+	dirs            dirsMap
 }
 
 // NewBox returns a Box that can be used to
@@ -125,6 +125,9 @@ func (b *Box) Has(name string) bool {
 
 // HasDir returns true if the directory exists in the box
 func (b *Box) HasDir(name string) bool {
+	if name == "/" {
+		return b.Has("index.html")
+	}
 	oncer.Do("packr2/box/HasDir"+b.Name, func() {
 		for _, f := range b.List() {
 			for d := filepath.Dir(f); d != "."; d = filepath.Dir(d) {
@@ -132,9 +135,6 @@ func (b *Box) HasDir(name string) bool {
 			}
 		}
 	})
-	if name == "/" {
-		return b.Has("index.html")
-	}
 	_, ok := b.dirs.Load(name)
 	return ok
 }
@@ -149,7 +149,13 @@ func (b *Box) Open(name string) (http.File, error) {
 		}
 		return f, err
 	}
-	f, err = file.NewFileR(name, f)
+	info, err := f.FileInfo()
+	if err != nil {
+		return f, err
+	}
+	if !info.IsDir() {
+		f, err = file.NewFileR(name, f)
+	}
 	plog.Debug(b, "Open", "name", f.Name(), "file", f.Name())
 	return f, err
 }
