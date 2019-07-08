@@ -13,17 +13,17 @@ import (
 
 // ParsedFile ...
 type ParsedFile struct {
-	File	packd.SimpleFile
-	FileSet	*token.FileSet
-	Ast	*ast.File
-	Lines	[]string
+	File    packd.SimpleFile
+	FileSet *token.FileSet
+	Ast     *ast.File
+	Lines   []string
 }
 
 // ParseFileMode ...
 func ParseFileMode(gf packd.SimpleFile, mode parser.Mode) (ParsedFile, error) {
 	pf := ParsedFile{
-		FileSet:	token.NewFileSet(),
-		File:		gf,
+		FileSet: token.NewFileSet(),
+		File:    gf,
 	}
 
 	src := gf.String()

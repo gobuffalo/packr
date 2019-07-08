@@ -32,11 +32,11 @@ var _ Store = &Disk{}
 const DISK_GLOBAL_KEY = "__packr_global__"
 
 type Disk struct {
-	DBPath		string
-	DBPackage	string
-	global		map[string]string
-	boxes		map[string]*parser.Box
-	moot		*sync.RWMutex
+	DBPath    string
+	DBPackage string
+	global    map[string]string
+	boxes     map[string]*parser.Box
+	moot      *sync.RWMutex
 }
 
 func NewDisk(path string, pkg string) *Disk {
@@ -50,11 +50,11 @@ func NewDisk(path string, pkg string) *Disk {
 		path, _ = filepath.Abs(path)
 	}
 	return &Disk{
-		DBPath:		path,
-		DBPackage:	pkg,
-		global:		map[string]string{},
-		boxes:		map[string]*parser.Box{},
-		moot:		&sync.RWMutex{},
+		DBPath:    path,
+		DBPackage: pkg,
+		global:    map[string]string{},
+		boxes:     map[string]*parser.Box{},
+		moot:      &sync.RWMutex{},
 	}
 }
 
@@ -68,7 +68,7 @@ func (d *Disk) FileNames(box *parser.Box) ([]string, error) {
 		return names, nil
 	}
 	err := godirwalk.Walk(path, &godirwalk.Options{
-		FollowSymbolicLinks:	true,
+		FollowSymbolicLinks: true,
 		Callback: func(path string, de *godirwalk.Dirent) error {
 			if !de.IsRegular() {
 				return nil
@@ -126,15 +126,15 @@ func (d *Disk) Clean(box *parser.Box) error {
 }
 
 type options struct {
-	Package		string
-	GlobalFiles	map[string]string
-	Boxes		[]optsBox
-	GK		string
+	Package     string
+	GlobalFiles map[string]string
+	Boxes       []optsBox
+	GK          string
 }
 
 type optsBox struct {
-	Name	string
-	Path	string
+	Name string
+	Path string
 }
 
 // Close ...
@@ -145,9 +145,9 @@ func (d *Disk) Close() error {
 
 	xb := &parser.Box{Name: DISK_GLOBAL_KEY}
 	opts := options{
-		Package:	d.DBPackage,
-		GlobalFiles:	map[string]string{},
-		GK:		makeKey(xb, d.DBPath),
+		Package:     d.DBPackage,
+		GlobalFiles: map[string]string{},
+		GK:          makeKey(xb, d.DBPath),
 	}
 
 	wg := errgroup.Group{}
@@ -204,8 +204,8 @@ func (d *Disk) Close() error {
 			}
 
 			type file struct {
-				Resolver	string
-				ForwardPath	string
+				Resolver    string
+				ForwardPath string
 			}
 
 			tmpl, err := template.New("box.go").Parse(diskGlobalBoxTmpl)
@@ -218,13 +218,13 @@ func (d *Disk) Close() error {
 				p := strings.TrimPrefix(s, box.AbsPath)
 				p = strings.TrimPrefix(p, string(filepath.Separator))
 				files = append(files, file{
-					Resolver:	strings.Replace(p, "\\", "/", -1),
-					ForwardPath:	makeKey(box, s),
+					Resolver:    strings.Replace(p, "\\", "/", -1),
+					ForwardPath: makeKey(box, s),
 				})
 			}
 			opts := map[string]interface{}{
-				"Box":		box,
-				"Files":	files,
+				"Box":   box,
+				"Files": files,
 			}
 
 			bb := &bytes.Buffer{}
@@ -312,11 +312,11 @@ func (d *Disk) Close() error {
 		defer f.Close()
 
 		o := struct {
-			Package	string
-			Import	string
+			Package string
+			Import  string
 		}{
-			Package:	b.Package,
-			Import:		ip,
+			Package: b.Package,
+			Import:  ip,
 		}
 
 		tmpl, err := template.New(p).Parse(diskImportTmpl)
