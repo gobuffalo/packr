@@ -1,3 +1,3 @@
 package packr
 
-const Version = "v1.30.1"
+const Version = "v2.5.3"
