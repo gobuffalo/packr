@@ -215,7 +215,12 @@ func (b *Box) Resolve(key string) (file.File, error) {
 
 	f, err := r.Resolve(b.Name, key)
 	if err != nil {
-		z := filepath.Join(resolver.OsPath(b.ResolutionDir), filepath.FromSlash(path.Clean("/"+resolver.OsPath(key))))
+		z, err := resolver.ResolvePathInBase(resolver.OsPath(b.ResolutionDir), filepath.FromSlash(path.Clean("/"+resolver.OsPath(key))))
+		if err != nil {
+			plog.Debug(r, "Resolve", "box", b.Name, "key", key, "err", err)
+			return f, err
+		}
+
 		f, err = r.Resolve(b.Name, z)
 		if err != nil {
 			plog.Debug(r, "Resolve", "box", b.Name, "key", z, "err", err)
