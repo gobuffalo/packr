@@ -15,8 +15,8 @@ import (
 	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
-	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
+	"github.com/gobuffalo/packr/v2/plog"
 )
 
 var _ packd.Box = &Box{}
@@ -28,12 +28,12 @@ var _ packd.Finder = &Box{}
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path		string			`json:"path"`
-	Name		string			`json:"name"`
-	ResolutionDir	string			`json:"resolution_dir"`
-	DefaultResolver	resolver.Resolver	`json:"default_resolver"`
-	resolvers	resolversMap
-	dirs		dirsMap
+	Path            string            `json:"path"`
+	Name            string            `json:"name"`
+	ResolutionDir   string            `json:"resolution_dir"`
+	DefaultResolver resolver.Resolver `json:"default_resolver"`
+	resolvers       resolversMap
+	dirs            dirsMap
 }
 
 // NewBox returns a Box that can be used to
