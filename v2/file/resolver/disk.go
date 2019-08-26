@@ -45,8 +45,8 @@ func (d *Disk) Resolve(box string, name string) (file.File, error) {
 	return nil, os.ErrNotExist
 }
 
-// resolvePathInBase returns a path that is guaranteed to be inside of the base directory or an error
-func ResolvePathInBase(base string, path string) (string, error) {
+// ResolvePathInBase returns a path that is guaranteed to be inside of the base directory or an error
+func ResolvePathInBase(base, path string) (string, error) {
 	// Determine the absolute file path of the base directory
 	d, err := filepath.Abs(base)
 	if err != nil {
