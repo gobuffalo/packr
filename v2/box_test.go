@@ -182,9 +182,9 @@ func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
 
 	d := resolver.NewInMemory(map[string]file.File{
-		"foo.txt":		qfile("foo.txt", "foo!"),
-		"bar":			qfile("bar", "bar!"),
-		"baz/index.html":	qfile("baz", "baz!"),
+		"foo.txt":        qfile("foo.txt", "foo!"),
+		"bar":            qfile("bar", "bar!"),
+		"baz/index.html": qfile("baz", "baz!"),
 	})
 	box := New("Test_Box_Open", "./templates")
 
@@ -222,4 +222,32 @@ func Test_Box_HasDir(t *testing.T) {
 	r.True(box.HasDir("d"))
 	r.True(box.HasDir("c"))
 	r.False(box.HasDir("a"))
+}
+
+func Test_Box_Traversal_Standard(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Standard", "")
+	_, err := box.FindString("../go.mod")
+	r.Error(err)
+}
+
+func Test_Box_Traversal_Standard_Depth2(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Standard_Depth2", "")
+	_, err := box.FindString("../../packr/go.mod")
+	r.Error(err)
+}
+
+func Test_Box_Traversal_Backslash(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Backslash", "")
+	_, err := box.FindString("..\\go.mod")
+	r.Error(err)
+}
+
+func Test_Box_Traversal_Backslash_Depth2(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Backslash_Depth2", "")
+	_, err := box.FindString("..\\..packr2\\go.mod")
+	r.Error(err)
 }
