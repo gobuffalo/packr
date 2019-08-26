@@ -35,7 +35,8 @@ changelog:
       - '^test:'
 
 brews:
-  github:
-    owner: gobuffalo
-    name: homebrew-tap
+  -
+      github:
+        owner: gobuffalo
+        name: homebrew-tap
 
