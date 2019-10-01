@@ -18,15 +18,12 @@ func (b *Box) Walk(wf WalkFunc) error {
 	m := map[string]file.File{}
 
 	dr := b.DefaultResolver
-	if dr == nil {
-		cd := resolver.OsPath(b.ResolutionDir)
-		dr = &resolver.Disk{Root: cd}
-	}
 	if fm, ok := dr.(file.FileMappable); ok {
 		for n, f := range fm.FileMap() {
 			m[n] = f
 		}
 	}
+
 	var err error
 	b.resolvers.Range(func(n string, r resolver.Resolver) bool {
 		var f file.File

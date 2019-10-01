@@ -186,7 +186,7 @@ func (b *Box) List() []string {
 }
 
 // Resolve will attempt to find the file in the box,
-// returning an error if the find can not be found.
+// returning an error if the file can not be found.
 func (b *Box) Resolve(key string) (file.File, error) {
 	key = strings.TrimPrefix(key, "/")
 

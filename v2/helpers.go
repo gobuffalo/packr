@@ -7,16 +7,24 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/gobuffalo/packr/v2/plog"
 )
 
 func construct(name string, path string) *Box {
+	var dr resolver.Resolver
+	rd := resolutionDir(path)
+	if len(rd) > 0 {
+		dr = &resolver.Disk{Root: resolver.OsPath(rd)}
+	}
+
 	return &Box{
-		Path:		path,
-		Name:		name,
-		ResolutionDir:	resolutionDir(path),
-		resolvers:	resolversMap{},
-		dirs:		dirsMap{},
+		Path:            path,
+		Name:            name,
+		ResolutionDir:   rd,
+		DefaultResolver: dr,
+		resolvers:       resolversMap{},
+		dirs:            dirsMap{},
 	}
 }
 
@@ -49,12 +57,6 @@ func resolutionDirExists(s, og string) bool {
 }
 
 func resolutionDir(og string) string {
-	ng, _ := filepath.Abs(og)
-
-	if resolutionDirExists(ng, og) {
-		return ng
-	}
-
 	// packr.New
 	_, filename, _, _ := runtime.Caller(3)
 	ng, ok := resolutionDirTestFilename(filename, og)
@@ -69,5 +71,5 @@ func resolutionDir(og string) string {
 		return ng
 	}
 
-	return og
+	return ""
 }
