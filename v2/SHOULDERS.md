@@ -33,8 +33,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/joho/godotenv](https://godoc.org/github.com/joho/godotenv)
 
-* [github.com/karrick/godirwalk](https://godoc.org/github.com/karrick/godirwalk)
-
 * [github.com/konsorten/go-windows-terminal-sequences](https://godoc.org/github.com/konsorten/go-windows-terminal-sequences)
 
 * [github.com/kr/pretty](https://godoc.org/github.com/kr/pretty)
