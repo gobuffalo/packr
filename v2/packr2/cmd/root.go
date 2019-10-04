@@ -12,15 +12,15 @@ import (
 
 var globalOptions = struct {
 	jam.PackOptions
-	Verbose	bool
-	Silent	bool
+	Verbose bool
+	Silent  bool
 }{
 	PackOptions: jam.PackOptions{},
 }
 
 var rootCmd = &cobra.Command{
-	Use:	"packr2",
-	Short:	"Packr is a simple solution for bundling static assets inside of Go binaries.",
+	Use:   "packr2",
+	Short: "Packr is a simple solution for bundling static assets inside of Go binaries.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		for _, a := range args {
 			if a == "--legacy" {

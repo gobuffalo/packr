@@ -9,10 +9,10 @@ import (
 var _ Store = &FnStore{}
 
 type FnStore struct {
-	FileNamesFn	func(*parser.Box) ([]string, error)
-	FilesFn		func(*parser.Box) ([]*parser.File, error)
-	PackFn		func(*parser.Box) error
-	CleanFn		func(*parser.Box) error
+	FileNamesFn func(*parser.Box) ([]string, error)
+	FilesFn     func(*parser.Box) ([]*parser.File, error)
+	PackFn      func(*parser.Box) error
+	CleanFn     func(*parser.Box) error
 }
 
 func (f *FnStore) FileNames(box *parser.Box) ([]string, error) {

@@ -23,9 +23,9 @@ $ go build/install
 `
 
 var installCmd = &cobra.Command{
-	Use:			"install",
-	Short:			"Don't. ru",
-	DisableFlagParsing:	true,
+	Use:                "install",
+	Short:              "Don't. ru",
+	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cargs := parseArgs(args)
 		if globalOptions.Verbose {

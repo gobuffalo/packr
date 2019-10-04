@@ -10,8 +10,8 @@ import (
 
 // fixCmd represents the info command
 var fixCmd = &cobra.Command{
-	Use:	"fix",
-	Short:	fmt.Sprintf("will attempt to fix a application's API to match packr version %s", packr.Version),
+	Use:   "fix",
+	Short: fmt.Sprintf("will attempt to fix a application's API to match packr version %s", packr.Version),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return fix.Run()
 	},
