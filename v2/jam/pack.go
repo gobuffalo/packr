@@ -15,11 +15,11 @@ import (
 
 // PackOptions ...
 type PackOptions struct {
-	IgnoreImports	bool
-	Legacy		bool
-	StoreCmd	string
-	Roots		[]string
-	RootsOptions	*parser.RootsOptions
+	IgnoreImports bool
+	Legacy        bool
+	StoreCmd      string
+	Roots         []string
+	RootsOptions  *parser.RootsOptions
 }
 
 // Pack the roots given + PWD

@@ -9,8 +9,8 @@ import (
 // Pointer is a resolvr which resolves
 // a file from a different box.
 type Pointer struct {
-	ForwardBox	string
-	ForwardPath	string
+	ForwardBox  string
+	ForwardPath string
 }
 
 var _ resolver.Resolver = Pointer{}

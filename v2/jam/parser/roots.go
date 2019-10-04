@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/karrick/godirwalk"
 	"github.com/gobuffalo/packr/v2/plog"
-	"github.com/karrick/godirwalk"
 )
 
 type RootsOptions struct {
-	IgnoreImports	bool
-	Ignores		[]string
+	IgnoreImports bool
+	Ignores       []string
 }
 
 func (r RootsOptions) String() string {
@@ -49,8 +49,8 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 		return nil
 	}
 	wopts := &godirwalk.Options{
-		FollowSymbolicLinks:	true,
-		Callback:		callback,
+		FollowSymbolicLinks: true,
+		Callback:            callback,
 	}
 	for _, root := range roots {
 		plog.Debug(p, "NewFromRoots", "walking", root)

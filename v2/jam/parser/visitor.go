@@ -12,17 +12,17 @@ import (
 )
 
 type Visitor struct {
-	File	packd.SimpleFile
-	Package	string
-	boxes	map[string]*Box
-	errors	[]error
+	File    packd.SimpleFile
+	Package string
+	boxes   map[string]*Box
+	errors  []error
 }
 
 func NewVisitor(f *File) *Visitor {
 	return &Visitor{
-		File:	f,
-		boxes:	map[string]*Box{},
-		errors:	[]error{},
+		File:   f,
+		boxes:  map[string]*Box{},
+		errors: []error{},
 	}
 }
 
