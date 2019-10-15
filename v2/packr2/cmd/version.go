@@ -11,7 +11,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "shows packr version",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Print(packr.Version)
+		fmt.Println(packr.Version)
 		return nil
 	},
 }
