@@ -1,3 +1,8 @@
+**NOTICE: Please consider migrating your projects to github.com/markbates/pkger. It has an idiomatic API, minimal dependencies, a stronger test suite (tested directly against the std lib counterparts), transparent tooling, and more.**
+
+https://blog.gobuffalo.io/introducing-pkger-static-file-embedding-in-go-1ce76dc79c65
+
+
 # packr (v1)
 
 [![GoDoc](https://godoc.org/github.com/gobuffalo/packr?status.svg)](https://godoc.org/github.com/gobuffalo/packr)
