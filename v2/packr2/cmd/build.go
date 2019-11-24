@@ -8,9 +8,9 @@ import (
 )
 
 var buildCmd = &cobra.Command{
-	Use:			"build",
-	Short:			"Wraps the go build command with packr",
-	DisableFlagParsing:	true,
+	Use:                "build",
+	Short:              "Wraps the go build command with packr",
+	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cargs := parseArgs(args)
 		if globalOptions.Verbose {

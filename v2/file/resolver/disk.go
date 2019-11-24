@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/packr/v2/file"
+	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/karrick/godirwalk"
 	"github.com/gobuffalo/packr/v2/plog"
-	"github.com/karrick/godirwalk"
 )
 
 var _ Resolver = &Disk{}
@@ -37,7 +37,7 @@ func (d *Disk) Resolve(box string, name string) (file.File, error) {
 		return nil, err
 	}
 	if fi.IsDir() {
-		return file.NewDir(OsPath(name))
+		return nil, os.ErrNotExist
 	}
 	if bb, err := ioutil.ReadFile(path); err == nil {
 		return file.NewFile(OsPath(name), bb)
