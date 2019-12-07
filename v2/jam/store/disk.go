@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"crypto/md5"
 	"fmt"
+	"github.com/gobuffalo/packr/v2/internal"
 	"go/build"
 	"html/template"
 	"io"
@@ -17,7 +18,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/rogpeppe/go-internal/modfile"
@@ -254,7 +254,7 @@ func (d *Disk) Close() error {
 	}
 
 	var ip string
-	if envy.Mods() {
+	if internal.Mods() {
 		// Starting in 1.12, we can rely on Go's method for
 		// resolving where go.mod resides. Prior versions will
 		// simply return an empty string.
@@ -285,7 +285,7 @@ func (d *Disk) Close() error {
 		ip = strings.Replace(ip, "\\", "/", -1)
 	} else {
 		ip = filepath.Dir(d.DBPath)
-		srcs := envy.GoPaths()
+		srcs := internal.GoPaths()
 		srcs = append(srcs, build.Default.SrcDirs()...)
 		for _, x := range srcs {
 			ip = strings.TrimPrefix(ip, "/private")

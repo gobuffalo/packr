@@ -6,11 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr/v2/jam/store"
 )
-
-var modsOn = (strings.TrimSpace(envy.Get("GO111MODULE", "off")) == "on")
 
 //YesToAll will be used by the command to skip the questions
 var YesToAll bool
