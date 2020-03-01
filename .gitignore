@@ -33,4 +33,5 @@ gin-bin
 debug.test
 .grifter/
 *-packr.go
+.idea/
 

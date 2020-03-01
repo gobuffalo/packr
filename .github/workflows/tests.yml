@@ -1,0 +1,27 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+
+  tests:
+    name: ${{matrix.go-version}} ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version: [1.12.x, 1.13.x]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Test v1
+        run: |
+          go get -t -v ./...
+          go test -race ./...
+          go install -v ./packr
+      - name: Test v2
+        run: |
+          cd v2
+          go get -t -v ./...
+          go test -race ./...
+          go install -v ./packr2
