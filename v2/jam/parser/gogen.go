@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packd"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/errx"
+	"github.com/markbates/errx"
 )
 
 // ParsedFile ...

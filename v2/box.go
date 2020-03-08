@@ -15,8 +15,8 @@ import (
 	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
 	"github.com/gobuffalo/packr/v2/plog"
+	"github.com/markbates/oncer"
 )
 
 var _ packd.Box = &Box{}

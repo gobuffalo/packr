@@ -6,7 +6,7 @@ import (
 
 	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gobuffalo/packr/v2/file/resolver"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
+	"github.com/markbates/oncer"
 )
 
 // File has been deprecated and file.File should be used instead
