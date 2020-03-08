@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"crypto/md5"
 	"fmt"
-	"github.com/gobuffalo/packr/v2/internal"
 	"go/build"
 	"html/template"
 	"io"
@@ -18,11 +17,13 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gobuffalo/packr/v2/internal"
+	"github.com/karrick/godirwalk"
+
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 	"github.com/gobuffalo/packr/v2/plog"
 	"github.com/rogpeppe/go-internal/modfile"
 
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/karrick/godirwalk"
 	"github.com/gobuffalo/packr/v2/jam/parser"
 	"golang.org/x/sync/errgroup"
 )

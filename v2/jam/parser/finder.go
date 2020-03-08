@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/karrick/godirwalk"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/errx"
-	"github.com/gobuffalo/packr/v2/internal/takeon/github.com/markbates/oncer"
 	"github.com/gobuffalo/packr/v2/plog"
+	"github.com/karrick/godirwalk"
+	"github.com/markbates/errx"
+	"github.com/markbates/oncer"
 )
 
 type finder struct {
