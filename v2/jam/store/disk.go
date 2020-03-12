@@ -288,6 +288,9 @@ func (d *Disk) Close() error {
 		ip = filepath.Dir(d.DBPath)
 		srcs := internal.GoPaths()
 		srcs = append(srcs, build.Default.SrcDirs()...)
+		sort.SliceStable(srcs, func(i, j int) bool {
+			return len(srcs[i]) > len(srcs[j])
+		})
 		for _, x := range srcs {
 			ip = strings.TrimPrefix(ip, "/private")
 			ip = strings.TrimPrefix(ip, x)
