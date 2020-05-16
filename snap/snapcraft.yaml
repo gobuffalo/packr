@@ -1,7 +1,7 @@
 name: packr2
 base: core18
 version: '2.8.0'
-summary: packr2
+summary: The simple and easy way to embed static files into Go binaries.
 description: |
   The simple and easy way to embed static files into Go binaries.
 
