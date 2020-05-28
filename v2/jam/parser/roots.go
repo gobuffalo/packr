@@ -35,25 +35,25 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 	}
 	p := New()
 	plog.Debug(p, "NewFromRoots", "roots", roots, "options", opts)
-	callback := func(path string, de *godirwalk.Dirent) error {
-		if IsProspect(path, opts.Ignores...) {
-			if de.IsDir() {
-				return nil
-			}
-			roots = append(roots, path)
-			return nil
-		}
-		if de.IsDir() {
-			return filepath.SkipDir
-		}
-		return nil
-	}
-	wopts := &godirwalk.Options{
-		FollowSymbolicLinks: true,
-		Callback:            callback,
-	}
 	for _, root := range roots {
 		plog.Debug(p, "NewFromRoots", "walking", root)
+		callback := func(path string, de *godirwalk.Dirent) error {
+			if IsProspect(root, path, opts.Ignores...) {
+				if de.IsDir() {
+					return nil
+				}
+				roots = append(roots, path)
+				return nil
+			}
+			if de.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		wopts := &godirwalk.Options{
+			FollowSymbolicLinks: true,
+			Callback:            callback,
+		}
 		err := godirwalk.Walk(root, wopts)
 		if err != nil {
 			return p, err
@@ -70,7 +70,7 @@ func NewFromRoots(roots []string, opts *RootsOptions) (*Parser, error) {
 			names, _ = fd.findAllGoFilesImports(r)
 		}
 		for _, n := range names {
-			if IsProspect(n) {
+			if IsProspect(n, n) {
 				plog.Debug(p, "NewFromRoots", "mapping", n)
 				dd[n] = n
 			}
