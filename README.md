@@ -45,7 +45,7 @@ box := packr.NewBox("./templates")
 html, err := box.FindString("index.html")
 
 // Get the []byte representation of a file, or an error if it doesn't exist:
-html, err := box.FindBytes("index.html")
+html, err := box.Find("index.html")
 ```
 
 ### What is a Box?
