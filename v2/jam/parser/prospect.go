@@ -11,11 +11,11 @@ import (
 
 var DefaultIgnoredFolders = []string{".", "_", "vendor", "node_modules", "_fixtures", "testdata"}
 
-func IsProspect(path string, ignore ...string) (status bool) {
+func IsProspect(root string, path string, ignore ...string) (status bool) {
 	// plog.Debug("parser", "IsProspect", "path", path, "ignore", ignore)
 	defer func() {
 		if status {
-			plog.Debug("parser", "IsProspect (TRUE)", "path", path, "status", status)
+			plog.Debug("parser", "IsProspect (TRUE)", "root", root, "path", path, "status", status)
 		}
 	}()
 	if path == "." {
@@ -52,10 +52,7 @@ func IsProspect(path string, ignore ...string) (status bool) {
 		ignore[i] = strings.TrimSpace(strings.ToLower(x))
 	}
 
-	parts := strings.Split(resolver.OsPath(path), string(filepath.Separator))
-	if len(parts) == 0 {
-		return false
-	}
+	parts := partsUnderRoot(root, path)
 
 	for _, i := range ignore {
 		for _, p := range parts {
@@ -74,4 +71,23 @@ func IsProspect(path string, ignore ...string) (status bool) {
 	}
 
 	return ext == ".go"
+}
+
+func partsUnderRoot(root string, path string) []string {
+	root = filepath.Clean(resolver.OsPath(root))
+	path = filepath.Clean(resolver.OsPath(path))
+	rootParts := strings.Split(root, string(filepath.Separator))
+	pathParts := strings.Split(path, string(filepath.Separator))
+
+	if len(rootParts) > len(pathParts) {
+		rootParts = rootParts[:len(pathParts)]
+	}
+
+	for i, r := range rootParts {
+		if pathParts[i] != r {
+			return pathParts[i:]
+		}
+	}
+
+	return pathParts[len(rootParts):]
 }
