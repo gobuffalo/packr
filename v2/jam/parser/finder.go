@@ -84,8 +84,11 @@ func (fd *finder) findAllGoFilesImports(dir string) ([]string, error) {
 		if pkg.Goroot {
 			return
 		}
-		if len(pkg.GoFiles) <= 0 {
-			return
+
+		if _, err := os.Stat(pkg.Dir + "/go.mod"); err != nil {
+			if len(pkg.GoFiles) <= 0 {
+				return
+			}
 		}
 
 		plog.Debug(fd, "findAllGoFilesImports", "dir", dir)
