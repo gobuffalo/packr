@@ -18,7 +18,7 @@ func Test_IsProspect(t *testing.T) {
 		{"a/b.go", true},
 		{"a/b_test.go", false},
 		{"a/b-packr.go", false},
-		{"a/vendor/b.go", false},
+		{"a/vendor/b.go", true},
 		{"a/_c/c.go", false},
 		{"a/_c/e/fe/f/c.go", false},
 		{"a/d/_d.go", false},
