@@ -6,12 +6,14 @@ import (
 	"os"
 
 	"github.com/gobuffalo/packr/builder"
+	"github.com/gobuffalo/packr/v2/jam/parser"
 	"github.com/spf13/cobra"
 )
 
 var input string
 var compress bool
 var verbose bool
+var includeVendored bool
 
 var rootCmd = &cobra.Command{
 	Use:   "packr",
@@ -36,6 +38,9 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b := builder.New(context.Background(), input)
 		b.Compress = compress
+		if !includeVendored {
+			parser.DefaultIgnoredFolders = append(parser.DefaultIgnoredFolders, "vendor")
+		}
 		return b.Run()
 	},
 }
@@ -44,6 +49,7 @@ func init() {
 	pwd, _ := os.Getwd()
 	rootCmd.Flags().StringVarP(&input, "input", "i", pwd, "path to scan for packr Boxes")
 	rootCmd.Flags().BoolVarP(&compress, "compress", "z", false, "compress box contents")
+	rootCmd.Flags().BoolVar(&includeVendored, "vendor", false, "look for boxes in vendor directory")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print verbose logging information")
 }
 

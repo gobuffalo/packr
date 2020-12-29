@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	parser.DefaultIgnoredFolders = []string{"vendor", ".git", "node_modules", ".idea"}
+	parser.DefaultIgnoredFolders = []string{".git", "node_modules", ".idea"}
 }
 
 func Test_Parser_Run(t *testing.T) {
