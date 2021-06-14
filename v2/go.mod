@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/gobuffalo/logger v1.0.3
 	github.com/gobuffalo/packd v1.0.0
-	github.com/karrick/godirwalk v1.15.3
+	github.com/karrick/godirwalk v1.15.8
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/markbates/errx v1.1.0
 	github.com/markbates/oncer v1.0.0
