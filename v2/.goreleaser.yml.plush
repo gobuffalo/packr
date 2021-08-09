@@ -5,6 +5,7 @@ builds:
     - linux
     - windows
   goarch:
+    - s390x
     - ppc64le
     - 386
     - amd64
@@ -15,6 +16,10 @@ builds:
       goarch: ppc64le
     - goos: windows
       goarch: ppc64le
+    - goos: darwin
+      goarch: s390x
+    - goos: windows
+      goarch: s390x
   main: ./packr2/main.go
   binary: packr2
 
