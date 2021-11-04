@@ -5,6 +5,7 @@ https://blog.gobuffalo.io/introducing-pkger-static-file-embedding-in-go-1ce76dc7
 # Packr (v2)
 
 [![GoDoc](https://godoc.org/github.com/gobuffalo/packr/v2?status.svg)](https://godoc.org/github.com/gobuffalo/packr/v2)
+[![Actions Status](https://github.com/gobuffalo/packr/workflows/Tests/badge.svg)](https://github.com/gobuffalo/packr/actions)
 
 Packr is a simple solution for bundling static assets inside of Go binaries. Most importantly it does it in a way that is friendly to developers while they are developing.
 
