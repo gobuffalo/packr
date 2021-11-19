@@ -1,55 +1,39 @@
 package packr
 
 import (
+	"path/filepath"
 	"testing"
 
+	"github.com/gobuffalo/packr/v2/file"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Box_Walk_Physical(t *testing.T) {
+func Test_Box_Walk(t *testing.T) {
 	r := require.New(t)
-	count := 0
-	err := testBox.Walk(func(path string, f File) error {
-		count++
+
+	box := NewBox(filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString(filepath.Join("d", "d.txt"), "D"))
+
+	var act []string
+	r.NoError(box.Walk(func(path string, f file.File) error {
+		act = append(act, path)
 		return nil
-	})
-	r.NoError(err)
-	r.Equal(3, count)
+	}))
+	exp := []string{"a.txt", filepath.Join("b", "b.txt"), filepath.Join("b", "b2.txt"), filepath.Join("c", "c.txt"), filepath.Join("d", "d.txt")}
+	r.Equal(exp, act)
 }
 
-func Test_Box_Walk_Virtual(t *testing.T) {
+func Test_Box_WalkPrefix(t *testing.T) {
 	r := require.New(t)
-	count := 0
-	err := virtualBox.Walk(func(path string, f File) error {
-		count++
-		return nil
-	})
-	r.NoError(err)
-	r.Equal(4, count)
-}
 
-func Test_Box_WalkPrefix_Physical(t *testing.T) {
-	r := require.New(t)
-	var files []string
-	b := NewBox("../packr/fixtures")
-	err := b.WalkPrefix("foo/", func(path string, f File) error {
-		files = append(files, path)
-		return nil
-	})
-	r.NoError(err)
-	r.Equal(2, len(files))
-	mustHave := osPaths("foo/a.txt", "foo/bar/b.txt")
-	r.Equal(mustHave, files)
-}
+	box := NewBox(filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString(filepath.Join("d", "d.txt"), "D"))
 
-func Test_Box_WalkPrefix_Virtual(t *testing.T) {
-	r := require.New(t)
-	var files []string
-	err := virtualBox.WalkPrefix("d", func(path string, f File) error {
-		files = append(files, path)
+	var act []string
+	r.NoError(box.WalkPrefix("b/", func(path string, f file.File) error {
+		act = append(act, path)
 		return nil
-	})
-	r.NoError(err)
-	r.Equal(1, len(files))
-	r.Equal([]string{"d/a"}, files)
+	}))
+	exp := []string{filepath.Join("b", "b.txt"), filepath.Join("b", "b2.txt")}
+	r.Equal(exp, act)
 }

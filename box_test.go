@@ -2,128 +2,252 @@ package packr
 
 import (
 	"bytes"
-	"io/ioutil"
-	"os"
-	"runtime"
-	"sort"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/gobuffalo/packr/v2/file"
+	"github.com/gobuffalo/packr/v2/file/resolver"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Box_FindString(t *testing.T) {
+func Test_New(t *testing.T) {
 	r := require.New(t)
-	s, err := testBox.FindString("hello.txt")
-	r.NoError(err)
-	r.Equal("hello world!", strings.TrimSpace(s))
 
-	_, err = testBox.Find("idontexist.txt")
+	box := New("Test_NewBox", filepath.Join("_fixtures", "list_test"))
+	r.Len(box.List(), 4)
+
+}
+func Test_Box_AddString(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_AddString", "./templates")
+	s, err := box.FindString("foo.txt")
 	r.Error(err)
+	r.Equal("", s)
+
+	r.NoError(box.AddString("foo.txt", "foo!!"))
+	s, err = box.FindString("foo.txt")
+	r.NoError(err)
+	r.Equal("foo!!", s)
 }
 
-func Test_Box_FindBytes(t *testing.T) {
+func Test_Box_AddBytes(t *testing.T) {
 	r := require.New(t)
-	s, err := testBox.Find("hello.txt")
-	r.NoError(err)
-	r.Equal([]byte("hello world!"), bytes.TrimSpace(s))
 
-	_, err = testBox.Find("idontexist.txt")
+	box := New("Test_Box_AddBytes", "")
+	s, err := box.FindString("foo.txt")
 	r.Error(err)
+	r.Equal("", s)
+
+	r.NoError(box.AddBytes("foo.txt", []byte("foo!!")))
+	s, err = box.FindString("foo.txt")
+	r.NoError(err)
+	r.Equal("foo!!", s)
+}
+
+func Test_Box_String(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_String", "./templates")
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt": qfile("foo.txt", "foo!"),
+	})
+	box.SetResolver("foo.txt", d)
+
+	s := box.String("foo.txt")
+	r.Equal("foo!", s)
+
+	s = box.String("idontexist")
+	r.Equal("", s)
+}
+
+func Test_Box_String_Miss(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_String_Miss", filepath.Join("_fixtures", "templates"))
+
+	s := box.String("foo.txt")
+	r.Equal("FOO!!!", strings.TrimSpace(s))
+
+	s = box.String("idontexist")
+	r.Equal("", s)
+}
+
+func Test_Box_FindString(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_FindString", "./templates")
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt": qfile("foo.txt", "foo!"),
+	})
+	box.SetResolver("foo.txt", d)
+
+	s, err := box.FindString("foo.txt")
+	r.NoError(err)
+	r.Equal("foo!", s)
+
+	s, err = box.FindString("idontexist")
+	r.Error(err)
+	r.Equal("", s)
+}
+
+func Test_Box_FindString_Miss(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_FindString_Miss", filepath.Join("_fixtures", "templates"))
+
+	s, err := box.FindString("foo.txt")
+	r.NoError(err)
+	r.Equal("FOO!!!", strings.TrimSpace(s))
+
+	s, err = box.FindString("idontexist")
+	r.Error(err)
+	r.Equal("", s)
+}
+
+func Test_Box_Bytes(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_Bytes", "./templates")
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt": qfile("foo.txt", "foo!"),
+	})
+	box.SetResolver("foo.txt", d)
+
+	s := box.Bytes("foo.txt")
+	r.Equal([]byte("foo!"), s)
+
+	s = box.Bytes("idontexist")
+	r.Equal([]byte(""), s)
+}
+
+func Test_Box_Bytes_Miss(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_Bytes_Miss", filepath.Join("_fixtures", "templates"))
+
+	s := box.Bytes("foo.txt")
+	r.Equal([]byte("FOO!!!"), bytes.TrimSpace(s))
+
+	s = box.Bytes("idontexist")
+	r.Equal([]byte(""), s)
+}
+
+func Test_Box_Find(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_Find", "./templates")
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt": qfile("foo.txt", "foo!"),
+	})
+	box.SetResolver("foo.txt", d)
+
+	s, err := box.Find("foo.txt")
+	r.NoError(err)
+	r.Equal("foo!", string(s))
+
+	s, err = box.Find("idontexist")
+	r.Error(err)
+	r.Equal("", string(s))
+}
+
+func Test_Box_Find_Miss(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_Find_Miss", "./_fixtures/templates")
+	s, err := box.Find("foo.txt")
+	r.NoError(err)
+	r.Equal("FOO!!!", strings.TrimSpace(string(s)))
+
+	s, err = box.Find("idontexist")
+	r.Error(err)
+	r.Equal("", string(s))
 }
 
 func Test_Box_Has(t *testing.T) {
 	r := require.New(t)
-	r.True(testBox.Has("hello.txt"))
-	r.False(testBox.Has("idontexist.txt"))
+
+	box := New("Test_Box_Has", "./templates")
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt": qfile("foo.txt", "foo!"),
+	})
+	box.SetResolver("foo.txt", d)
+
+	r.True(box.Has("foo.txt"))
+	r.False(box.Has("idontexist"))
 }
 
-func Test_List_Virtual(t *testing.T) {
+func Test_Box_Open(t *testing.T) {
 	r := require.New(t)
-	mustHave := []string{"a", "b", "c", "d/a"}
-	actual := virtualBox.List()
-	sort.Strings(actual)
-	r.Equal(mustHave, actual)
-}
 
-func Test_List_Physical(t *testing.T) {
-	r := require.New(t)
-	mustHave := osPaths("MyFile.txt", "foo/a.txt", "foo/bar/b.txt", "goodbye.txt", "hello.txt", "index.html")
-	actual := testBox.List()
-	r.Equal(mustHave, actual)
-}
+	d := resolver.NewInMemory(map[string]file.File{
+		"foo.txt":        qfile("foo.txt", "foo!"),
+		"bar":            qfile("bar", "bar!"),
+		"baz/index.html": qfile("baz", "baz!"),
+	})
+	box := New("Test_Box_Open", "./templates")
 
-func Test_Outside_Box(t *testing.T) {
-	r := require.New(t)
-	f, err := ioutil.TempFile("", "")
-	r.NoError(err)
-	defer os.RemoveAll(f.Name())
-	_, err = testBox.FindString(f.Name())
-	r.Error(err)
-}
+	box.DefaultResolver = d
 
-func Test_Box_find(t *testing.T) {
-	box := NewBox("./example")
-
-	onWindows := runtime.GOOS == "windows"
-	table := []struct {
-		name  string
-		found bool
-	}{
-		{"assets/app.css", true},
-		{"assets\\app.css", onWindows},
-		{"foo/bar.baz", false},
-		{"bar", true},
-		{"bar/sub", true},
-		{"bar/foo", false},
-		{"bar/sub/sub.html", true},
+	for _, x := range []string{"foo.txt", "/foo.txt", "bar", "/bar", "baz", "/baz"} {
+		f, err := box.Open(x)
+		r.NoError(err)
+		r.NotZero(f)
 	}
 
-	for _, tt := range table {
-		t.Run(tt.name, func(st *testing.T) {
-			r := require.New(st)
-			_, err := box.find(tt.name)
-			if tt.found {
-				r.True(box.Has(tt.name))
-				r.NoError(err)
-			} else {
-				r.False(box.Has(tt.name))
-				r.Error(err)
-			}
-		})
-	}
+	f, err := box.Open("idontexist.txt")
+	r.Error(err)
+	r.Zero(f)
 }
 
-func Test_Virtual_Directory_Not_Found(t *testing.T) {
+func Test_Box_List(t *testing.T) {
 	r := require.New(t)
-	_, err := virtualBox.find("d")
-	r.NoError(err)
-	_, err = virtualBox.find("does-not-exist")
+
+	box := New("Test_Box_List", filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString(filepath.Join("d", "d.txt"), "D"))
+
+	act := box.List()
+	exp := []string{"a.txt", filepath.Join("b", "b.txt"), filepath.Join("b", "b2.txt"), filepath.Join("c", "c.txt"), filepath.Join("d", "d.txt")}
+	r.Equal(exp, act)
+}
+
+func Test_Box_HasDir(t *testing.T) {
+	r := require.New(t)
+
+	box := New("Test_Box_HasDir", filepath.Join("_fixtures", "list_test"))
+	r.NoError(box.AddString("d/e/f.txt", "D"))
+
+	r.True(box.HasDir("d/e"))
+	r.True(box.HasDir("d"))
+	r.True(box.HasDir("c"))
+	r.False(box.HasDir("a"))
+}
+
+func Test_Box_Traversal_Standard(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Standard", "")
+	_, err := box.FindString("../fixtures/hello.txt")
 	r.Error(err)
 }
 
-func Test_AddString(t *testing.T) {
+func Test_Box_Traversal_Standard_Depth2(t *testing.T) {
 	r := require.New(t)
-
-	_, err := virtualBox.Find("string")
+	box := New("Test_Box_Traversal_Standard_Depth2", "")
+	_, err := box.FindString("../../packr/fixtures/hello.txt")
 	r.Error(err)
-
-	virtualBox.AddString("string", "hello")
-
-	s, err := virtualBox.FindString("string")
-	r.NoError(err)
-	r.Equal("hello", s)
 }
 
-func Test_AddBytes(t *testing.T) {
+func Test_Box_Traversal_Backslash(t *testing.T) {
 	r := require.New(t)
-
-	_, err := virtualBox.Find("bytes")
+	box := New("Test_Box_Traversal_Backslash", "")
+	_, err := box.FindString("..\\fixtures\\hello.txt")
 	r.Error(err)
+}
 
-	virtualBox.AddBytes("bytes", []byte("hello"))
-
-	s, err := virtualBox.Find("bytes")
-	r.NoError(err)
-	r.Equal([]byte("hello"), s)
+func Test_Box_Traversal_Backslash_Depth2(t *testing.T) {
+	r := require.New(t)
+	box := New("Test_Box_Traversal_Backslash_Depth2", "")
+	_, err := box.FindString("..\\..\\packr2\\fixtures\\hello.txt")
+	r.Error(err)
 }

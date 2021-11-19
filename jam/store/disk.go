@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"crypto/md5"
 	"fmt"
-	"go/build"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -17,7 +16,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gobuffalo/packr/v2/internal"
 	"github.com/karrick/godirwalk"
 
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
@@ -255,49 +253,34 @@ func (d *Disk) Close() error {
 	}
 
 	var ip string
-	if internal.Mods() {
-		// Starting in 1.12, we can rely on Go's method for
-		// resolving where go.mod resides. Prior versions will
-		// simply return an empty string.
-		cmd := exec.Command("go", "env", "GOMOD")
-		out, err := cmd.Output()
-		if err != nil {
-			return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
-		}
-		mp := strings.TrimSpace(string(out))
-		if mp == "" {
-			// We are on a prior version of Go; try and do
-			// the resolution ourselves.
-			mp = filepath.Join(filepath.Dir(d.DBPath), "go.mod")
-			if _, err := os.Stat(mp); err != nil {
-				mp = filepath.Join(d.DBPath, "go.mod")
-			}
-		}
-
-		moddata, err := ioutil.ReadFile(mp)
-		if err != nil {
-			return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
-		}
-		ip = modfile.ModulePath(moddata)
-		if ip == "" {
-			return fmt.Errorf("go.mod is malformed")
-		}
-		ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
-		ip = strings.Replace(ip, "\\", "/", -1)
-	} else {
-		ip = filepath.Dir(d.DBPath)
-		srcs := internal.GoPaths()
-		srcs = append(srcs, build.Default.SrcDirs()...)
-		for _, x := range srcs {
-			ip = strings.TrimPrefix(ip, "/private")
-			ip = strings.TrimPrefix(ip, x)
-		}
-		ip = strings.TrimPrefix(ip, string(filepath.Separator))
-		ip = strings.TrimPrefix(ip, "src")
-		ip = strings.TrimPrefix(ip, string(filepath.Separator))
-
-		ip = strings.Replace(ip, "\\", "/", -1)
+	// Starting in 1.12, we can rely on Go's method for
+	// resolving where go.mod resides. Prior versions will
+	// simply return an empty string.
+	cmd := exec.Command("go", "env", "GOMOD")
+	out, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
 	}
+	mp := strings.TrimSpace(string(out))
+	if mp == "" {
+		// We are on a prior version of Go; try and do
+		// the resolution ourselves.
+		mp = filepath.Join(filepath.Dir(d.DBPath), "go.mod")
+		if _, err := os.Stat(mp); err != nil {
+			mp = filepath.Join(d.DBPath, "go.mod")
+		}
+	}
+
+	moddata, err := ioutil.ReadFile(mp)
+	if err != nil {
+		return fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled")
+	}
+	ip = modfile.ModulePath(moddata)
+	if ip == "" {
+		return fmt.Errorf("go.mod is malformed")
+	}
+	ip = filepath.Join(ip, strings.TrimPrefix(filepath.Dir(d.DBPath), filepath.Dir(mp)))
+	ip = strings.Replace(ip, "\\", "/", -1)
 	ip = path.Join(ip, d.DBPackage)
 
 	for _, n := range opts.Boxes {

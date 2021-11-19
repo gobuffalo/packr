@@ -2,9 +2,9 @@ TAGS ?= "sqlite"
 GO_BIN ?= go
 
 install: deps
-	echo "installing packr v1"
-	packr
-	$(GO_BIN) install -v ./packr
+	echo "installing packr v2"
+	packr2
+	$(GO_BIN) install -v ./packr2
 
 tidy:
 ifeq ($(GO111MODULE),on)
@@ -14,46 +14,28 @@ else
 endif
 
 deps:
-	rm -rf packrd
-	rm -rf v2/packrd
-	$(GO_BIN) get github.com/gobuffalo/release
 	$(GO_BIN) get -tags ${TAGS} -t ./...
-	$(GO_BIN) install -v ./packr
-	packr clean
+	$(GO_BIN) install -v ./packr2
 	make tidy
 
 build: deps
-	packr
-	$(GO_BIN) build -v .
+	packr2
+	$(GO_BIN) build -v ./packr2
 	make tidy
 
 test:
-	packr clean
+	packr2
 	$(GO_BIN) test -tags ${TAGS} ./...
-	packr clean
-
-ci-deps:
-	rm -rf packrd
-	rm -rf v2/packrd
-	$(GO_BIN) get -tags ${TAGS} -t ./...
-	$(GO_BIN) install -v ./packr
-	packr clean
 	make tidy
-
-ci-test:
-	$(GO_BIN) test -v -tags ${TAGS} -race ./...
-	make tidy
-	cd ./v2 && make ci-test
 
 lint:
 	gometalinter --vendor ./... --deadline=1m --skip=internal
 
 update:
-	$(GO_BIN) get -u -tags ${TAGS}
+	$(GO_BIN) get -u -tags ${TAGS} ./...
 	make tidy
-	packr
-	make test
 	make install
+	make test
 	make tidy
 
 release-test:
