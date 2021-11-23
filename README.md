@@ -1,4 +1,6 @@
-**NOTICE: Please consider migrating your projects to github.com/markbates/pkger. It has an idiomatic API, minimal dependencies, a stronger test suite (tested directly against the std lib counterparts), transparent tooling, and more.**
+**NOTICE: Please consider migrating your projects to
+[embed](https://pkg.go.dev/embed) which is native file embedding feature of Go,
+or github.com/markbates/pkger. It has an idiomatic API, minimal dependencies, a stronger test suite (tested directly against the std lib counterparts), transparent tooling, and more.**
 
 https://blog.gobuffalo.io/introducing-pkger-static-file-embedding-in-go-1ce76dc79c65
 
@@ -9,20 +11,55 @@ https://blog.gobuffalo.io/introducing-pkger-static-file-embedding-in-go-1ce76dc7
 
 Packr is a simple solution for bundling static assets inside of Go binaries. Most importantly it does it in a way that is friendly to developers while they are developing.
 
+At this moment, supported go versions are:
+
+* 1.16.x
+* 1.17.x
+
+even though it may (or may not) working well with older versions.
+
 ## Intro Video
 
 To get an idea of the what and why of Packr, please enjoy this short video: [https://vimeo.com/219863271](https://vimeo.com/219863271).
 
 ## Library Installation
 
-```text
-$ go get -u github.com/gobuffalo/packr/v2/...
+### Go 1.16 and above
+
+```console
+$ go install github.com/gobuffalo/packr/v2@v2.8.3
+```
+
+or
+
+```console
+$ go install github.com/gobuffalo/packr/v2@latest
+```
+
+### Go 1.15 and below
+
+```console
+$ go get -u github.com/gobuffalo/packr/...
 ```
 
 ## Binary Installation
 
-```text
-$ go get -u github.com/gobuffalo/packr/v2/packr2
+### Go 1.16 and above
+
+```console
+$ go install github.com/gobuffalo/packr/v2/packr2@v2.8.3
+```
+
+or
+
+```console
+$ go install github.com/gobuffalo/packr/v2/packr2@latest
+```
+
+### Go 1.15 and below
+
+```console
+$ go get -u github.com/gobuffalo/packr/packr2
 ```
 
 ## New File Format FAQs
