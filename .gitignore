@@ -34,4 +34,4 @@ debug.test
 .grifter/
 *-packr.go
 .idea/
-
+packr2_*.snap

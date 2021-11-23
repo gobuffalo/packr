@@ -1,0 +1,23 @@
+name: packr2
+base: core18
+version: '2.8.0'
+summary: The simple and easy way to embed static files into Go binaries.
+description: |
+  The simple and easy way to embed static files into Go binaries.
+
+grade: stable # devel/stable
+confinement: strict # devmode/strict
+
+parts:
+  packr2:
+    plugin: go
+    source-type: git
+    source-tag: v2.8.0
+    source: .
+    source-subdir: ./v2
+    go-importpath: github.com/gobuffalo/packr
+    build-packages:
+      - gcc
+apps:
+  packr2:
+    command: bin/packr2
